@@ -3,8 +3,8 @@ import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    kotlin("jvm") version "1.6.10"
-    id("org.jetbrains.compose") version "1.1.1"
+    kotlin("jvm") version "1.7.20"
+    id("org.jetbrains.compose") version "1.2.0"
 }
 
 group = "moe.styx"
@@ -18,6 +18,11 @@ repositories {
 
 dependencies {
     implementation(compose.desktop.currentOs)
+    implementation("com.alialbaali.kamel:kamel-image:0.4.1")
+    implementation("io.ktor:ktor-client-core:2.1.3")
+    implementation("io.ktor:ktor-client-okhttp:2.1.3")
+    implementation("com.arkivanov.decompose:decompose:1.0.0-beta-01")
+    implementation("com.arkivanov.decompose:extensions-compose-jetbrains:1.0.0-beta-01")
 }
 
 tasks.withType<KotlinCompile> {
@@ -28,7 +33,7 @@ compose.desktop {
     application {
         mainClass = "MainKt"
         nativeDistributions {
-            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
+            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb, TargetFormat.Rpm)
             packageName = "Styx-2"
             packageVersion = "1.0.0"
         }
