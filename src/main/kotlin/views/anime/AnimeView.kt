@@ -7,6 +7,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
@@ -41,12 +42,11 @@ data class AnimeView(val ID: String) : Screen {
                 Column(modifier = Modifier.padding(5.dp).fillMaxHeight().fillMaxWidth(0.35F)) {
                     //Card(modifier= Modifier.padding(3.dp).aspectRatio(0.71F).fillMaxHeight(0.45F), elevation = 5.dp){
                     KamelImage(
-                        lazyPainterResource(anime.coverURL),
+                        lazyPainterResource(anime.coverURL, filterQuality = FilterQuality.High),
                         contentDescription = "Anime",
                         modifier = Modifier.padding(2.dp).aspectRatio(0.71F).fillMaxHeight(0.45F),
-                        contentScale = ContentScale.FillBounds
+                        contentScale = ContentScale.FillBounds,
                     )
-                    //}
                     Column {
                         Text("English:\n${anime.english}")
                         Text("Romaji:\n${anime.romaji}")

@@ -10,6 +10,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
@@ -45,7 +46,7 @@ class AnimeListView : Screen {
                             nav.push(AnimeView(anime[i].name))
                         }) {
                             KamelImage(
-                                lazyPainterResource(anime[i].coverURL),
+                                lazyPainterResource(anime[i].coverURL, filterQuality = FilterQuality.Low),
                                 contentDescription = "Anime",
                                 modifier = Modifier.padding(2.dp),
                                 contentScale = ContentScale.FillBounds
