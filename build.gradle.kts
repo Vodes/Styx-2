@@ -1,4 +1,3 @@
-import org.jetbrains.compose.compose
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
@@ -23,6 +22,12 @@ dependencies {
     implementation("io.ktor:ktor-client-okhttp:2.1.3")
     implementation("com.arkivanov.decompose:decompose:1.0.0-beta-01")
     implementation("com.arkivanov.decompose:extensions-compose-jetbrains:1.0.0-beta-01")
+    implementation("ca.gosyer:voyager-navigator:1.0.0-rc07")
+    implementation("ca.gosyer:voyager-tab-navigator:1.0.0-rc07")
+    implementation("ca.gosyer:voyager-bottom-sheet-navigator:1.0.0-rc07")
+    implementation("ca.gosyer:voyager-transitions:1.0.0-rc07")
+    //implementation("com.russhwolf:multiplatform-settings:1.0.0-RC")
+    implementation("com.russhwolf:multiplatform-settings-no-arg:1.0.0-RC")
 }
 
 tasks.withType<KotlinCompile> {
