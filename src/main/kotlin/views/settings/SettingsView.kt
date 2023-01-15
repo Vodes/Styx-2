@@ -1,5 +1,6 @@
 package views.settings
 
+import Endpoints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.height
@@ -15,7 +16,10 @@ import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import getList
 import isUiModeDark
+import logic.data.Media
+import logic.login.login
 import settings
 
 class SettingsView : Screen {
@@ -25,6 +29,9 @@ class SettingsView : Screen {
         val scaffoldState = rememberScaffoldState()
         val nav = LocalNavigator.currentOrThrow
         val darkMode = remember { isUiModeDark }
+
+        var num = 0
+
         Scaffold(scaffoldState = scaffoldState, topBar = {
             TopAppBar(
                 title = { Text("Settings") },
@@ -44,6 +51,20 @@ class SettingsView : Screen {
                         },
                         modifier = Modifier.align(Alignment.CenterVertically)
                     )
+                }
+                Text("Logged in as: ${login!!.name}")
+
+
+                Button(onClick = {
+                    val media = getList<Media>(Endpoints.MEDIA)
+                    for (m in media) {
+                        num++
+                        println(m.name)
+                        if (num > 5)
+                            break
+                    }
+                }) {
+                    Text("Test")
                 }
             }
         }

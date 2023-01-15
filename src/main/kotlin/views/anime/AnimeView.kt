@@ -10,12 +10,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
+import anime
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import io.kamel.image.KamelImage
 import io.kamel.image.lazyPainterResource
-import logic.data.get_anime
 import java.net.URLDecoder
 
 data class AnimeView(val ID: String) : Screen {
@@ -24,7 +24,7 @@ data class AnimeView(val ID: String) : Screen {
     override fun Content() {
         val scaffoldState = rememberScaffoldState()
         val nav = LocalNavigator.currentOrThrow
-        val anime = get_anime().find { a -> a.name.contentEquals(ID) }
+        val anime = anime.find { a -> a.name.contentEquals(ID) }
         val episodes = (1..12).map { it.toString() }
         Scaffold(scaffoldState = scaffoldState, topBar = {
             TopAppBar(

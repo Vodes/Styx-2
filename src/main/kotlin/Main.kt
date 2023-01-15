@@ -14,12 +14,14 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
 import com.russhwolf.settings.Settings
 import com.russhwolf.settings.get
+import logic.data.get_anime
 import logic.login.isLoggedIn
 import views.anime.AnimeListView
 import views.login.LoginView
 
 val settings: Settings = Settings()
 var isUiModeDark: MutableState<Boolean> = mutableStateOf(true)
+val anime = get_anime().reversed();
 
 fun main() = application {
     isUiModeDark.value = settings["darkmode", true]
@@ -29,9 +31,8 @@ fun main() = application {
     Window(
         onCloseRequest = ::exitApplication,
         title = "Styx 2",
-        state = WindowState(width = 740.dp, height = 600.dp),
+        state = WindowState(width = 750.dp, height = 750.dp),
         onKeyEvent = {
-            println("keke")
             if (nav != null && nav.canPop)
                 nav.pop()
 
@@ -41,10 +42,12 @@ fun main() = application {
     {
         Surface(modifier = Modifier.fillMaxSize()) {
             MaterialTheme(
-                colors = if (darkMode.value) styxDarkColors() else styxLightColors(),
+                colors = (if (darkMode.value) styxDarkColors() else styxLightColors()).switch(),
                 typography = styxTypography
             ) {
-                Navigator(if (isLoggedIn()) AnimeListView() else LoginView())
+                Navigator(if (isLoggedIn()) AnimeListView() else LoginView()) { navigator ->
+                    NavTransition(navigator)
+                }
             }
         }
     }

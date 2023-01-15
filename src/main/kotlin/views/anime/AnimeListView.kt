@@ -13,19 +13,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
+import anime
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import io.kamel.image.KamelImage
 import io.kamel.image.lazyPainterResource
-import logic.data.get_anime
 import views.settings.SettingsView
 
 @OptIn(ExperimentalMaterialApi::class)
 class AnimeListView : Screen {
     @Composable
     override fun Content() {
-        val anime = get_anime().reversed();
         val scaffoldState = rememberScaffoldState()
         val nav = LocalNavigator.currentOrThrow
         Scaffold(scaffoldState = scaffoldState, topBar = {

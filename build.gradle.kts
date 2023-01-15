@@ -3,7 +3,8 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     kotlin("jvm") version "1.7.20"
-    id("org.jetbrains.compose") version "1.2.0"
+    id("org.jetbrains.compose") version "1.2.2"
+    id("org.jetbrains.kotlin.plugin.serialization") version "1.7.22"
 }
 
 group = "moe.styx"
@@ -18,8 +19,10 @@ repositories {
 dependencies {
     implementation(compose.desktop.currentOs)
     implementation("com.alialbaali.kamel:kamel-image:0.4.1")
-    implementation("io.ktor:ktor-client-core:2.1.3")
-    implementation("io.ktor:ktor-client-okhttp:2.1.3")
+    implementation("io.ktor:ktor-client-core:2.2.1")
+    implementation("io.ktor:ktor-client-okhttp:2.2.1")
+    implementation("io.ktor:ktor-client-content-negotiation:2.2.1")
+    implementation("io.ktor:ktor-serialization-kotlinx-json-jvm:2.2.1")
     implementation("com.arkivanov.decompose:decompose:1.0.0-beta-01")
     implementation("com.arkivanov.decompose:extensions-compose-jetbrains:1.0.0-beta-01")
     implementation("ca.gosyer:voyager-navigator:1.0.0-rc07")

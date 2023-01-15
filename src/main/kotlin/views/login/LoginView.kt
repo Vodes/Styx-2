@@ -16,31 +16,38 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import kotlinx.coroutines.delay
+import logic.data.CreationResponse
+import logic.login.checkLogin
+import logic.login.generateCode
+import logic.login.isLoggedIn
 import views.anime.AnimeListView
-import kotlin.random.Random
 
-class LoginView : Screen {
+class LoginView() : Screen {
 
+    private val CreationResp: MutableState<CreationResponse> = mutableStateOf(generateCode())
     private val Countdown: MutableState<Int> = mutableStateOf(30);
-    private val Code: MutableState<Int> = mutableStateOf(Random.nextInt(100000, 999999));
 
     @Composable
     override fun Content() {
         val nav = LocalNavigator.currentOrThrow
-        val count = remember { Countdown }
-        val code = remember { Code }
 
         LaunchedEffect(Unit) {
-            while (true) {
+            while (!isLoggedIn()) {
                 Countdown.value--
-                println(Countdown.value)
+                val log = checkLogin(CreationResp.value.GUID, true)
+                if (log != null)
+                    nav.push(AnimeListView())
+
                 delay(1000)
                 if (Countdown.value < 2) {
                     Countdown.value = 30
-                    Code.value = Random.nextInt(100000, 999999)
+                    CreationResp.value = generateCode()
                 }
             }
         }
+
+        val count = remember { Countdown }
+        val resp = remember { CreationResp }
 
         val progressAnimation by animateFloatAsState(
             count.value / 30F,
@@ -57,7 +64,7 @@ class LoginView : Screen {
                 Text("Code", Modifier.align(Alignment.CenterHorizontally).padding(0.dp, 10.dp), fontSize = 18.sp)
 
                 Text(
-                    code.value.toString(),
+                    resp.value.code.toString(),
                     Modifier.align(Alignment.CenterHorizontally).padding(0.dp, 10.dp),
                     fontSize = 30.sp, fontWeight = FontWeight.Bold
                 )
