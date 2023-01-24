@@ -1,6 +1,5 @@
-package views.settings
+package moe.styx.views.settings
 
-import Endpoints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.height
@@ -16,11 +15,9 @@ import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import getList
-import isUiModeDark
-import logic.data.Media
-import logic.login.login
-import settings
+import moe.styx.isUiModeDark
+import moe.styx.logic.login.login
+import moe.styx.settings
 
 class SettingsView : Screen {
 
@@ -53,19 +50,6 @@ class SettingsView : Screen {
                     )
                 }
                 Text("Logged in as: ${login!!.name}")
-
-
-                Button(onClick = {
-                    val media = getList<Media>(Endpoints.MEDIA)
-                    for (m in media) {
-                        num++
-                        println(m.name)
-                        if (num > 5)
-                            break
-                    }
-                }) {
-                    Text("Test")
-                }
             }
         }
     }

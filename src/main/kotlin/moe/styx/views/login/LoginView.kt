@@ -1,4 +1,4 @@
-package views.login
+package moe.styx.views.login
 
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.layout.*
@@ -16,11 +16,11 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import kotlinx.coroutines.delay
-import logic.data.CreationResponse
-import logic.login.checkLogin
-import logic.login.generateCode
-import logic.login.isLoggedIn
-import views.anime.AnimeListView
+import moe.styx.logic.data.CreationResponse
+import moe.styx.logic.login.checkLogin
+import moe.styx.logic.login.generateCode
+import moe.styx.logic.login.isLoggedIn
+import moe.styx.views.anime.AnimeListView
 
 class LoginView() : Screen {
 

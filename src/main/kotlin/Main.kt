@@ -1,4 +1,5 @@
-// Copyright 2000-2021 JetBrains s.r.o. and contributors. Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE file.
+package moe.styx
+
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
@@ -14,19 +15,20 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
 import com.russhwolf.settings.Settings
 import com.russhwolf.settings.get
-import logic.data.get_anime
-import logic.login.isLoggedIn
-import views.anime.AnimeListView
-import views.login.LoginView
+import moe.styx.logic.data.DataManager
+import moe.styx.logic.login.isLoggedIn
+import moe.styx.views.anime.AnimeListView
+import moe.styx.views.login.LoginView
 
 val settings: Settings = Settings()
 var isUiModeDark: MutableState<Boolean> = mutableStateOf(true)
-val anime = get_anime().reversed();
-
+val dataManager = DataManager()
 fun main() = application {
     isUiModeDark.value = settings["darkmode", true]
     val darkMode = remember { isUiModeDark }
     val nav = LocalNavigator.current
+
+    dataManager.load()
 
     Window(
         onCloseRequest = ::exitApplication,

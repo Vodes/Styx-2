@@ -1,13 +1,15 @@
-package logic.data
+package moe.styx.logic.data
 
 import kotlinx.serialization.Serializable
+import moe.styx.dataManager
+import moe.styx.toBoolean
 
 @Serializable
 data class Media(
     val GUID: String, val name: String, val nameJP: String?, val nameEN: String?, val synopsisEN: String?,
     val synopsisDE: String?, val thumbID: String?, val bannerID: String? = null, val categoryID: String? = null,
     val prequel: String? = null, val sequel: String? = null, val genres: String? = null, val tags: String? = null,
-    val metadataMap: String? = null, val isSeries: Int = 1
+    val metadataMap: String? = null, val isSeries: Int = 1, val added: Long = 0
 )
 
 @Serializable
@@ -16,7 +18,7 @@ data class Category(val GUID: String, val sort: Int, val isSeries: Int, val isVi
 @Serializable
 data class Image(
     val GUID: String, val hasWEBP: Int? = 0, val hasPNG: Int? = 0,
-    val hasJPG: Int? = 0, val externalURL: String?, val type: Int = 0
+    val hasJPG: Int? = 0, val externalURL: String? = null, val type: Int = 0
 )
 
 @Serializable
@@ -73,3 +75,41 @@ data class Device(
 
 @Serializable
 data class ApiResponse(var code: Int, var message: String?, var silent: Boolean = false)
+
+@Serializable
+data class Changes(val media: Long, val entry: Long)
+
+fun Image.getURL(): String {
+    return if (hasWEBP.toBoolean()) {
+        "https://i.styx.moe/$GUID.webp"
+    } else if (hasJPG.toBoolean()) {
+        "https://i.styx.moe/$GUID.jpg"
+    } else if (hasPNG.toBoolean()) {
+        "https://i.styx.moe/$GUID.png"
+    } else {
+        if (externalURL.isNullOrBlank()) "" else externalURL
+    }
+}
+
+fun String?.getImageFromID(): Image? {
+    if (this == null)
+        return null
+    return dataManager.images.value.find { it.GUID.equals(this, true) }
+}
+
+fun Media.find(search: String): Boolean {
+    if (name.isNotEmpty()) {
+        if (name.startsWith(search, true) || name.equals(search, true))
+            return true
+    }
+    if (!nameEN.isNullOrEmpty()) {
+        if (nameEN.startsWith(search, true) || nameEN.equals(search, true))
+            return true
+    }
+
+    if (!nameJP.isNullOrEmpty()) {
+        if (nameJP.startsWith(search, true) || nameJP.equals(search, true))
+            return true
+    }
+    return false
+}

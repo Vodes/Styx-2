@@ -1,19 +1,19 @@
-package logic.login
+package moe.styx.logic.login
 
-import Endpoints
 import com.russhwolf.settings.get
-import httpClient
 import io.ktor.client.request.forms.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
-import json
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
-import logic.data.CreationResponse
-import logic.data.DeviceInfo
-import logic.data.LoginResponse
-import settings
+import moe.styx.Endpoints
+import moe.styx.httpClient
+import moe.styx.json
+import moe.styx.logic.data.CreationResponse
+import moe.styx.logic.data.DeviceInfo
+import moe.styx.logic.data.LoginResponse
+import moe.styx.settings
 import kotlin.system.exitProcess
 
 fun generateCode(): CreationResponse = runBlocking {

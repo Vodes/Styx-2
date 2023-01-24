@@ -31,15 +31,16 @@ dependencies {
     implementation("ca.gosyer:voyager-transitions:1.0.0-rc07")
     //implementation("com.russhwolf:multiplatform-settings:1.0.0-RC")
     implementation("com.russhwolf:multiplatform-settings-no-arg:1.0.0-RC")
+    //implementation("dev.cbyrne:kdiscordipc:1.0.0")
 }
 
 tasks.withType<KotlinCompile> {
-    kotlinOptions.jvmTarget = "11"
+    kotlinOptions.jvmTarget = "17"
 }
 
 compose.desktop {
     application {
-        mainClass = "MainKt"
+        mainClass = "moe.styx.MainKt"
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb, TargetFormat.Rpm)
             packageName = "Styx-2"

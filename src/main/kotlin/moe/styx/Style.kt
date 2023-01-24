@@ -1,3 +1,5 @@
+package moe.styx
+
 import androidx.compose.animation.*
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring

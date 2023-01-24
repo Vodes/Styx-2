@@ -1,4 +1,4 @@
-package logic.data
+package moe.styx.logic.data
 
 import java.net.URI
 import java.net.URLEncoder
