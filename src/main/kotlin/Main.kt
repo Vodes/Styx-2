@@ -3,6 +3,7 @@ package moe.styx
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -17,7 +18,8 @@ import com.russhwolf.settings.Settings
 import com.russhwolf.settings.get
 import moe.styx.logic.data.DataManager
 import moe.styx.logic.login.isLoggedIn
-import moe.styx.views.anime.AnimeListView
+import moe.styx.moe.styx.navigation.LocalGlobalNavigator
+import moe.styx.moe.styx.views.other.LoadingView
 import moe.styx.views.login.LoginView
 
 val settings: Settings = Settings()
@@ -27,8 +29,6 @@ fun main() = application {
     isUiModeDark.value = settings["darkmode", true]
     val darkMode = remember { isUiModeDark }
     val nav = LocalNavigator.current
-
-    dataManager.load()
 
     Window(
         onCloseRequest = ::exitApplication,
@@ -47,8 +47,10 @@ fun main() = application {
                 colors = (if (darkMode.value) styxDarkColors() else styxLightColors()).switch(),
                 typography = styxTypography
             ) {
-                Navigator(if (isLoggedIn()) AnimeListView() else LoginView()) { navigator ->
-                    NavTransition(navigator)
+                Navigator(if (isLoggedIn()) LoadingView() else LoginView()) { navigator ->
+                    CompositionLocalProvider(LocalGlobalNavigator provides navigator) {
+                        NavTransition(navigator)
+                    }
                 }
             }
         }

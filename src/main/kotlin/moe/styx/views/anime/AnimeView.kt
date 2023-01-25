@@ -3,21 +3,19 @@ package moe.styx.views.anime
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
-import cafe.adriel.voyager.navigator.LocalNavigator
-import cafe.adriel.voyager.navigator.currentOrThrow
 import io.kamel.image.KamelImage
 import io.kamel.image.lazyPainterResource
 import moe.styx.dataManager
 import moe.styx.logic.data.getImageFromID
 import moe.styx.logic.data.getURL
+import moe.styx.moe.styx.components.PopButton
+import moe.styx.moe.styx.navigation.LocalGlobalNavigator
 import java.net.URLDecoder
 
 data class AnimeView(val ID: String) : Screen {
@@ -25,7 +23,7 @@ data class AnimeView(val ID: String) : Screen {
     @Composable
     override fun Content() {
         val scaffoldState = rememberScaffoldState()
-        val nav = LocalNavigator.currentOrThrow
+        val nav = LocalGlobalNavigator.current
         val anime = dataManager.media.value.find { a -> a.name.contentEquals(ID) }
 
         if (anime == null) {
@@ -34,14 +32,12 @@ data class AnimeView(val ID: String) : Screen {
         }
         val episodes =
             dataManager.entries.value.filter { it.mediaID == anime.GUID }.sortedByDescending { it.entryNumber }
-        
+
         Scaffold(scaffoldState = scaffoldState, topBar = {
             TopAppBar(
                 title = { Text(anime.name) },
                 backgroundColor = MaterialTheme.colors.primaryVariant,
-                actions = {
-                    IconButton(onClick = { nav.pop(); }, content = { Icon(Icons.Filled.Close, null) })
-                }
+                actions = { PopButton(nav) }
             )
         }) {
             Row(Modifier.fillMaxSize()) {

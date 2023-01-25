@@ -6,6 +6,8 @@ import io.ktor.client.request.*
 import io.ktor.client.request.forms.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
@@ -49,8 +51,11 @@ for example gets you a list of all Media by doing
 val media = getList<Media>(Endpoints.MEDIA)
  */
 
-inline fun <reified T> getList(endpoint: Endpoints): List<T> = runBlocking {
+suspend inline fun <reified T> getList(endpoint: Endpoints): List<T> {
     var list = listOf<T>()
+
+    if (!hasInternet())
+        return list
 
     val response: HttpResponse = httpClient.submitForm(
         endpoint.url(),
@@ -63,7 +68,7 @@ inline fun <reified T> getList(endpoint: Endpoints): List<T> = runBlocking {
         list = json.decodeFromString(response.bodyAsText())
     }
 
-    return@runBlocking list
+    return list
 }
 
 inline fun <reified T> getObject(endpoint: Endpoints): T? = runBlocking {
@@ -74,4 +79,12 @@ inline fun <reified T> getObject(endpoint: Endpoints): T? = runBlocking {
     }
 
     return@runBlocking null
+}
+
+fun hasInternet(): Boolean {
+    return true
+}
+
+suspend fun awaitAll(vararg jobs: Job) {
+    jobs.asList().joinAll()
 }

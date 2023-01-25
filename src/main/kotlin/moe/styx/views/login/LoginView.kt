@@ -13,14 +13,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
-import cafe.adriel.voyager.navigator.LocalNavigator
-import cafe.adriel.voyager.navigator.currentOrThrow
 import kotlinx.coroutines.delay
 import moe.styx.logic.data.CreationResponse
 import moe.styx.logic.login.checkLogin
 import moe.styx.logic.login.generateCode
 import moe.styx.logic.login.isLoggedIn
-import moe.styx.views.anime.AnimeListView
+import moe.styx.moe.styx.navigation.LocalGlobalNavigator
+import moe.styx.moe.styx.views.other.LoadingView
 
 class LoginView() : Screen {
 
@@ -29,14 +28,16 @@ class LoginView() : Screen {
 
     @Composable
     override fun Content() {
-        val nav = LocalNavigator.currentOrThrow
+        val nav = LocalGlobalNavigator.current
 
         LaunchedEffect(Unit) {
             while (!isLoggedIn()) {
                 Countdown.value--
                 val log = checkLogin(CreationResp.value.GUID, true)
-                if (log != null)
-                    nav.push(AnimeListView())
+                if (log != null) {
+                    nav.push(LoadingView())
+                    break
+                }
 
                 delay(1000)
                 if (Countdown.value < 2) {
@@ -76,7 +77,7 @@ class LoginView() : Screen {
             }
 
             Button(onClick = {
-                nav.push(AnimeListView())
+                println("Penis")
             }, Modifier.height(38.dp).align(Alignment.BottomCenter)) {
                 Text("Open styx.moe")
             }

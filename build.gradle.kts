@@ -31,6 +31,11 @@ dependencies {
     implementation("ca.gosyer:voyager-transitions:1.0.0-rc07")
     //implementation("com.russhwolf:multiplatform-settings:1.0.0-RC")
     implementation("com.russhwolf:multiplatform-settings-no-arg:1.0.0-RC")
+    // https://mvnrepository.com/artifact/org.jetbrains.compose.material/material-icons-extended-desktop
+    implementation("org.jetbrains.compose.material:material-icons-extended-desktop:1.2.2")
+    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.4.0")
+
+
     //implementation("dev.cbyrne:kdiscordipc:1.0.0")
 }
 
