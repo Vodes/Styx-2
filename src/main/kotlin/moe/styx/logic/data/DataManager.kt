@@ -8,7 +8,6 @@ import kotlinx.datetime.Clock
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import moe.styx.*
-import moe.styx.logic.login.isLoggedIn
 import moe.styx.moe.styx.logic.data.updateImageCache
 import java.io.File
 
@@ -18,16 +17,16 @@ class DataManager() {
     val entries = mutableStateOf(listOf<MediaEntry>())
     val categories = mutableStateOf(listOf<Category>())
     val images = mutableStateOf(listOf<Image>())
+    val favourites = mutableStateOf(listOf<Favourite>())
 
     val isLoaded = mutableStateOf(false)
 
     suspend fun load(onProgressUpdate: (String) -> Unit) = coroutineScope {
-        if (!isLoggedIn())
-            return@coroutineScope
-
         isLoaded.value = false
 
-        var lastChanges = if (hasInternet()) getObject<Changes>(Endpoints.CHANGES) else Changes(0, 0)
+        val hasConnection = hasInternet()
+
+        var lastChanges = if (hasConnection) getObject<Changes>(Endpoints.CHANGES) else Changes(0, 0)
         if (lastChanges != null) {
             println(lastChanges.media)
             println(lastChanges.entry)
@@ -49,7 +48,7 @@ class DataManager() {
             updateLocalChange(true, true)
             delay(300)
         } else {
-            if (shouldUpdateMedia) {
+            if (shouldUpdateMedia && hasConnection) {
                 onProgressUpdate("Updating media...")
                 media.value = saveList(getList(Endpoints.MEDIA), "media.json")
                 updateLocalChange(true, false)
@@ -58,7 +57,7 @@ class DataManager() {
                 media.value = readList("media.json")
             }
 
-            if (shouldUpdateEntries) {
+            if (shouldUpdateEntries && hasConnection) {
                 onProgressUpdate("Updating entries...")
                 entries.value = saveList(getList(Endpoints.MEDIA_ENTRIES), "entries.json")
                 updateLocalChange(false, true)
@@ -68,10 +67,11 @@ class DataManager() {
             }
         }
 
-        if (shouldUpdateMedia || shouldUpdateEntries) {
+        if ((shouldUpdateMedia || shouldUpdateEntries) && hasConnection) {
             onProgressUpdate("Updating categories & images...")
             categories.value = saveList(getList(Endpoints.CATEGORIES), "categories.json")
             images.value = saveList(getList(Endpoints.IMAGES), "images.json")
+            favourites.value = saveList(getList(Endpoints.FAVOURITES), "favourites.json")
             delay(300)
 
             onProgressUpdate("Updating image cache...")
@@ -79,6 +79,7 @@ class DataManager() {
         } else {
             categories.value = readList("categories.json")
             images.value = readList("images.json")
+            favourites.value = readList("favourites.json")
         }
         isLoaded.value = true
     }

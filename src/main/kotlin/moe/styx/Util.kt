@@ -38,6 +38,11 @@ enum class Endpoints(private val path: String) {
     IMAGES("/media/images"),
     CATEGORIES("/media/categories"),
 
+    // TODO: Favourites
+    FAVOURITES("/favourites/list"),
+    FAVOURITES_ADD("/favourites/add/"),
+    FAVOURITES_DELETE("/favourites/delete/"),
+
     CHANGES("/changes");
 
     fun url(): String {

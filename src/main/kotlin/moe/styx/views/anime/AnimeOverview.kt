@@ -15,8 +15,8 @@ import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabNavigator
 import moe.styx.moe.styx.navigation.LocalGlobalNavigator
 import moe.styx.moe.styx.navigation.defaultTab
+import moe.styx.moe.styx.navigation.favsTab
 import moe.styx.moe.styx.navigation.movieTab
-import moe.styx.moe.styx.views.anime.tabs.FavouritesListView
 import moe.styx.views.settings.SettingsView
 
 class AnimeOverview() : Screen {
@@ -44,7 +44,7 @@ class AnimeOverview() : Screen {
                         BottomNavigation {
                             TabNavigationItem(defaultTab)
                             TabNavigationItem(movieTab)
-                            TabNavigationItem(FavouritesListView())
+                            TabNavigationItem(favsTab)
                         }
                     }
                 ) {

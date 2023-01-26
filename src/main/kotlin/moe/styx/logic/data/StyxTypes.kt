@@ -79,6 +79,10 @@ data class ApiResponse(var code: Int, var message: String?, var silent: Boolean 
 @Serializable
 data class Changes(val media: Long, val entry: Long)
 
+@Serializable
+data class Favourite(val mediaID: String, var userID: String, var added: Long)
+
+
 fun Image.getURL(): String {
     return if (hasWEBP.toBoolean()) {
         "https://i.styx.moe/$GUID.webp"
@@ -112,4 +116,16 @@ fun Media.find(search: String): Boolean {
             return true
     }
     return false
+}
+
+fun Media.isFav(): Boolean {
+    val fav = dataManager.favourites.value.find { it.mediaID.equals(GUID, true) }
+    if (fav != null)
+        return true
+    return false
+}
+
+fun Media.favAdded(): Long {
+    val fav = dataManager.favourites.value.find { it.mediaID.equals(GUID, true) }
+    return fav?.added ?: 0L
 }

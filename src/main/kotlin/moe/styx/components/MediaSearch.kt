@@ -7,7 +7,7 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
-import androidx.compose.material.icons.filled.List
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -17,14 +17,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.russhwolf.settings.get
 import moe.styx.logic.data.Media
+import moe.styx.logic.data.favAdded
 import moe.styx.logic.data.find
 import moe.styx.settings
 
-class MediaSearch(listIn: List<Media>, movies: Boolean = false) {
+class MediaSearch(listIn: List<Media>, favs: Boolean = false) {
 
     private val list = listIn
     val searchState = mutableStateOf("")
     val sortTypes = listOf("Added", "Name", "English Name", "Romaji Name")
+    val favs = favs
     private var lastSearch = ""
 
     fun getDefault(): List<Media> {
@@ -36,12 +38,19 @@ class MediaSearch(listIn: List<Media>, movies: Boolean = false) {
         if (search.isNotBlank())
             processedList = processedList.filter { it.find(search) }
 
-        processedList = when (sort.lowercase()) {
-            "name" -> if (descending) processedList.sortedByDescending { it.name.lowercase() } else processedList.sortedBy { it.name.lowercase() }
-            "added" -> if (descending) processedList.sortedByDescending { it.added } else processedList.sortedBy { it.added }
-            "english name" -> if (descending) processedList.sortedByDescending { it.nameEN?.lowercase() } else processedList.sortedBy { it.nameEN?.lowercase() }
-            "romaji name" -> if (descending) processedList.sortedByDescending { it.nameJP?.lowercase() } else processedList.sortedBy { it.nameJP?.lowercase() }
-            else -> processedList
+        if (sort.lowercase() == "added" && favs) {
+            processedList = if (descending)
+                processedList.sortedByDescending { it.favAdded() }
+            else
+                processedList.sortedBy { it.favAdded() }
+        } else {
+            processedList = when (sort.lowercase()) {
+                "name" -> if (descending) processedList.sortedByDescending { it.name.lowercase() } else processedList.sortedBy { it.name.lowercase() }
+                "added" -> if (descending) processedList.sortedByDescending { it.added } else processedList.sortedBy { it.added }
+                "english name" -> if (descending) processedList.sortedByDescending { it.nameEN?.lowercase() } else processedList.sortedBy { it.nameEN?.lowercase() }
+                "romaji name" -> if (descending) processedList.sortedByDescending { it.nameJP?.lowercase() } else processedList.sortedBy { it.nameJP?.lowercase() }
+                else -> processedList
+            }
         }
 
         lastSearch = search
@@ -49,7 +58,7 @@ class MediaSearch(listIn: List<Media>, movies: Boolean = false) {
     }
 
     @Composable
-    fun component(result: (List<Media>) -> Unit, movies: Boolean = false) {
+    fun component(result: (List<Media>) -> Unit) {
         val sort = remember { mutableStateOf(settings["sort", "added"]) }
         val showSort = remember { mutableStateOf(false) }
         val search = remember { searchState }
@@ -67,7 +76,7 @@ class MediaSearch(listIn: List<Media>, movies: Boolean = false) {
                 Row {
                     IconButton(
                         onClick = { showSort.value = true },
-                        content = { Icon(Icons.Filled.List, null) })
+                        content = { Icon(Icons.Filled.MoreVert, null) })
                 }
                 DropdownMenu(
                     expanded = showSort.value,

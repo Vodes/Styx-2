@@ -7,13 +7,10 @@ import io.ktor.http.*
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
-import moe.styx.Endpoints
-import moe.styx.httpClient
-import moe.styx.json
+import moe.styx.*
 import moe.styx.logic.data.CreationResponse
 import moe.styx.logic.data.DeviceInfo
 import moe.styx.logic.data.LoginResponse
-import moe.styx.settings
 import kotlin.system.exitProcess
 
 fun generateCode(): CreationResponse = runBlocking {
@@ -53,7 +50,7 @@ fun isLoggedIn(): Boolean {
     if (token.isBlank())
         return false
 
-    if (login != null)
+    if (login != null || !hasInternet())
         return true
 
     val loginTry = checkLogin(token)
