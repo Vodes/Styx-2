@@ -19,6 +19,7 @@ import moe.styx.logic.data.Category
 import moe.styx.logic.data.Media
 import moe.styx.logic.data.favAdded
 import moe.styx.logic.data.find
+import moe.styx.moe.styx.logic.data.getSelectedCategories
 import moe.styx.settings
 
 class MediaSearch(listIn: List<Media>, favs: Boolean = false) {
@@ -29,12 +30,24 @@ class MediaSearch(listIn: List<Media>, favs: Boolean = false) {
     val favs = favs
     private var lastSearch = ""
 
-    fun getDefault(): List<Media> {
-        return updateList(settings["sort", "added"], lastSearch, settings["sort-descending", true], listOf())
+    fun getDefault(shows: Boolean = true): List<Media> {
+        return updateList(
+            settings["sort", "added"],
+            lastSearch,
+            settings["sort-descending", true],
+            getSelectedCategories(shows)
+        )
     }
 
     fun updateList(sort: String, search: String, descending: Boolean, selectedCategories: List<Category>): List<Media> {
         var processedList = list
+
+        if (selectedCategories.isNotEmpty() && !favs) {
+            processedList = processedList.filter { media ->
+                selectedCategories.find { it.GUID.equals(media.categoryID, true) } != null
+            }
+        }
+        
         if (search.isNotBlank())
             processedList = processedList.filter { it.find(search) }
 
@@ -53,24 +66,18 @@ class MediaSearch(listIn: List<Media>, favs: Boolean = false) {
             }
         }
 
-        if (selectedCategories.isNotEmpty()) {
-            processedList = processedList.filter { media ->
-                selectedCategories.find { it.GUID.equals(media.categoryID, true) } != null
-            }
-        }
-
         lastSearch = search
         return processedList
     }
 
     @Composable
-    fun component(result: (List<Media>) -> Unit) {
+    fun component(result: (List<Media>) -> Unit, shows: Boolean = true) {
         val sort = remember { mutableStateOf(settings["sort", "added"]) }
         val showSort = remember { mutableStateOf(false) }
-        val showFilters = remember { mutableStateOf(false) }
+        val showFilters = remember { mutableStateOf(settings["show-filters", false]) }
         val search = remember { searchState }
         val descending = remember { mutableStateOf(settings["sort-descending", true]) }
-        val selectedCategories = remember { mutableStateOf(listOf<Category>()) }
+        val selectedCategories = remember { mutableStateOf(getSelectedCategories()) }
 
         TextField(
             value = search.value,
@@ -83,18 +90,12 @@ class MediaSearch(listIn: List<Media>, favs: Boolean = false) {
             trailingIcon = {
                 Row {
                     if (!favs) {
-//                        TwoStateIconButton(
-//                            "group-media",
-//                            false,
-//                            Icons.Default.AccountTree,
-//                            Icons.Default.Apps,
-//                            onChange = group,
-//                            trueTooltip = "Category grouping",
-//                            falseTooltip = "No Grouping"
-//                        )
-                        IconButton(
-                            onClick = { showFilters.value = !showFilters.value },
-                            content = { Icon(Icons.Filled.FilterAlt, null) })
+                        TwoStateIconButton(
+                            "show-filters",
+                            false,
+                            Icons.Filled.FilterAltOff,
+                            Icons.Filled.FilterAlt,
+                            { showFilters.value = it })
                     }
                     IconButton(
                         onClick = { showSort.value = true },
@@ -145,12 +146,12 @@ class MediaSearch(listIn: List<Media>, favs: Boolean = false) {
             modifier = Modifier.fillMaxWidth()
         )
 
-        AnimatedVisibility(showFilters.value) {
+        AnimatedVisibility(showFilters.value && !favs) {
             Surface(Modifier.fillMaxWidth().padding(6.dp)) {
                 Card(Modifier.fillMaxWidth().padding(3.dp), elevation = 8.dp) {
                     Column {
                         Text("Category", Modifier.padding(7.dp, 3.dp))
-                        CategoryFilterBar(list) {
+                        CategoryFilterBar(list, shows) {
                             selectedCategories.value = it
                             result(updateList(sort.value, search.value, descending.value, selectedCategories.value))
                         }
@@ -159,5 +160,4 @@ class MediaSearch(listIn: List<Media>, favs: Boolean = false) {
             }
         }
     }
-
 }

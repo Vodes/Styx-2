@@ -30,7 +30,7 @@ class AnimeOverview() : Screen {
 
         Scaffold(scaffoldState = scaffoldState, topBar = {
             TopAppBar(
-                title = { Text("Styx Test") },
+                title = { Text("Styx 2 — Beta") },
                 backgroundColor = MaterialTheme.colors.primaryVariant,
                 actions = {
                     IconButton(onClick = { nav.push(SettingsView()) }, content = { Icon(Icons.Filled.Settings, null) })

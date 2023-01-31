@@ -29,11 +29,11 @@ class MovieListView() : Tab {
     @OptIn(ExperimentalFoundationApi::class)
     @Composable
     override fun Content() {
-        val list = remember { mutableStateOf(mediaSearch.getDefault()) }
+        val list = remember { mutableStateOf(mediaSearch.getDefault(false)) }
         val useListView = remember { mutableStateOf(settings["movies-list", false]) }
 
         Column {
-            mediaSearch.component({ list.value = it })
+            mediaSearch.component({ list.value = it }, false)
 
             if (useListView.value) {
                 MediaList(list)

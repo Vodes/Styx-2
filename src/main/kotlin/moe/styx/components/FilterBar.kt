@@ -18,12 +18,14 @@ import androidx.compose.ui.unit.dp
 import moe.styx.logic.data.Category
 import moe.styx.logic.data.Media
 import moe.styx.logic.data.getCategory
+import moe.styx.moe.styx.logic.data.getSelectedCategories
+import moe.styx.moe.styx.logic.data.saveSelectedCategories
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun CategoryFilterBar(listIn: List<Media>, onSelected: (List<Category>) -> Unit) {
+fun CategoryFilterBar(listIn: List<Media>, shows: Boolean = true, onSelected: (List<Category>) -> Unit) {
     val categories = listIn.map { it.getCategory() }.distinctBy { it.GUID }.sortedByDescending { it.sort }
-    val selectedCategories = remember { mutableStateOf(mutableListOf<Category>()) }
+    val selectedCategories = remember { mutableStateOf(getSelectedCategories(shows).toMutableList()) }
     val state = rememberLazyListState()
     Box {
         LazyRow(
@@ -49,7 +51,11 @@ fun CategoryFilterBar(listIn: List<Media>, onSelected: (List<Category>) -> Unit)
                                 selectedCategories.value.add(item)
                                 isSelected.value = true
                             }
+                            selectedCategories.value = selectedCategories.value.filter { cat ->
+                                categories.find { it.GUID.equals(cat.GUID, true) } != null
+                            }.toMutableList()
                             onSelected(selectedCategories.value.toList())
+                            saveSelectedCategories(selectedCategories.value, shows)
                         }.clip(shape),
                         shape = shape,
                         border = BorderStroke(2.dp, MaterialTheme.colors.primary),
