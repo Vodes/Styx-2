@@ -1,14 +1,13 @@
 package moe.styx.moe.styx.components
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material.icons.filled.KeyboardArrowUp
-import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -16,6 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.russhwolf.settings.get
+import moe.styx.logic.data.Category
 import moe.styx.logic.data.Media
 import moe.styx.logic.data.favAdded
 import moe.styx.logic.data.find
@@ -30,10 +30,10 @@ class MediaSearch(listIn: List<Media>, favs: Boolean = false) {
     private var lastSearch = ""
 
     fun getDefault(): List<Media> {
-        return updateList(settings["sort", "added"], lastSearch, settings["sort-descending", true])
+        return updateList(settings["sort", "added"], lastSearch, settings["sort-descending", true], listOf())
     }
 
-    fun updateList(sort: String, search: String, descending: Boolean): List<Media> {
+    fun updateList(sort: String, search: String, descending: Boolean, selectedCategories: List<Category>): List<Media> {
         var processedList = list
         if (search.isNotBlank())
             processedList = processedList.filter { it.find(search) }
@@ -53,6 +53,12 @@ class MediaSearch(listIn: List<Media>, favs: Boolean = false) {
             }
         }
 
+        if (selectedCategories.isNotEmpty()) {
+            processedList = processedList.filter { media ->
+                selectedCategories.find { it.GUID.equals(media.categoryID, true) } != null
+            }
+        }
+
         lastSearch = search
         return processedList
     }
@@ -61,19 +67,35 @@ class MediaSearch(listIn: List<Media>, favs: Boolean = false) {
     fun component(result: (List<Media>) -> Unit) {
         val sort = remember { mutableStateOf(settings["sort", "added"]) }
         val showSort = remember { mutableStateOf(false) }
+        val showFilters = remember { mutableStateOf(false) }
         val search = remember { searchState }
         val descending = remember { mutableStateOf(settings["sort-descending", true]) }
+        val selectedCategories = remember { mutableStateOf(listOf<Category>()) }
 
         TextField(
             value = search.value,
             onValueChange = {
                 search.value = it
-                result(updateList(sort.value, search.value, descending.value))
+                result(updateList(sort.value, search.value, descending.value, selectedCategories.value))
             },
             placeholder = { Text("Search") },
             leadingIcon = { Icon(Icons.Filled.Search, null) },
             trailingIcon = {
                 Row {
+                    if (!favs) {
+//                        TwoStateIconButton(
+//                            "group-media",
+//                            false,
+//                            Icons.Default.AccountTree,
+//                            Icons.Default.Apps,
+//                            onChange = group,
+//                            trueTooltip = "Category grouping",
+//                            falseTooltip = "No Grouping"
+//                        )
+                        IconButton(
+                            onClick = { showFilters.value = !showFilters.value },
+                            content = { Icon(Icons.Filled.FilterAlt, null) })
+                    }
                     IconButton(
                         onClick = { showSort.value = true },
                         content = { Icon(Icons.Filled.MoreVert, null) })
@@ -90,7 +112,7 @@ class MediaSearch(listIn: List<Media>, favs: Boolean = false) {
                             IconButton(onClick = {
                                 descending.value = !descending.value
                                 settings.putBoolean("sort-descending", descending.value)
-                                result(updateList(sort.value, search.value, descending.value))
+                                result(updateList(sort.value, search.value, descending.value, selectedCategories.value))
                             }, content = {
                                 Icon(
                                     if (descending.value) Icons.Default.KeyboardArrowDown else Icons.Default.KeyboardArrowUp,
@@ -102,7 +124,14 @@ class MediaSearch(listIn: List<Media>, favs: Boolean = false) {
                             DropdownMenuItem(
                                 onClick = {
                                     sort.value = itemValue
-                                    result(updateList(sort.value, search.value, descending.value))
+                                    result(
+                                        updateList(
+                                            sort.value,
+                                            search.value,
+                                            descending.value,
+                                            selectedCategories.value
+                                        )
+                                    )
                                     settings.putString("sort", itemValue)
                                     showSort.value = false
                                 },
@@ -115,6 +144,20 @@ class MediaSearch(listIn: List<Media>, favs: Boolean = false) {
             },
             modifier = Modifier.fillMaxWidth()
         )
+
+        AnimatedVisibility(showFilters.value) {
+            Surface(Modifier.fillMaxWidth().padding(6.dp)) {
+                Card(Modifier.fillMaxWidth().padding(3.dp), elevation = 8.dp) {
+                    Column {
+                        Text("Category", Modifier.padding(7.dp, 3.dp))
+                        CategoryFilterBar(list) {
+                            selectedCategories.value = it
+                            result(updateList(sort.value, search.value, descending.value, selectedCategories.value))
+                        }
+                    }
+                }
+            }
+        }
     }
 
 }

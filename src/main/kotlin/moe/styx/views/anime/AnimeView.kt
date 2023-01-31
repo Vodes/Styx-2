@@ -12,9 +12,11 @@ import cafe.adriel.voyager.core.screen.Screen
 import io.kamel.image.KamelImage
 import io.kamel.image.lazyPainterResource
 import moe.styx.dataManager
-import moe.styx.logic.data.getImageFromID
-import moe.styx.logic.data.getURL
 import moe.styx.moe.styx.components.PopButton
+import moe.styx.moe.styx.logic.data.getFile
+import moe.styx.moe.styx.logic.data.getImageFromID
+import moe.styx.moe.styx.logic.data.getURL
+import moe.styx.moe.styx.logic.data.isCached
 import moe.styx.moe.styx.navigation.LocalGlobalNavigator
 import java.net.URLDecoder
 
@@ -43,9 +45,10 @@ data class AnimeView(val ID: String) : Screen {
             Row(Modifier.fillMaxSize()) {
                 Column(modifier = Modifier.padding(5.dp).fillMaxHeight().fillMaxWidth(0.35F)) {
                     //Card(modifier= Modifier.padding(3.dp).aspectRatio(0.71F).fillMaxHeight(0.45F), elevation = 5.dp){
+                    val img = anime.thumbID.getImageFromID()!!
                     KamelImage(
                         lazyPainterResource(
-                            anime.thumbID.getImageFromID()!!.getURL(),
+                            if (img.isCached()) img.getFile() else img.getURL(),
                             filterQuality = FilterQuality.High
                         ),
                         contentDescription = "Anime",

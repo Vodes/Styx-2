@@ -2,7 +2,6 @@ package moe.styx.logic.data
 
 import kotlinx.serialization.Serializable
 import moe.styx.dataManager
-import moe.styx.toBoolean
 
 @Serializable
 data class Media(
@@ -82,25 +81,6 @@ data class Changes(val media: Long, val entry: Long)
 @Serializable
 data class Favourite(val mediaID: String, var userID: String, var added: Long)
 
-
-fun Image.getURL(): String {
-    return if (hasWEBP.toBoolean()) {
-        "https://i.styx.moe/$GUID.webp"
-    } else if (hasJPG.toBoolean()) {
-        "https://i.styx.moe/$GUID.jpg"
-    } else if (hasPNG.toBoolean()) {
-        "https://i.styx.moe/$GUID.png"
-    } else {
-        if (externalURL.isNullOrBlank()) "" else externalURL
-    }
-}
-
-fun String?.getImageFromID(): Image? {
-    if (this == null)
-        return null
-    return dataManager.images.value.find { it.GUID.equals(this, true) }
-}
-
 fun Media.find(search: String): Boolean {
     if (name.isNotEmpty()) {
         if (name.startsWith(search, true) || name.equals(search, true))
@@ -123,6 +103,19 @@ fun Media.isFav(): Boolean {
     if (fav != null)
         return true
     return false
+}
+
+fun Media.getCategory(): Category {
+    val categories = dataManager.categories.value.sortedByDescending { it.sort }
+    for (cat in categories) {
+        if (cat.GUID.equals(categoryID, true))
+            return cat
+    }
+    return categories.last()
+}
+
+fun Media.getCategoryName(): String {
+    return getCategory().name
 }
 
 fun Media.favAdded(): Long {

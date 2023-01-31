@@ -25,8 +25,10 @@ import io.kamel.image.KamelImage
 import io.kamel.image.lazyPainterResource
 import moe.styx.dataManager
 import moe.styx.logic.data.Media
-import moe.styx.logic.data.getImageFromID
-import moe.styx.logic.data.getURL
+import moe.styx.moe.styx.logic.data.getFile
+import moe.styx.moe.styx.logic.data.getImageFromID
+import moe.styx.moe.styx.logic.data.getURL
+import moe.styx.moe.styx.logic.data.isCached
 import moe.styx.settings
 import moe.styx.views.anime.AnimeView
 
@@ -44,7 +46,10 @@ fun AnimeCard(nav: Navigator, media: Media, showUnseenBadge: Boolean = false) {
         Box(contentAlignment = Alignment.Center) {
             if (image != null) {
                 KamelImage(
-                    lazyPainterResource(image.getURL(), filterQuality = FilterQuality.Low),
+                    lazyPainterResource(
+                        if (image.isCached()) image.getFile() else image.getURL(),
+                        filterQuality = FilterQuality.Low
+                    ),
                     contentDescription = media.name,
                     contentScale = ContentScale.FillBounds,
                     modifier = Modifier.padding(2.dp).align(Alignment.Center)

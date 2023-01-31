@@ -2,8 +2,8 @@ import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    kotlin("jvm") version "1.7.20"
-    id("org.jetbrains.compose") version "1.2.2"
+    kotlin("jvm") version "1.8.0"
+    id("org.jetbrains.compose") version "1.3.0"
     id("org.jetbrains.kotlin.plugin.serialization") version "1.7.22"
 }
 
@@ -19,8 +19,6 @@ repositories {
 dependencies {
     implementation(compose.desktop.currentOs)
     implementation("com.alialbaali.kamel:kamel-image:0.4.1")
-    implementation("io.ktor:ktor-client-core:2.2.1")
-    implementation("io.ktor:ktor-client-okhttp:2.2.1")
     implementation("io.ktor:ktor-client-content-negotiation:2.2.1")
     implementation("io.ktor:ktor-serialization-kotlinx-json-jvm:2.2.1")
     implementation("com.arkivanov.decompose:decompose:1.0.0-beta-01")
@@ -34,6 +32,8 @@ dependencies {
     // https://mvnrepository.com/artifact/org.jetbrains.compose.material/material-icons-extended-desktop
     implementation("org.jetbrains.compose.material:material-icons-extended-desktop:1.2.2")
     implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.4.0")
+    implementation("io.ktor:ktor-client-okhttp-jvm:2.2.2")
+    implementation("io.ktor:ktor-client-core-jvm:2.2.2")
 
 
     //implementation("dev.cbyrne:kdiscordipc:1.0.0")
