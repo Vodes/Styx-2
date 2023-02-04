@@ -29,8 +29,8 @@ import moe.styx.moe.styx.logic.data.getFile
 import moe.styx.moe.styx.logic.data.getImageFromID
 import moe.styx.moe.styx.logic.data.getURL
 import moe.styx.moe.styx.logic.data.isCached
+import moe.styx.moe.styx.views.anime.AnimeDetailView
 import moe.styx.settings
-import moe.styx.views.anime.AnimeView
 
 @OptIn(ExperimentalMaterialApi::class, ExperimentalComposeUiApi::class)
 @Composable
@@ -41,7 +41,8 @@ fun AnimeCard(nav: Navigator, media: Media, showUnseenBadge: Boolean = false) {
     val shadowAlpha: Float by animateFloatAsState(if (showName.value) 0.8f else 0f)
     val textAlpha: Float by animateFloatAsState(if (showName.value) 1.0f else 0f)
     Card(modifier = Modifier.padding(2.dp).aspectRatio(0.71F), onClick = {
-        nav.push(AnimeView(media.name))
+        //nav.push(AnimeView(media.name))
+        nav.push(AnimeDetailView(media.GUID))
     }) {
         Box(contentAlignment = Alignment.Center) {
             if (image != null) {

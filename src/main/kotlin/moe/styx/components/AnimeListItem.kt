@@ -23,14 +23,14 @@ import moe.styx.moe.styx.logic.data.getFile
 import moe.styx.moe.styx.logic.data.getImageFromID
 import moe.styx.moe.styx.logic.data.getURL
 import moe.styx.moe.styx.logic.data.isCached
-import moe.styx.views.anime.AnimeView
+import moe.styx.moe.styx.views.anime.AnimeDetailView
 
 @OptIn(ExperimentalMaterialApi::class, ExperimentalComposeUiApi::class)
 @Composable
 fun AnimeListItem(nav: Navigator, media: Media) {
     val image = media.thumbID.getImageFromID()
     Card(modifier = Modifier.padding(5.dp, 2.dp).fillMaxWidth(), onClick = {
-        nav.push(AnimeView(media.name))
+        nav.push(AnimeDetailView(media.GUID))
     }) {
         Row(Modifier.height(80.dp)) {
             Card(

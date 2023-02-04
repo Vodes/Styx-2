@@ -43,7 +43,8 @@ enum class Endpoints(private val path: String) {
     FAVOURITES_ADD("/favourites/add/"),
     FAVOURITES_DELETE("/favourites/delete/"),
 
-    CHANGES("/changes");
+    CHANGES("/changes"),
+    WATCH("/watch");
 
     fun url(): String {
         return baseURL + path
