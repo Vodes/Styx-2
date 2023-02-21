@@ -38,7 +38,8 @@ data class MediaWatched(
     val entryID: String,
     val userID: String,
     var lastWatched: Long,
-    var progress: Float,
+    var progress: Long,
+    var progressPercent: Float,
     var maxProgress: Float
 )
 
@@ -47,6 +48,10 @@ data class User(
     val GUID: String, var name: String, var discordID: String, val added: Long, var lastLogin: Long,
     var permissions: Int
 )
+
+@Serializable
+data class Favourite(val mediaID: String, var userID: String, var added: Long)
+
 
 @Serializable
 data class LoginResponse(
@@ -76,10 +81,21 @@ data class Device(
 data class ApiResponse(var code: Int, var message: String?, var silent: Boolean = false)
 
 @Serializable
-data class Changes(val media: Long, val entry: Long)
+data class MediaSchedule(
+    var mediaID: String,
+    var day: ScheduleWeekday,
+    var hour: Int,
+    var minute: Int,
+    var isEstimated: Int = 0,
+    var finalEpisodeCount: Int = 0
+)
+
+enum class ScheduleWeekday {
+    MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY, SUNDAY
+}
 
 @Serializable
-data class Favourite(val mediaID: String, var userID: String, var added: Long)
+data class Changes(val media: Long, val entry: Long)
 
 fun Media.find(search: String): Boolean {
     if (name.isNotEmpty()) {

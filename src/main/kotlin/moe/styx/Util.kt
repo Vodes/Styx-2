@@ -24,7 +24,8 @@ val httpClient = HttpClient() {
     }
 }
 
-private const val baseURL = "http://localhost:8080"
+//private const val baseURL = "http://localhost:8080"
+private const val baseURL = "https://beta.styx.moe"
 
 enum class Endpoints(private val path: String) {
     // TODO: Login
@@ -37,6 +38,7 @@ enum class Endpoints(private val path: String) {
     MEDIA_ENTRIES("/media/entries"),
     IMAGES("/media/images"),
     CATEGORIES("/media/categories"),
+    SCHEDULES("/media/schedules"),
 
     // TODO: Favourites
     FAVOURITES("/favourites/list"),

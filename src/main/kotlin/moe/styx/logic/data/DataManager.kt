@@ -18,6 +18,7 @@ class DataManager() {
     val categories = mutableStateOf(listOf<Category>())
     val images = mutableStateOf(listOf<Image>())
     val favourites = mutableStateOf(listOf<Favourite>())
+    val schedules = mutableStateOf(listOf<MediaSchedule>())
 
     val isLoaded = mutableStateOf(false)
 
@@ -67,11 +68,14 @@ class DataManager() {
             }
         }
 
+        if (hasConnection)
+            favourites.value = saveList(getList(Endpoints.FAVOURITES), "favourites.json")
+
         if ((shouldUpdateMedia || shouldUpdateEntries) && hasConnection) {
             onProgressUpdate("Updating categories & images...")
             categories.value = saveList(getList(Endpoints.CATEGORIES), "categories.json")
             images.value = saveList(getList(Endpoints.IMAGES), "images.json")
-            favourites.value = saveList(getList(Endpoints.FAVOURITES), "favourites.json")
+            schedules.value = saveList(getList(Endpoints.SCHEDULES), "schedules.json")
             delay(300)
 
             onProgressUpdate("Updating image cache...")
@@ -80,6 +84,7 @@ class DataManager() {
             categories.value = readList("categories.json")
             images.value = readList("images.json")
             favourites.value = readList("favourites.json")
+            schedules.value = readList("schedules.json")
         }
         isLoaded.value = true
     }

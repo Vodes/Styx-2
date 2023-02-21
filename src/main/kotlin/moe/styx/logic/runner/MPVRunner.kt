@@ -1,5 +1,6 @@
 package moe.styx.moe.styx.logic.runner
 
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import moe.styx.Endpoints
@@ -9,6 +10,7 @@ import java.io.BufferedReader
 import java.io.InputStream
 import java.io.InputStreamReader
 
+@OptIn(DelicateCoroutinesApi::class)
 fun launchMPV(entry: MediaEntry, onFail: (String) -> Unit = {}) {
     val isWindows = System.getProperty("os.name").contains("win", true)
 
@@ -22,7 +24,7 @@ fun launchMPV(entry: MediaEntry, onFail: (String) -> Unit = {}) {
 
     GlobalScope.launch {
         val proc = ProcessBuilder(listOf(mpvExecutable.absolutePath, url)).directory(mpvExecutable.parentFile)
-            .redirectOutput(ProcessBuilder.Redirect.DISCARD)
+            .redirectOutput(ProcessBuilder.Redirect.PIPE)
             .redirectError(ProcessBuilder.Redirect.PIPE).start()
 
         launch {
