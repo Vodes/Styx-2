@@ -12,7 +12,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.google.accompanist.flowlayout.FlowRow
+import moe.styx.dataManager
 import moe.styx.logic.data.Media
+import moe.styx.moe.styx.navigation.LocalGlobalNavigator
 
 @Composable
 fun MediaNameListing(media: Media) {
@@ -43,7 +46,7 @@ fun MediaNameListing(media: Media) {
 @Composable
 fun MediaGenreListing(media: Media) {
     if (!media.genres.isNullOrBlank()) {
-        Row(Modifier.padding(5.dp)) {
+        FlowRow(Modifier.padding(5.dp)) {
             val shape = RoundedCornerShape(16.dp)
             for (genre in media.genres.split(",")) {
                 Surface(
@@ -61,6 +64,27 @@ fun MediaGenreListing(media: Media) {
                         )
                     }
                 }
+            }
+        }
+    }
+}
+
+@Composable
+fun MediaRelations(media: Media) {
+    Text("Relations", Modifier.padding(6.dp, 4.dp), style = MaterialTheme.typography.h6)
+    Column(Modifier.padding(5.dp, 2.dp)) {
+        val pre = dataManager.media.value.find { a -> a.GUID == media.prequel }
+        if (pre != null) {
+            Column(Modifier.align(Alignment.Start)) {
+                Text("Prequel", Modifier.padding(7.dp, 2.dp), style = MaterialTheme.typography.caption)
+                AnimeListItem(LocalGlobalNavigator.current, pre, 5)
+            }
+        }
+        val seq = dataManager.media.value.find { a -> a.GUID == media.sequel }
+        if (seq != null) {
+            Column(Modifier.align(Alignment.Start)) {
+                Text("Sequel", Modifier.padding(7.dp, 2.dp), style = MaterialTheme.typography.caption)
+                AnimeListItem(LocalGlobalNavigator.current, seq, 5)
             }
         }
     }

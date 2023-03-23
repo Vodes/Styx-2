@@ -25,3 +25,22 @@ fun saveSelectedCategories(categories: List<Category>, shows: Boolean = true) {
     }
     settings.putString(if (shows) "selected-categories-shows" else "selected-categories-movies", s)
 }
+
+fun getSelectedGenres(shows: Boolean = true): List<String> {
+    val list = mutableListOf<String>()
+    val saved = settings[if (shows) "selected-genres-shows" else "selected-genres-movies", ""]
+    if (saved.isNotBlank() && saved.contains(";")) {
+        for (s in saved.split(";")) {
+            list.add(s);
+        }
+    }
+    return list.sorted().toList()
+}
+
+fun saveSelectedGenres(genres: List<String>, shows: Boolean = true) {
+    var s = ""
+    for (g in genres) {
+        s += "${g};"
+    }
+    settings.putString(if (shows) "selected-genres-shows" else "selected-genres-movies", s)
+}

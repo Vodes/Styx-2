@@ -5,13 +5,13 @@ import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.VisibilityThreshold
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
@@ -38,10 +38,14 @@ fun main() = application {
     val darkMode = remember { isUiModeDark }
     val nav = LocalNavigator.current
 
+    val preferRounded = settings["rounded-corners", false]
+
     Window(
         onCloseRequest = ::exitApplication,
         title = "Styx 2",
         state = WindowState(width = 750.dp, height = 750.dp),
+        undecorated = preferRounded,
+        transparent = preferRounded,
         onKeyEvent = {
             if (nav != null && nav.canPop)
                 nav.pop()
@@ -50,7 +54,7 @@ fun main() = application {
         }
     )
     {
-        Surface(modifier = Modifier.fillMaxSize()) {
+        StyxSurface(preferRounded) {
             MaterialTheme(
                 colors = (if (darkMode.value) styxDarkColors() else styxLightColors()).switch(),
                 typography = styxTypography
@@ -66,6 +70,22 @@ fun main() = application {
                     }
                 }
             }
+        }
+    }
+}
+
+@Composable
+fun StyxSurface(rounded: Boolean = false, content: @Composable () -> Unit) {
+    if (rounded) {
+        Surface(
+            modifier = Modifier.fillMaxSize().padding(2.dp).shadow(4.dp, RoundedCornerShape(20.dp)),
+            shape = RoundedCornerShape(20.dp)
+        ) {
+            content()
+        }
+    } else {
+        Surface(modifier = Modifier.fillMaxSize()) {
+            content()
         }
     }
 }

@@ -20,11 +20,14 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import moe.styx.logic.data.MediaEntry
 import moe.styx.moe.styx.logic.runner.launchMPV
+import moe.styx.moe.styx.navigation.LocalGlobalNavigator
 import moe.styx.readableSize
+import moe.styx.views.settings.SettingsView
 
-@OptIn(ExperimentalFoundationApi::class, ExperimentalComposeUiApi::class)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalComposeUiApi::class, ExperimentalMaterialApi::class)
 @Composable
 fun EpisodeList(episodes: List<MediaEntry>, showSelection: MutableState<Boolean>) {
+    val nav = LocalGlobalNavigator.current
     Column(Modifier.fillMaxHeight().fillMaxWidth()) {
         val selected = remember { mutableStateMapOf<String, Boolean>() }
 
@@ -47,6 +50,30 @@ fun EpisodeList(episodes: List<MediaEntry>, showSelection: MutableState<Boolean>
 
         LazyColumn {
             items(episodes.size) { i ->
+                val showFailedDialog = remember { mutableStateOf(false) }
+                val failedToPlayMessage = remember { mutableStateOf("") }
+                if (showFailedDialog.value) {
+                    AlertDialog(
+                        {
+                            showFailedDialog.value = false
+                        },
+                        modifier = Modifier.fillMaxWidth(0.6F),
+                        title = { Text("Failed to start player") },
+                        text = { Text(failedToPlayMessage.value) },
+                        dismissButton = {
+                            Button(
+                                { showFailedDialog.value = false },
+                                modifier = Modifier.align(Alignment.CenterHorizontally)
+                            ) { Text("OK") }
+                        },
+                        confirmButton = {
+                            Button({
+                                showFailedDialog.value = false
+                                nav.push(SettingsView())
+                            }, modifier = Modifier.align(Alignment.CenterHorizontally)) { Text("Open Settings") }
+                        }
+                    )
+                }
                 Column(
                     Modifier.padding(10.dp, 5.dp).fillMaxWidth().defaultMinSize(0.dp, 50.dp)
                         .combinedClickable(onClick = {
@@ -54,7 +81,10 @@ fun EpisodeList(episodes: List<MediaEntry>, showSelection: MutableState<Boolean>
                                 selected.put(episodes[i].GUID, !selected.getOrDefault(episodes[i].GUID, false))
                                 return@combinedClickable
                             }
-                            launchMPV(episodes[i]) {}
+                            launchMPV(episodes[i]) {
+                                failedToPlayMessage.value = it
+                                showFailedDialog.value = true
+                            }
                         }, onLongClick = {
                             showSelection.value = !showSelection.value
                         })

@@ -41,8 +41,11 @@ fun AnimeCard(nav: Navigator, media: Media, showUnseenBadge: Boolean = false) {
     val shadowAlpha: Float by animateFloatAsState(if (showName.value) 0.8f else 0f)
     val textAlpha: Float by animateFloatAsState(if (showName.value) 1.0f else 0f)
     Card(modifier = Modifier.padding(2.dp).aspectRatio(0.71F), onClick = {
-        //nav.push(AnimeView(media.name))
-        nav.push(AnimeDetailView(media.GUID))
+        if (nav.lastItem is AnimeDetailView) {
+            nav.replace(AnimeDetailView(media.GUID))
+        } else {
+            nav.push(AnimeDetailView(media.GUID))
+        }
     }) {
         Box(contentAlignment = Alignment.Center) {
             if (image != null) {

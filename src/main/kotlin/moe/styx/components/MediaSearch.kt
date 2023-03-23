@@ -7,7 +7,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.filled.FilterAlt
+import androidx.compose.material.icons.filled.FilterAltOff
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -15,11 +20,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.russhwolf.settings.get
+import moe.styx.equalsAny
 import moe.styx.logic.data.Category
 import moe.styx.logic.data.Media
 import moe.styx.logic.data.favAdded
 import moe.styx.logic.data.find
 import moe.styx.moe.styx.logic.data.getSelectedCategories
+import moe.styx.moe.styx.logic.data.getSelectedGenres
 import moe.styx.settings
 
 class MediaSearch(listIn: List<Media>, favs: Boolean = false) {
@@ -35,11 +42,12 @@ class MediaSearch(listIn: List<Media>, favs: Boolean = false) {
             settings["sort", "added"],
             lastSearch,
             settings["sort-descending", true],
-            getSelectedCategories(shows)
+            getSelectedCategories(shows),
+            getSelectedGenres(shows)
         )
     }
 
-    fun updateList(sort: String, search: String, descending: Boolean, selectedCategories: List<Category>): List<Media> {
+    fun updateList(sort: String, search: String, descending: Boolean, selectedCategories: List<Category>, selectedGenres: List<String>): List<Media> {
         var processedList = list
 
         if (selectedCategories.isNotEmpty() && !favs) {
@@ -47,7 +55,14 @@ class MediaSearch(listIn: List<Media>, favs: Boolean = false) {
                 selectedCategories.find { it.GUID.equals(media.categoryID, true) } != null
             }
         }
-        
+
+        if (selectedGenres.isNotEmpty() && !favs) {
+            processedList = processedList.filter { media ->
+                var genresOfMedia = if (media.genres != null) media.genres.split(",") else listOf()
+                selectedGenres.find { it.equalsAny(genresOfMedia) } != null
+            }
+        }
+
         if (search.isNotBlank())
             processedList = processedList.filter { it.find(search) }
 
@@ -77,13 +92,14 @@ class MediaSearch(listIn: List<Media>, favs: Boolean = false) {
         val showFilters = remember { mutableStateOf(settings["show-filters", false]) }
         val search = remember { searchState }
         val descending = remember { mutableStateOf(settings["sort-descending", true]) }
+        val selectedGenres = remember { mutableStateOf(getSelectedGenres()) }
         val selectedCategories = remember { mutableStateOf(getSelectedCategories()) }
 
         TextField(
             value = search.value,
             onValueChange = {
                 search.value = it
-                result(updateList(sort.value, search.value, descending.value, selectedCategories.value))
+                result(updateList(sort.value, search.value, descending.value, selectedCategories.value, selectedGenres.value))
             },
             placeholder = { Text("Search") },
             leadingIcon = { Icon(Icons.Filled.Search, null) },
@@ -113,7 +129,7 @@ class MediaSearch(listIn: List<Media>, favs: Boolean = false) {
                             IconButton(onClick = {
                                 descending.value = !descending.value
                                 settings.putBoolean("sort-descending", descending.value)
-                                result(updateList(sort.value, search.value, descending.value, selectedCategories.value))
+                                result(updateList(sort.value, search.value, descending.value, selectedCategories.value, selectedGenres.value))
                             }, content = {
                                 Icon(
                                     if (descending.value) Icons.Default.KeyboardArrowDown else Icons.Default.KeyboardArrowUp,
@@ -130,7 +146,8 @@ class MediaSearch(listIn: List<Media>, favs: Boolean = false) {
                                             sort.value,
                                             search.value,
                                             descending.value,
-                                            selectedCategories.value
+                                            selectedCategories.value,
+                                            selectedGenres.value
                                         )
                                     )
                                     settings.putString("sort", itemValue)
@@ -150,10 +167,16 @@ class MediaSearch(listIn: List<Media>, favs: Boolean = false) {
             Surface(Modifier.fillMaxWidth().padding(6.dp)) {
                 Card(Modifier.fillMaxWidth().padding(3.dp), elevation = 8.dp) {
                     Column {
-                        Text("Category", Modifier.padding(7.dp, 3.dp))
+                        Text("Category", Modifier.padding(7.dp, 4.dp, 7.dp, 3.dp))
                         CategoryFilterBar(list, shows) {
                             selectedCategories.value = it
-                            result(updateList(sort.value, search.value, descending.value, selectedCategories.value))
+                            result(updateList(sort.value, search.value, descending.value, selectedCategories.value, selectedGenres.value))
+                        }
+
+                        Text("Genre", Modifier.padding(7.dp, 4.dp, 7.dp, 3.dp))
+                        GenreFilterBar(list, shows) {
+                            selectedGenres.value = it
+                            result(updateList(sort.value, search.value, descending.value, selectedCategories.value, selectedGenres.value))
                         }
                     }
                 }

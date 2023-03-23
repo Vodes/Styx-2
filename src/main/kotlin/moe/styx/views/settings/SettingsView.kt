@@ -1,5 +1,8 @@
 package moe.styx.views.settings
 
+import androidx.compose.foundation.ScrollState
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -38,8 +41,9 @@ class SettingsView : Screen {
                 actions = { PopButton(nav) }
             )
         }) {
+            val scrollState = ScrollState(0)
             Box(Modifier.fillMaxSize(), contentAlignment = Alignment.TopStart) {
-                Column(Modifier.padding(5.dp)) {
+                Column(Modifier.padding(5.dp).scrollable(scrollState, Orientation.Vertical)) {
                     SettingsCheckbox("Darkmode", "darkmode", true, onUpdate = { darkMode.value = it })
 
                     Column(Modifier.padding(5.dp)) {
@@ -50,6 +54,12 @@ class SettingsView : Screen {
 
                         SettingsCheckbox("Use list for shows", "shows-list", false)
                         SettingsCheckbox("Use list for movies", "movies-list", false)
+                    }
+
+                    Column(Modifier.padding(5.dp)) {
+                        Text("MPV Options", style = MaterialTheme.typography.h5, modifier = Modifier.padding(5.dp))
+                        SettingsCheckbox("Use system MPV", "mpv-system", false)
+                        SettingsCheckbox("Try to use flatpak (Linux only)", "mpv-flatpak", false)
                     }
                 }
                 Text("Logged in as: ${login!!.name}", Modifier.padding(10.dp).align(Alignment.BottomStart))

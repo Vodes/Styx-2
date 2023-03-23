@@ -1,81 +1,115 @@
 package moe.styx.moe.styx.components
 
 import androidx.compose.animation.animateColorAsState
-import androidx.compose.foundation.*
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
+import com.google.accompanist.flowlayout.FlowRow
+import moe.styx.addIfNotExisting
 import moe.styx.logic.data.Category
 import moe.styx.logic.data.Media
 import moe.styx.logic.data.getCategory
 import moe.styx.moe.styx.logic.data.getSelectedCategories
+import moe.styx.moe.styx.logic.data.getSelectedGenres
 import moe.styx.moe.styx.logic.data.saveSelectedCategories
+import moe.styx.moe.styx.logic.data.saveSelectedGenres
 
-@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun <T> PrimarySelectableObject(objectIn: T, name: String, isSelected: MutableState<Boolean>, onSelection: (Boolean) -> Unit) {
+    val textColor = animateColorAsState(if (isSelected.value) MaterialTheme.colors.onSurface else MaterialTheme.colors.primary)
+    val fillColor = animateColorAsState(if (isSelected.value) MaterialTheme.colors.primary else MaterialTheme.colors.surface)
+    val shape = RoundedCornerShape(10.dp)
+
+    Surface(
+        Modifier.padding(2.dp, 2.dp).sizeIn(0.dp, 36.dp).clip(shape).clickable { isSelected.value = !isSelected.value; onSelection(isSelected.value) },
+        shape = shape,
+        border = BorderStroke(2.dp, MaterialTheme.colors.primary),
+        color = fillColor.value,
+    ) {
+        Row {
+            Text(
+                name,
+                Modifier.padding(7.dp).align(Alignment.CenterVertically),
+                color = textColor.value
+            )
+        }
+    }
+}
+
 @Composable
 fun CategoryFilterBar(listIn: List<Media>, shows: Boolean = true, onSelected: (List<Category>) -> Unit) {
     val categories = listIn.map { it.getCategory() }.distinctBy { it.GUID }.sortedByDescending { it.sort }
     val selectedCategories = remember { mutableStateOf(getSelectedCategories(shows).toMutableList()) }
     val state = rememberLazyListState()
+
     Box {
-        LazyRow(
-            Modifier.padding(2.dp, 2.dp, 2.dp, 10.dp).align(Alignment.TopStart),
-            state
-        ) {
-            itemsIndexed(
-                items = categories, key = { _, item -> item.GUID },
-            ) { _, item ->
-                Row(modifier = Modifier.animateItemPlacement()) {
-                    val isSelected = mutableStateOf(selectedCategories.value.find { it.GUID == item.GUID } != null)
-                    val textColor =
-                        animateColorAsState(if (isSelected.value) MaterialTheme.colors.onSurface else MaterialTheme.colors.primary)
-                    val fillColor =
-                        animateColorAsState(if (isSelected.value) MaterialTheme.colors.primary else MaterialTheme.colors.surface)
-                    val shape = RoundedCornerShape(10.dp)
-                    Surface(
-                        Modifier.padding(4.dp, 2.dp).sizeIn(0.dp, 36.dp).clickable {
-                            if (isSelected.value) {
-                                selectedCategories.value.remove(item)
-                                isSelected.value = false
-                            } else {
-                                selectedCategories.value.add(item)
-                                isSelected.value = true
-                            }
-                            selectedCategories.value = selectedCategories.value.filter { cat ->
-                                categories.find { it.GUID.equals(cat.GUID, true) } != null
-                            }.toMutableList()
-                            onSelected(selectedCategories.value.toList())
-                            saveSelectedCategories(selectedCategories.value, shows)
-                        }.clip(shape),
-                        shape = shape,
-                        border = BorderStroke(2.dp, MaterialTheme.colors.primary),
-                        color = fillColor.value,
-                    ) {
-                        Row {
-                            Text(
-                                item.name,
-                                Modifier.padding(7.dp).align(Alignment.CenterVertically),
-                                color = textColor.value
-                            )
-                        }
+        FlowRow(Modifier.padding(2.dp, 2.dp, 2.dp, 10.dp).heightIn(0.dp, 150.dp).align(Alignment.TopStart)) {
+            for (c in categories) {
+                PrimarySelectableObject(c, c.name, mutableStateOf(selectedCategories.value.find { it.GUID == c.GUID } != null)) {
+                    if (!it) {
+                        selectedCategories.value.remove(c)
+                    } else {
+                        selectedCategories.value.add(c)
                     }
+                    selectedCategories.value = selectedCategories.value.filter { cat ->
+                        categories.find { c -> c.GUID.equals(cat.GUID, true) } != null
+                    }.toMutableList()
+                    onSelected(selectedCategories.value.toList())
+                    saveSelectedCategories(selectedCategories.value, shows)
                 }
             }
         }
+    }
+}
 
-        HorizontalScrollbar(
-            rememberScrollbarAdapter(state),
-            Modifier.fillMaxWidth().align(Alignment.BottomStart).height(8.dp)//.padding(0.dp, 3.dp)
-        )
+@Composable
+fun GenreFilterBar(listIn: List<Media>, shows: Boolean = true, onSelected: (List<String>) -> Unit) {
+    val genres = mutableListOf<String>()
+    listIn.forEach { m ->
+        if (m.genres == null)
+            return@forEach
+
+        for (s in m.genres.split(",")) {
+            genres.addIfNotExisting(s.trim())
+        }
+    }
+    genres.sort()
+    val selectedGenres = remember { mutableStateOf(getSelectedGenres(shows).toMutableList()) }
+    val state = rememberLazyListState()
+
+    Box {
+        FlowRow(Modifier.padding(2.dp, 2.dp, 2.dp, 10.dp).heightIn(0.dp, 150.dp).align(Alignment.TopStart)) {
+            for (g in genres) {
+                PrimarySelectableObject(g, g, mutableStateOf(selectedGenres.value.find { it.equals(g, true) } != null)) {
+                    if (!it) {
+                        selectedGenres.value.remove(g)
+                    } else {
+                        selectedGenres.value.add(g)
+                    }
+                    selectedGenres.value = selectedGenres.value.filter { gen ->
+                        genres.find { g -> g.equals(gen, true) } != null
+                    }.toMutableList()
+                    onSelected(selectedGenres.value.toList())
+                    saveSelectedGenres(selectedGenres.value, shows)
+                }
+            }
+        }
     }
 }

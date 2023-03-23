@@ -27,10 +27,14 @@ import moe.styx.moe.styx.views.anime.AnimeDetailView
 
 @OptIn(ExperimentalMaterialApi::class, ExperimentalComposeUiApi::class)
 @Composable
-fun AnimeListItem(nav: Navigator, media: Media) {
+fun AnimeListItem(nav: Navigator, media: Media, elevation: Int = 1) {
     val image = media.thumbID.getImageFromID()
-    Card(modifier = Modifier.padding(5.dp, 2.dp).fillMaxWidth(), onClick = {
-        nav.push(AnimeDetailView(media.GUID))
+    Card(modifier = Modifier.padding(5.dp, 2.dp).fillMaxWidth(), elevation = elevation.dp, onClick = {
+        if (nav.lastItem is AnimeDetailView) {
+            nav.replace(AnimeDetailView(media.GUID))
+        } else {
+            nav.push(AnimeDetailView(media.GUID))
+        }
     }) {
         Row(Modifier.height(80.dp)) {
             Card(

@@ -46,7 +46,7 @@ fun generateCode(): CreationResponse = runBlocking {
 var login: LoginResponse? = null
 
 fun isLoggedIn(): Boolean {
-    val token = settings["refreshToken", ""]
+    val token = settings["refreshToken", "4AC27790-3472-4409-87EC-625FF86B9D63"]
     if (token.isBlank())
         return false
 

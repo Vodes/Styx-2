@@ -1,7 +1,9 @@
 package moe.styx.logic.data
 
+import com.aallam.similarity.Cosine
 import kotlinx.serialization.Serializable
 import moe.styx.dataManager
+import moe.styx.getLevenshteinScore
 
 @Serializable
 data class Media(
@@ -97,20 +99,29 @@ enum class ScheduleWeekday {
 @Serializable
 data class Changes(val media: Long, val entry: Long)
 
-fun Media.find(search: String): Boolean {
-    if (name.isNotEmpty()) {
-        if (name.startsWith(search, true) || name.equals(search, true))
-            return true
-    }
-    if (!nameEN.isNullOrEmpty()) {
-        if (nameEN.startsWith(search, true) || nameEN.equals(search, true))
-            return true
-    }
+val cos = Cosine(3)
 
-    if (!nameJP.isNullOrEmpty()) {
-        if (nameJP.startsWith(search, true) || nameJP.equals(search, true))
+fun String?.isClose(s: String): Boolean {
+    if (!this.isNullOrEmpty()) {
+        val score = this.getLevenshteinScore(s).toDouble()
+        val maxLen = kotlin.math.max(this.length, s.length).toDouble()
+        val compensatedLevScore = (maxLen - score) / maxLen
+        val cosineScore = cos.similarity(this, s)
+        val avgScore = (compensatedLevScore + cosineScore) / 2
+
+        if (this.startsWith(s, true) ||
+            this.equals(s, true) ||
+            kotlin.math.max(cosineScore, avgScore) >= 0.3
+        ) {
             return true
+        }
     }
+    return false
+}
+
+fun Media.find(search: String): Boolean {
+    if (name.isClose(search.trim()) || nameEN.isClose(search.trim()) || nameJP.isClose(search.trim()))
+        return true
     return false
 }
 

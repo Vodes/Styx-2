@@ -18,20 +18,30 @@ import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.core.screen.ScreenKey
 import io.kamel.image.KamelImage
 import io.kamel.image.lazyPainterResource
 import moe.styx.dataManager
-import moe.styx.moe.styx.components.EpisodeList
-import moe.styx.moe.styx.components.MainScaffold
-import moe.styx.moe.styx.components.MediaGenreListing
-import moe.styx.moe.styx.components.MediaNameListing
+import moe.styx.moe.styx.components.*
 import moe.styx.moe.styx.logic.data.getFile
 import moe.styx.moe.styx.logic.data.getImageFromID
 import moe.styx.moe.styx.logic.data.getURL
 import moe.styx.moe.styx.logic.data.isCached
 import moe.styx.moe.styx.navigation.LocalGlobalNavigator
+import java.util.*
 
 class AnimeDetailView(val ID: String) : Screen {
+
+    private var sKey: String? = null
+
+    private fun generateKey(): String {
+        if (sKey == null)
+            sKey = UUID.randomUUID().toString()
+        return sKey as String
+    }
+
+    override val key: ScreenKey
+        get() = ID
 
     @OptIn(ExperimentalFoundationApi::class, ExperimentalComposeUiApi::class)
     @Composable
@@ -85,6 +95,11 @@ class AnimeDetailView(val ID: String) : Screen {
                             SelectionContainer {
                                 Text(anime.synopsisEN, Modifier.padding(6.dp), style = MaterialTheme.typography.caption)
                             }
+
+                        if (anime.sequel != null || anime.prequel != null) {
+                            Divider(Modifier.fillMaxWidth().padding(0.dp, 4.dp, 0.dp, 2.dp), thickness = 3.dp)
+                            MediaRelations(anime)
+                        }
                     }
                     Column(Modifier.padding(6.dp).width(2.dp).fillMaxHeight()) {
                         Divider(Modifier.fillMaxHeight(), thickness = 3.dp)
