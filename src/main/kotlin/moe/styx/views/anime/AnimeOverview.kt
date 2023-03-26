@@ -13,10 +13,7 @@ import cafe.adriel.voyager.navigator.tab.CurrentTab
 import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabNavigator
-import moe.styx.moe.styx.navigation.LocalGlobalNavigator
-import moe.styx.moe.styx.navigation.defaultTab
-import moe.styx.moe.styx.navigation.favsTab
-import moe.styx.moe.styx.navigation.movieTab
+import moe.styx.moe.styx.navigation.*
 import moe.styx.views.settings.SettingsView
 
 class AnimeOverview() : Screen {
@@ -45,6 +42,7 @@ class AnimeOverview() : Screen {
                             TabNavigationItem(defaultTab)
                             TabNavigationItem(movieTab)
                             TabNavigationItem(favsTab)
+                            TabNavigationItem(scheduleTab)
                         }
                     }
                 ) {

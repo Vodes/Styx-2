@@ -4,6 +4,11 @@ import com.aallam.similarity.Cosine
 import kotlinx.serialization.Serializable
 import moe.styx.dataManager
 import moe.styx.getLevenshteinScore
+import java.time.DayOfWeek
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.ZoneId
+import java.time.temporal.TemporalAdjusters
 
 @Serializable
 data class Media(
@@ -117,6 +122,25 @@ fun String?.isClose(s: String): Boolean {
         }
     }
     return false
+}
+
+fun ScheduleWeekday.dayOfWeek(): DayOfWeek {
+    return when (this) {
+        ScheduleWeekday.MONDAY -> DayOfWeek.MONDAY
+        ScheduleWeekday.TUESDAY -> DayOfWeek.TUESDAY
+        ScheduleWeekday.WEDNESDAY -> DayOfWeek.WEDNESDAY
+        ScheduleWeekday.THURSDAY -> DayOfWeek.THURSDAY
+        ScheduleWeekday.FRIDAY -> DayOfWeek.FRIDAY
+        ScheduleWeekday.SATURDAY -> DayOfWeek.SATURDAY
+        else -> DayOfWeek.SUNDAY
+    }
+}
+
+fun MediaSchedule.getTargetTime(): LocalDateTime {
+    val now = LocalDate.now(ZoneId.of("Europe/Berlin"))
+    val adjusted = now.atTime(this.hour, this.minute)
+    val target = adjusted.with(TemporalAdjusters.next(this.day.dayOfWeek()))
+    return target.atZone(ZoneId.of("Europe/Berlin")).withZoneSameInstant(ZoneId.systemDefault()).toLocalDateTime()
 }
 
 fun Media.find(search: String): Boolean {
