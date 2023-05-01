@@ -62,7 +62,10 @@ class SettingsView : Screen {
                         SettingsCheckbox("Try to use flatpak (Linux only)", "mpv-flatpak", false)
                     }
                 }
-                Text("Logged in as: ${login!!.name}", Modifier.padding(10.dp).align(Alignment.BottomStart))
+                Text(
+                    if (login != null) "Logged in as: ${login!!.name}" else "You're not logged in right now.",
+                    Modifier.padding(10.dp).align(Alignment.BottomStart)
+                )
             }
         }
     }

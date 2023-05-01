@@ -1,5 +1,6 @@
 package moe.styx.logic.data
 
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
@@ -9,6 +10,7 @@ import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import moe.styx.*
 import moe.styx.moe.styx.logic.data.updateImageCache
+import moe.styx.moe.styx.logic.login.ServerStatus
 import java.io.File
 
 class DataManager() {
@@ -25,67 +27,64 @@ class DataManager() {
     suspend fun load(onProgressUpdate: (String) -> Unit) = coroutineScope {
         isLoaded.value = false
 
-        val hasConnection = hasInternet()
+        val hasConnection = hasInternet() && ServerStatus.lastKnown == ServerStatus.ONLINE
 
         var lastChanges = if (hasConnection) getObject<Changes>(Endpoints.CHANGES) else Changes(0, 0)
-        if (lastChanges != null) {
-            println(lastChanges.media)
-            println(lastChanges.entry)
-        } else
+        if (lastChanges == null)
             lastChanges = Changes(0, 0)
 
         val shouldUpdateMedia = lastChanges.media > lastLocalChange().media
         val shouldUpdateEntries = lastChanges.entry > lastLocalChange().entry
 
-        if (shouldUpdateMedia && shouldUpdateEntries) {
-            onProgressUpdate("Updating media & entries...")
-            val mediaJob = launch {
-                media.value = saveList(getList(Endpoints.MEDIA), "media.json")
-            }
-            val entryJob = launch {
-                entries.value = saveList(getList(Endpoints.MEDIA_ENTRIES), "entries.json")
-            }
-            awaitAll(mediaJob, entryJob)
-            updateLocalChange(true, true)
-            delay(300)
-        } else {
-            if (shouldUpdateMedia && hasConnection) {
-                onProgressUpdate("Updating media...")
-                media.value = saveList(getList(Endpoints.MEDIA), "media.json")
-                updateLocalChange(true, false)
-                delay(300)
+        if (hasConnection) {
+            // These can be updated every time because its not a lot of data
+            val jobs = mutableListOf(launch {
+                saveListEx(getList(Endpoints.SCHEDULES), "schedules.json", schedules)
+                saveListEx(getList(Endpoints.CATEGORIES), "categories.json", categories)
+                saveListEx(getList(Endpoints.FAVOURITES), "favourites.json", favourites)
+            })
+
+            if (shouldUpdateEntries || shouldUpdateMedia) {
+                // Update Images if entries or media get updated
+                jobs.add(launch {
+                    saveListEx(getList(Endpoints.IMAGES), "images.json", images)
+                })
+
+                if (shouldUpdateMedia)
+                    jobs.add(launch {
+                        saveListEx(getList(Endpoints.MEDIA), "media.json", media)
+                    })
+                else
+                    readListEx("media.json", media)
+
+                if (shouldUpdateEntries)
+                    jobs.add(launch {
+                        saveListEx(getList(Endpoints.MEDIA_ENTRIES), "entries.json", entries)
+                    })
+                else
+                    readListEx("entries.json", entries)
             } else {
-                media.value = readList("media.json")
+                readListEx("entries.json", entries)
+                readListEx("media.json", media)
+                readListEx("images.json", images)
             }
-
-            if (shouldUpdateEntries && hasConnection) {
-                onProgressUpdate("Updating entries...")
-                entries.value = saveList(getList(Endpoints.MEDIA_ENTRIES), "entries.json")
-                updateLocalChange(false, true)
-                delay(300)
-            } else {
-                entries.value = readList("entries.json")
-            }
-        }
-
-        if (hasConnection)
-            favourites.value = saveList(getList(Endpoints.FAVOURITES), "favourites.json")
-
-        if ((shouldUpdateMedia || shouldUpdateEntries) && hasConnection) {
-            onProgressUpdate("Updating categories & images...")
-            categories.value = saveList(getList(Endpoints.CATEGORIES), "categories.json")
-            images.value = saveList(getList(Endpoints.IMAGES), "images.json")
-            schedules.value = saveList(getList(Endpoints.SCHEDULES), "schedules.json")
-            delay(300)
-
-            onProgressUpdate("Updating image cache...")
-            updateImageCache()
+            // Wait for all jobs to finish
+            awaitAll(*jobs.toTypedArray())
         } else {
+            // Read from local files
+            entries.value = readList("entries.json")
+            media.value = readList("media.json")
             categories.value = readList("categories.json")
             images.value = readList("images.json")
             favourites.value = readList("favourites.json")
             schedules.value = readList("schedules.json")
         }
+
+        delay(300)
+
+        onProgressUpdate("Updating image cache...")
+        updateImageCache()
+
         isLoaded.value = true
     }
 
@@ -109,12 +108,20 @@ class DataManager() {
         return list
     }
 
+    private inline fun <reified T> saveListEx(list: List<T>, file: String, target: MutableState<List<T>>) {
+        target.value = saveList(list, file)
+    }
+
     private inline fun <reified T> readList(file: String): List<T> {
         val open = File(getDataDir(), file)
         val content = open.readText()
         if (content.isEmpty())
             return listOf()
         return json.decodeFromString(content)
+    }
+
+    private inline fun <reified T> readListEx(file: String, target: MutableState<List<T>>) {
+        target.value = readList(file)
     }
 
     private fun lastLocalChange(): Changes {

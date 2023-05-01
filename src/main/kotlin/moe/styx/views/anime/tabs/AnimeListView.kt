@@ -1,7 +1,7 @@
 package moe.styx.moe.styx.views.anime.tabs
 
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Tv
 import androidx.compose.runtime.Composable
@@ -17,10 +17,6 @@ import moe.styx.settings
 import moe.styx.toBoolean
 
 class AnimeListView() : Tab {
-    init {
-        println("Creating AnimeLIst")
-    }
-
     override val options: TabOptions
         @Composable
         get() {

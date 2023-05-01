@@ -12,6 +12,7 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import moe.styx.logic.login.login
+import moe.styx.moe.styx.logic.login.ServerStatus
 
 val json = Json {
     prettyPrint = true
@@ -72,6 +73,8 @@ suspend inline fun <reified T> getList(endpoint: Endpoints): List<T> {
         }
     )
 
+    ServerStatus.setLastKnown(response.status)
+
     if (response.status.value in 200..203) {
         list = json.decodeFromString(response.bodyAsText())
     }
@@ -81,6 +84,8 @@ suspend inline fun <reified T> getList(endpoint: Endpoints): List<T> {
 
 inline fun <reified T> getObject(endpoint: Endpoints): T? = runBlocking {
     val response: HttpResponse = httpClient.get(endpoint.url())
+
+    ServerStatus.setLastKnown(response.status)
 
     if (response.status.value in 200..203) {
         return@runBlocking json.decodeFromString(response.bodyAsText())

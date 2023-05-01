@@ -30,7 +30,6 @@ class LoadingView() : Screen {
         coroutineScope.launch {
             launch { dataManager.load { progress.value = it } }
             while (!dataManager.isLoaded.value) {
-                println("Waiting...")
                 delay(500)
             }
             nav.replaceAll(AnimeOverview())

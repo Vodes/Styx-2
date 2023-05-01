@@ -24,7 +24,9 @@ import com.russhwolf.settings.Settings
 import com.russhwolf.settings.get
 import moe.styx.logic.data.DataManager
 import moe.styx.logic.login.isLoggedIn
+import moe.styx.moe.styx.logic.login.ServerStatus
 import moe.styx.moe.styx.navigation.LocalGlobalNavigator
+import moe.styx.moe.styx.views.login.OfflineView
 import moe.styx.moe.styx.views.other.LoadingView
 import moe.styx.views.login.LoginView
 
@@ -59,7 +61,15 @@ fun main() = application {
                 colors = (if (darkMode.value) styxDarkColors() else styxLightColors()).switch(),
                 typography = styxTypography
             ) {
-                Navigator(if (isLoggedIn()) LoadingView() else LoginView()) { navigator ->
+                val view = if (isLoggedIn())
+                    LoadingView()
+                else {
+                    if(ServerStatus.lastKnown != ServerStatus.ONLINE)
+                        OfflineView()
+                    else
+                        LoginView()
+                }
+                Navigator(view) { navigator ->
                     CompositionLocalProvider(LocalGlobalNavigator provides navigator) {
                         SlideTransition(
                             navigator, animationSpec = spring(

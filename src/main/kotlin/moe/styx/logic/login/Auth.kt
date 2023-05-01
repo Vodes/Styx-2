@@ -11,6 +11,8 @@ import moe.styx.*
 import moe.styx.logic.data.CreationResponse
 import moe.styx.logic.data.DeviceInfo
 import moe.styx.logic.data.LoginResponse
+import moe.styx.moe.styx.logic.login.ServerStatus
+import moe.styx.moe.styx.logic.login.ServerStatus.Companion.setLastKnown
 import kotlin.system.exitProcess
 
 fun generateCode(): CreationResponse = runBlocking {
@@ -69,6 +71,8 @@ fun checkLogin(token: String, first: Boolean = false): LoginResponse? = runBlock
             append("token", token)
         }
     )
+
+    setLastKnown(response.status)
 
     if (response.status.value in 200..203) {
         val log = json.decodeFromString<LoginResponse>(response.bodyAsText())
