@@ -11,7 +11,8 @@ import moe.styx.dataManager
 import moe.styx.logic.data.ScheduleWeekday
 import moe.styx.logic.data.dayOfWeek
 import moe.styx.logic.data.getTargetTime
-import moe.styx.moe.styx.components.AnimeListItem
+import moe.styx.makeFirstLetterBig
+import moe.styx.moe.styx.components.anime.AnimeListItem
 import moe.styx.moe.styx.navigation.LocalGlobalNavigator
 import java.time.format.DateTimeFormatter
 import java.util.*
@@ -24,7 +25,7 @@ fun ScheduleDay(day: ScheduleWeekday) {
         return
     Column(Modifier.padding(2.dp, 6.dp)) {
         Text(
-            day.name.lowercase().capitalize(),
+            day.name.lowercase().makeFirstLetterBig(),
             modifier = Modifier.padding(2.dp),
             style = MaterialTheme.typography.h6
         )

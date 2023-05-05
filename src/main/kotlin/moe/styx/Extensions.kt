@@ -3,6 +3,7 @@ package moe.styx
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.text.DecimalFormat
+import java.util.*
 import kotlin.math.floor
 import kotlin.math.min
 
@@ -28,9 +29,15 @@ fun Double.round(decimals: Int = 2): Double {
     return BigDecimal(this).setScale(decimals, RoundingMode.HALF_UP).toDouble()
 }
 
+fun String.makeFirstLetterBig(): String {
+    return this.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }
+}
+
 fun String.equalsAny(vararg strings: String, trim: Boolean = true, ignoreCase: Boolean = true): Boolean {
     for (s in strings) {
-        if ((if (trim) s.trim() else s).equals(if (trim) this.trim() else this, ignoreCase)) {
+        var s2 = this
+        val s1 = if (trim) s.trim().also { s2 = s2.trim() } else s
+        if (s2.equals(s1, ignoreCase)) {
             return true
         }
     }
@@ -38,12 +45,7 @@ fun String.equalsAny(vararg strings: String, trim: Boolean = true, ignoreCase: B
 }
 
 fun String.equalsAny(strings: List<String>, trim: Boolean = true, ignoreCase: Boolean = true): Boolean {
-    for (s in strings) {
-        if ((if (trim) s.trim() else s).equals(if (trim) this.trim() else this, ignoreCase)) {
-            return true
-        }
-    }
-    return false
+    return equalsAny(*strings.toTypedArray(), trim = trim, ignoreCase = ignoreCase)
 }
 
 fun String.getLevenshteinScore(other: String): Int {

@@ -9,7 +9,7 @@ import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
 import moe.styx.components.ScheduleDay
 import moe.styx.logic.data.ScheduleWeekday
-import moe.styx.moe.styx.components.createTabOptions
+import moe.styx.moe.styx.components.misc.createTabOptions
 
 class ScheduleView : Tab {
     override val options: TabOptions

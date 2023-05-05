@@ -18,7 +18,7 @@ import cafe.adriel.voyager.core.screen.Screen
 import com.russhwolf.settings.get
 import moe.styx.isUiModeDark
 import moe.styx.logic.login.login
-import moe.styx.moe.styx.components.PopButton
+import moe.styx.moe.styx.components.misc.PopButton
 import moe.styx.moe.styx.components.SettingsCheckbox
 import moe.styx.moe.styx.navigation.LocalGlobalNavigator
 import moe.styx.settings

@@ -4,7 +4,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     kotlin("jvm") version "1.8.20"
     id("org.jetbrains.compose") version "1.4.0"
-    id("org.jetbrains.kotlin.plugin.serialization") version "1.8.0"
+    id("org.jetbrains.kotlin.plugin.serialization") version "1.8.20"
 }
 
 group = "moe.styx"
@@ -37,6 +37,9 @@ dependencies {
 
     // Still gotta think about some cross-platform IO stuff
     //implementation("com.soywiz.korlibs.korio:korio:2.2.0")
+
+    // https://mvnrepository.com/artifact/org.jetbrains.compose.material3/material3-desktop
+    // implementation("org.jetbrains.compose.material3:material3-desktop:1.4.0")
 
     //implementation("dev.cbyrne:kdiscordipc:0.2.1")
 }

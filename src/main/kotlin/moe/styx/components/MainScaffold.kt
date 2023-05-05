@@ -8,6 +8,7 @@ import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import moe.styx.moe.styx.components.misc.PopButton
 
 @Composable
 fun MainScaffold(
@@ -19,6 +20,7 @@ fun MainScaffold(
     actions: @Composable () -> Unit = {},
     content: @Composable () -> Unit
 ) {
+    //BoxWithConstraints {
     Scaffold(scaffoldState = scaffoldState, modifier = modifier, topBar = {
         TopAppBar(
             title = { Text(title) },
@@ -30,6 +32,7 @@ fun MainScaffold(
             }
         )
     }) {
-        content()
+        content()//constraints)
     }
+    //}
 }

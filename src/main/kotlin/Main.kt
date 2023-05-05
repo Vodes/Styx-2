@@ -22,6 +22,10 @@ import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.transitions.SlideTransition
 import com.russhwolf.settings.Settings
 import com.russhwolf.settings.get
+import io.kamel.core.config.KamelConfig
+import io.kamel.core.config.takeFrom
+import io.kamel.image.config.Default
+import io.kamel.image.config.resourcesFetcher
 import moe.styx.logic.data.DataManager
 import moe.styx.logic.login.isLoggedIn
 import moe.styx.moe.styx.logic.login.ServerStatus
@@ -33,6 +37,11 @@ import moe.styx.views.login.LoginView
 val settings: Settings = Settings()
 var isUiModeDark: MutableState<Boolean> = mutableStateOf(true)
 val dataManager = DataManager()
+
+val desktopConfig = KamelConfig {
+    takeFrom(KamelConfig.Default)
+    resourcesFetcher()
+}
 
 @OptIn(ExperimentalAnimationApi::class)
 fun main() = application {
@@ -64,7 +73,7 @@ fun main() = application {
                 val view = if (isLoggedIn())
                     LoadingView()
                 else {
-                    if(ServerStatus.lastKnown != ServerStatus.ONLINE)
+                    if (ServerStatus.lastKnown != ServerStatus.ONLINE)
                         OfflineView()
                     else
                         LoginView()
