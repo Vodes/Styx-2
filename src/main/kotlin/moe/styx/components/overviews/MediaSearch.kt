@@ -1,18 +1,10 @@
 package moe.styx.moe.styx.components.overviews
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.FilterAlt
-import androidx.compose.material.icons.filled.FilterAltOff
-import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material.icons.filled.KeyboardArrowUp
-import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -21,10 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.russhwolf.settings.get
 import moe.styx.equalsAny
-import moe.styx.logic.data.Category
-import moe.styx.logic.data.Media
-import moe.styx.logic.data.favAdded
-import moe.styx.logic.data.find
+import moe.styx.logic.data.*
 import moe.styx.moe.styx.components.misc.TwoStateIconButton
 import moe.styx.moe.styx.logic.data.getSelectedCategories
 import moe.styx.moe.styx.logic.data.getSelectedGenres
@@ -32,13 +21,15 @@ import moe.styx.settings
 
 class MediaSearch(listIn: List<Media>, favs: Boolean = false) {
 
-    private val list = listIn
+    private var list = listIn
     val searchState = mutableStateOf("")
     val sortTypes = listOf("Added", "Name", "English Name", "Romaji Name")
     val favs = favs
     private var lastSearch = ""
 
-    fun getDefault(shows: Boolean = true): List<Media> {
+    fun getDefault(shows: Boolean = true, updateList: List<Media>? = null): List<Media> {
+        if (updateList != null)
+            list = updateList
         return updateList(
             settings["sort", "added"],
             lastSearch,

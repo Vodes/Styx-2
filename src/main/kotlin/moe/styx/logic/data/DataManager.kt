@@ -53,6 +53,7 @@ class DataManager() {
                 if (shouldUpdateMedia)
                     jobs.add(launch {
                         saveListEx(getList(Endpoints.MEDIA), "media.json", media)
+                        updateLocalChange(true, false)
                     })
                 else
                     readListEx("media.json", media)
@@ -60,6 +61,7 @@ class DataManager() {
                 if (shouldUpdateEntries)
                     jobs.add(launch {
                         saveListEx(getList(Endpoints.MEDIA_ENTRIES), "entries.json", entries)
+                        updateLocalChange(false, true)
                     })
                 else
                     readListEx("entries.json", entries)

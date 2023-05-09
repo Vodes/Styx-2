@@ -4,46 +4,30 @@ import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.Card
-import androidx.compose.material.Divider
-import androidx.compose.material.IconButton
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
-import androidx.compose.material.rememberScaffoldState
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.FilterQuality
-import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
-import io.kamel.core.Resource
-import io.kamel.image.KamelImage
 import io.kamel.image.lazyPainterResource
 import moe.styx.dataManager
 import moe.styx.logic.data.Media
 import moe.styx.logic.data.MediaEntry
 import moe.styx.moe.styx.components.MainScaffold
-import moe.styx.moe.styx.components.anime.EpisodeList
-import moe.styx.moe.styx.components.anime.MediaGenreListing
-import moe.styx.moe.styx.components.anime.MediaNameListing
-import moe.styx.moe.styx.components.anime.MediaRelations
-import moe.styx.moe.styx.logic.data.getFile
-import moe.styx.moe.styx.logic.data.getImageFromID
-import moe.styx.moe.styx.logic.data.getURL
-import moe.styx.moe.styx.logic.data.isCached
+import moe.styx.moe.styx.components.anime.*
+import moe.styx.moe.styx.components.misc.FavouriteIconButton
+import moe.styx.moe.styx.logic.data.*
 import moe.styx.moe.styx.navigation.LocalGlobalNavigator
 import java.util.*
 
@@ -76,7 +60,9 @@ class AnimeDetailView(val ID: String) : Screen {
         val scrollState = rememberScrollState()
         val showSelection = remember { mutableStateOf(false) }
 
-        MainScaffold(scaffoldState, title = vm.anime.name) {
+        MainScaffold(scaffoldState, title = vm.anime.name, actions = {
+            FavouriteIconButton(vm.anime)
+        }) {
             Card(Modifier.padding(8.dp).fillMaxSize(), elevation = 9.dp) {
                 Row(Modifier.padding(5.dp).fillMaxSize()) {
                     Column(Modifier.fillMaxHeight().fillMaxWidth(.55F).verticalScroll(scrollState)) {
@@ -140,23 +126,6 @@ fun StupidImageNameArea(media: Media) {
                     }
                 }
             }
-        }
-    }
-}
-
-@Composable
-fun BigScalingCardImage(image: Resource<Painter>, modifier: Modifier = Modifier) {
-    Column(modifier) {
-        Card(
-            Modifier.align(Alignment.Start).padding(12.dp).requiredHeightIn(150.dp, 500.dp).aspectRatio(0.71F),
-            elevation = 2.dp
-        ) {
-            KamelImage(
-                image,
-                contentDescription = "Anime",
-                modifier = Modifier.padding(2.dp).clip(RoundedCornerShape(4.dp)),
-                contentScale = ContentScale.FillBounds
-            )
         }
     }
 }

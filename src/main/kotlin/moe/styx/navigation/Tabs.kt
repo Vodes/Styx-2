@@ -1,11 +1,8 @@
 package moe.styx.moe.styx.navigation
 
-import moe.styx.moe.styx.views.anime.tabs.AnimeListView
-import moe.styx.moe.styx.views.anime.tabs.FavouritesListView
-import moe.styx.moe.styx.views.anime.tabs.MovieListView
-import moe.styx.moe.styx.views.anime.tabs.ScheduleView
+import moe.styx.moe.styx.views.anime.tabs.*
 
 val defaultTab = AnimeListView()
 val movieTab = MovieListView()
-val favsTab = FavouritesListView()
+var favsTab = FavouritesListView()
 val scheduleTab = ScheduleView()

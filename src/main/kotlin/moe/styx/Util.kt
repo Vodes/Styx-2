@@ -82,6 +82,17 @@ suspend inline fun <reified T> getList(endpoint: Endpoints): List<T> {
     return list
 }
 
+inline fun <reified T> sendObject(endpoint: Endpoints, data: T?): Boolean = runBlocking {
+    val request = httpClient.post(endpoint.url()) {
+        contentType(ContentType.Application.Json)
+        setBody(data)
+    }
+
+    ServerStatus.setLastKnown(request.status)
+
+    return@runBlocking request.status.value in 200..203
+}
+
 inline fun <reified T> getObject(endpoint: Endpoints): T? = runBlocking {
     val response: HttpResponse = httpClient.get(endpoint.url())
 

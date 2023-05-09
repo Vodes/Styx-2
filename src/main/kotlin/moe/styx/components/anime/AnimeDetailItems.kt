@@ -2,25 +2,24 @@ package moe.styx.moe.styx.components.anime
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.SelectionContainer
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.flowlayout.FlowRow
 import com.google.accompanist.flowlayout.MainAxisAlignment
+import io.kamel.core.Resource
+import io.kamel.image.KamelImage
 import moe.styx.dataManager
 import moe.styx.logic.data.Media
 import moe.styx.moe.styx.components.misc.ExpandIconButton
@@ -47,6 +46,23 @@ fun MediaNameListing(media: Media, modifier: Modifier = Modifier) {
                     style = MaterialTheme.typography.subtitle2,
                     maxLines = 3
                 )
+        }
+    }
+}
+
+@Composable
+fun BigScalingCardImage(image: Resource<Painter>, modifier: Modifier = Modifier) {
+    Column(modifier) {
+        Card(
+            Modifier.align(Alignment.Start).padding(12.dp).requiredHeightIn(150.dp, 500.dp).aspectRatio(0.71F),
+            elevation = 2.dp
+        ) {
+            KamelImage(
+                image,
+                contentDescription = "Anime",
+                modifier = Modifier.padding(2.dp).clip(RoundedCornerShape(4.dp)),
+                contentScale = ContentScale.FillBounds
+            )
         }
     }
 }

@@ -1,13 +1,14 @@
 package moe.styx.logic.data
 
 import com.aallam.similarity.Cosine
+import kotlinx.coroutines.runBlocking
+import kotlinx.datetime.Clock
 import kotlinx.serialization.Serializable
 import moe.styx.dataManager
 import moe.styx.getLevenshteinScore
-import java.time.DayOfWeek
-import java.time.LocalDate
-import java.time.LocalDateTime
-import java.time.ZoneId
+import moe.styx.moe.styx.navigation.favsTab
+import moe.styx.requestQueue
+import java.time.*
 import java.time.temporal.TemporalAdjusters
 
 @Serializable
@@ -144,16 +145,32 @@ fun MediaSchedule.getTargetTime(): LocalDateTime {
 }
 
 fun Media.find(search: String): Boolean {
-    if (name.isClose(search.trim()) || nameEN.isClose(search.trim()) || nameJP.isClose(search.trim()))
-        return true
-    return false
+    return name.isClose(search.trim()) || nameEN.isClose(search.trim()) || nameJP.isClose(search.trim())
 }
 
 fun Media.isFav(): Boolean {
     val fav = dataManager.favourites.value.find { it.mediaID.equals(GUID, true) }
-    if (fav != null)
-        return true
-    return false
+    return fav != null
+}
+
+fun setFav(media: Media, fav: Boolean = true): Boolean = runBlocking {
+    var list: MutableList<Favourite> = dataManager.favourites.value.toMutableList()
+    if (!fav)
+        list.removeIf { it.mediaID.equals(media.GUID, true) }
+    else {
+        if (!media.isFav()) {
+            list.add(Favourite(media.GUID, "", Clock.System.now().epochSeconds))
+        }
+    }
+
+    dataManager.favourites.value = list.toList()
+    favsTab.searchState.value = favsTab.mediaSearch.getDefault(updateList = dataManager.media.value.filter { it.isFav() })
+    if (!requestQueue.syncFavs()) {
+        requestQueue.status.needsFavSync = true
+        requestQueue.save()
+        return@runBlocking false
+    }
+    return@runBlocking true
 }
 
 fun Media.getCategory(): Category {

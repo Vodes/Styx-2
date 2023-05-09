@@ -29,6 +29,7 @@ import io.kamel.image.config.resourcesFetcher
 import moe.styx.logic.data.DataManager
 import moe.styx.logic.login.isLoggedIn
 import moe.styx.moe.styx.logic.login.ServerStatus
+import moe.styx.moe.styx.logic.requests.RequestQueue
 import moe.styx.moe.styx.navigation.LocalGlobalNavigator
 import moe.styx.moe.styx.views.login.OfflineView
 import moe.styx.moe.styx.views.other.LoadingView
@@ -37,6 +38,7 @@ import moe.styx.views.login.LoginView
 val settings: Settings = Settings()
 var isUiModeDark: MutableState<Boolean> = mutableStateOf(true)
 val dataManager = DataManager()
+val requestQueue = RequestQueue()
 
 val desktopConfig = KamelConfig {
     takeFrom(KamelConfig.Default)
@@ -45,6 +47,7 @@ val desktopConfig = KamelConfig {
 
 @OptIn(ExperimentalAnimationApi::class)
 fun main() = application {
+    requestQueue.start()
     isUiModeDark.value = settings["darkmode", true]
     val darkMode = remember { isUiModeDark }
     val nav = LocalNavigator.current
