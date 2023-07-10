@@ -85,7 +85,7 @@ fun main() = application {
                     CompositionLocalProvider(LocalGlobalNavigator provides navigator) {
                         SlideTransition(
                             navigator, animationSpec = spring(
-                                stiffness = Spring.StiffnessHigh,
+                                stiffness = Spring.StiffnessMedium,
                                 visibilityThreshold = IntOffset.VisibilityThreshold
                             )
                         )
