@@ -9,26 +9,24 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import moe.styx.moe.styx.components.anime.AnimeCard
 import moe.styx.logic.data.Media
+import moe.styx.moe.styx.components.anime.AnimeCard
 import moe.styx.moe.styx.components.anime.AnimeListItem
 import moe.styx.moe.styx.navigation.LocalGlobalNavigator
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun MediaGrid(media: MutableState<List<Media>>) {
-    val list = remember { media }
+    val list by remember { media }
     LazyVerticalGrid(
         columns = GridCells.Adaptive(minSize = 160.dp),
         contentPadding = PaddingValues(10.dp, 7.dp),
     ) {
         itemsIndexed(
-            items = list.value, key = { _, item -> item.GUID },
+            items = list, key = { _, item -> item.GUID },
         ) { _, item ->
             Row(modifier = Modifier.animateItemPlacement()) {
                 AnimeCard(
@@ -43,10 +41,10 @@ fun MediaGrid(media: MutableState<List<Media>>) {
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun MediaList(media: MutableState<List<Media>>) {
-    val list = remember { media }
+    val list by remember { media }
     LazyColumn(Modifier.fillMaxWidth(), contentPadding = PaddingValues(4.dp, 10.dp), content = {
         itemsIndexed(
-            items = list.value, key = { _, item -> item.GUID },
+            items = list, key = { _, item -> item.GUID },
         ) { _, item ->
             Row(modifier = Modifier.animateItemPlacement()) {
                 AnimeListItem(LocalGlobalNavigator.current, item)

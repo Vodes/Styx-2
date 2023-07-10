@@ -3,7 +3,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     kotlin("jvm") version "1.8.20"
-    id("org.jetbrains.compose") version "1.4.0"
+    id("org.jetbrains.compose") version "1.4.1"
     id("org.jetbrains.kotlin.plugin.serialization") version "1.8.20"
 }
 
@@ -19,21 +19,21 @@ repositories {
 
 dependencies {
     implementation(compose.desktop.currentOs)
-    implementation("com.alialbaali.kamel:kamel-image:0.4.1")
-    implementation("io.ktor:ktor-client-content-negotiation:2.2.1")
-    implementation("io.ktor:ktor-serialization-kotlinx-json-jvm:2.2.1")
+    implementation("media.kamel:kamel-image:0.6.1")
     implementation("ca.gosyer:accompanist-flowlayout:0.25.2")
     implementation("com.aallam.similarity:string-similarity-kotlin:0.1.0")
-    implementation("cafe.adriel.voyager:voyager-navigator:1.0.0-rc05")
-    implementation("cafe.adriel.voyager:voyager-tab-navigator:1.0.0-rc05")
-    implementation("cafe.adriel.voyager:voyager-bottom-sheet-navigator:1.0.0-rc05")
-    implementation("cafe.adriel.voyager:voyager-transitions:1.0.0-rc05")
+    implementation("cafe.adriel.voyager:voyager-navigator:1.0.0-rc06")
+    implementation("cafe.adriel.voyager:voyager-tab-navigator:1.0.0-rc06")
+    implementation("cafe.adriel.voyager:voyager-bottom-sheet-navigator:1.0.0-rc06")
+    implementation("cafe.adriel.voyager:voyager-transitions:1.0.0-rc06")
     implementation("com.russhwolf:multiplatform-settings-no-arg:1.0.0")
     // https://mvnrepository.com/artifact/org.jetbrains.compose.material/material-icons-extended-desktop
     implementation("org.jetbrains.compose.material:material-icons-extended-desktop:1.4.0")
     implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.4.0")
-    implementation("io.ktor:ktor-client-okhttp-jvm:2.2.2")
-    implementation("io.ktor:ktor-client-core-jvm:2.2.2")
+    implementation("io.ktor:ktor-client-okhttp-jvm:2.3.2")
+    implementation("io.ktor:ktor-client-core-jvm:2.3.2")
+    implementation("io.ktor:ktor-serialization-kotlinx-json-jvm:2.3.2")
+    implementation("io.ktor:ktor-client-content-negotiation:2.3.2")
 
     // Still gotta think about some cross-platform IO stuff
     //implementation("com.soywiz.korlibs.korio:korio:2.2.0")
@@ -42,6 +42,7 @@ dependencies {
     // implementation("org.jetbrains.compose.material3:material3-desktop:1.4.0")
 
     //implementation("dev.cbyrne:kdiscordipc:0.2.1")
+    implementation(kotlin("stdlib-jdk8"))
 }
 
 tasks.withType<KotlinCompile> {
@@ -57,4 +58,7 @@ compose.desktop {
             packageVersion = "1.0.0"
         }
     }
+}
+kotlin {
+    jvmToolchain(11)
 }
