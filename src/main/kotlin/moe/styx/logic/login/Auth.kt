@@ -5,14 +5,12 @@ import io.ktor.client.request.forms.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import kotlinx.coroutines.runBlocking
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import moe.styx.*
-import moe.styx.logic.data.CreationResponse
-import moe.styx.logic.data.DeviceInfo
-import moe.styx.logic.data.LoginResponse
-import moe.styx.moe.styx.logic.login.ServerStatus
 import moe.styx.moe.styx.logic.login.ServerStatus.Companion.setLastKnown
+import moe.styx.types.CreationResponse
+import moe.styx.types.DeviceInfo
+import moe.styx.types.LoginResponse
 import kotlin.system.exitProcess
 
 fun generateCode(): CreationResponse = runBlocking {
@@ -78,7 +76,7 @@ fun checkLogin(token: String, first: Boolean = false): LoginResponse? = runBlock
         val log = json.decodeFromString<LoginResponse>(response.bodyAsText())
         login = log
         if (first && log.refreshToken != null)
-            settings.putString("refreshToken", log.refreshToken)
+            settings.putString("refreshToken", log.refreshToken!!)
         return@runBlocking login
     }
     return@runBlocking null

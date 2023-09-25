@@ -5,9 +5,9 @@ import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import moe.styx.Endpoints
-import moe.styx.logic.data.MediaEntry
 import moe.styx.logic.login.login
 import moe.styx.settings
+import moe.styx.types.MediaEntry
 import java.io.BufferedReader
 import java.io.InputStream
 import java.io.InputStreamReader

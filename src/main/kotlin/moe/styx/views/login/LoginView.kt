@@ -2,10 +2,7 @@ package moe.styx.views.login
 
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.Button
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.ProgressIndicatorDefaults
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -14,12 +11,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import kotlinx.coroutines.delay
-import moe.styx.logic.data.CreationResponse
 import moe.styx.logic.login.checkLogin
 import moe.styx.logic.login.generateCode
 import moe.styx.logic.login.isLoggedIn
 import moe.styx.moe.styx.navigation.LocalGlobalNavigator
 import moe.styx.moe.styx.views.other.LoadingView
+import moe.styx.types.CreationResponse
 
 class LoginView() : Screen {
 

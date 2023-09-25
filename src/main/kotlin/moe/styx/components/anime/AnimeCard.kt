@@ -4,13 +4,8 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
-import androidx.compose.ui.Modifier
+import androidx.compose.runtime.*
+import androidx.compose.ui.*
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.input.pointer.PointerEventType
@@ -18,19 +13,15 @@ import androidx.compose.ui.input.pointer.onPointerEvent
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.zIndex
 import cafe.adriel.voyager.navigator.Navigator
 import com.russhwolf.settings.get
 import io.kamel.image.KamelImage
 import io.kamel.image.lazyPainterResource
 import moe.styx.dataManager
-import moe.styx.logic.data.Media
-import moe.styx.moe.styx.logic.data.getFile
-import moe.styx.moe.styx.logic.data.getImageFromID
-import moe.styx.moe.styx.logic.data.getURL
-import moe.styx.moe.styx.logic.data.isCached
+import moe.styx.moe.styx.logic.data.*
 import moe.styx.moe.styx.views.anime.AnimeDetailView
 import moe.styx.settings
+import moe.styx.types.Media
 
 @OptIn(ExperimentalMaterialApi::class, ExperimentalComposeUiApi::class)
 @Composable

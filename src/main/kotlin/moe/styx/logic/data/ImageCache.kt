@@ -1,5 +1,6 @@
 package moe.styx.moe.styx.logic.data
 
+import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
@@ -10,8 +11,8 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import moe.styx.dataManager
 import moe.styx.httpClient
-import moe.styx.logic.data.Image
 import moe.styx.toBoolean
+import moe.styx.types.Image
 import java.io.File
 
 suspend fun updateImageCache() = coroutineScope {
@@ -51,7 +52,9 @@ private fun getImageDir(): File {
 
 @OptIn(InternalAPI::class)
 suspend fun Image.downloadFile() {
-    val response: HttpResponse = httpClient.get(getURL())
+    val response: HttpResponse = httpClient.get {
+        url(getURL())
+    }.body()
     if (response.status.isSuccess())
         response.content.copyAndClose(getFile().writeChannel())
 }
@@ -70,6 +73,8 @@ fun Image.getFile(): File {
 }
 
 fun Image.getURL(): String {
+    if (externalURL.isNullOrBlank())
+        return ""
     return if (hasWEBP.toBoolean()) {
         "https://i.styx.moe/$GUID.webp"
     } else if (hasJPG.toBoolean()) {
@@ -77,7 +82,7 @@ fun Image.getURL(): String {
     } else if (hasPNG.toBoolean()) {
         "https://i.styx.moe/$GUID.png"
     } else {
-        if (externalURL.isNullOrBlank()) "" else externalURL
+        return externalURL as String
     }
 }
 

@@ -22,13 +22,13 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
 import io.kamel.image.lazyPainterResource
 import moe.styx.dataManager
-import moe.styx.logic.data.Media
-import moe.styx.logic.data.MediaEntry
 import moe.styx.moe.styx.components.MainScaffold
 import moe.styx.moe.styx.components.anime.*
 import moe.styx.moe.styx.components.misc.FavouriteIconButton
 import moe.styx.moe.styx.logic.data.*
 import moe.styx.moe.styx.navigation.LocalGlobalNavigator
+import moe.styx.types.Media
+import moe.styx.types.MediaEntry
 import java.util.*
 
 class AnimeDetailView(val ID: String) : Screen {
@@ -74,7 +74,7 @@ class AnimeDetailView(val ID: String) : Screen {
                         MediaGenreListing(vm.anime)
                         if (!vm.anime.synopsisEN.isNullOrBlank())
                             SelectionContainer {
-                                Text(vm.anime.synopsisEN, Modifier.padding(6.dp), style = MaterialTheme.typography.caption)
+                                Text(vm.anime.synopsisEN!!, Modifier.padding(6.dp), style = MaterialTheme.typography.caption)
                             }
 
                         if (vm.anime.sequel != null || vm.anime.prequel != null) {

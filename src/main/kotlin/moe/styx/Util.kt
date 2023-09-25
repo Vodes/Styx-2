@@ -1,6 +1,7 @@
 package moe.styx
 
 import io.ktor.client.*
+import io.ktor.client.call.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.request.*
 import io.ktor.client.request.forms.*
@@ -9,7 +10,6 @@ import io.ktor.http.*
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.runBlocking
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import moe.styx.logic.login.login
 import moe.styx.moe.styx.logic.login.ServerStatus
@@ -25,8 +25,8 @@ val httpClient = HttpClient() {
     }
 }
 
-//private const val baseURL = "http://localhost:8080"
-private const val baseURL = "https://beta.styx.moe"
+private const val baseURL = "http://localhost:8080"
+//private const val baseURL = "https://beta.styx.moe"
 
 enum class Endpoints(private val path: String) {
     // TODO: Login
@@ -83,7 +83,8 @@ suspend inline fun <reified T> getList(endpoint: Endpoints): List<T> {
 }
 
 inline fun <reified T> sendObject(endpoint: Endpoints, data: T?): Boolean = runBlocking {
-    val request = httpClient.post(endpoint.url()) {
+    val request = httpClient.post {
+        url(endpoint.url())
         contentType(ContentType.Application.Json)
         setBody(data)
     }
@@ -94,7 +95,9 @@ inline fun <reified T> sendObject(endpoint: Endpoints, data: T?): Boolean = runB
 }
 
 inline fun <reified T> getObject(endpoint: Endpoints): T? = runBlocking {
-    val response: HttpResponse = httpClient.get(endpoint.url())
+    val response: HttpResponse = httpClient.get {
+        url(endpoint.url())
+    }.body()
 
     ServerStatus.setLastKnown(response.status)
 

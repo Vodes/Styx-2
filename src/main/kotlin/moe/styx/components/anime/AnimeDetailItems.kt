@@ -21,9 +21,9 @@ import com.google.accompanist.flowlayout.MainAxisAlignment
 import io.kamel.core.Resource
 import io.kamel.image.KamelImage
 import moe.styx.dataManager
-import moe.styx.logic.data.Media
 import moe.styx.moe.styx.components.misc.ExpandIconButton
 import moe.styx.moe.styx.navigation.LocalGlobalNavigator
+import moe.styx.types.Media
 
 @Composable
 fun MediaNameListing(media: Media, modifier: Modifier = Modifier) {
@@ -31,7 +31,7 @@ fun MediaNameListing(media: Media, modifier: Modifier = Modifier) {
         Column(modifier.padding(10.dp, 20.dp)) {
             if (media.nameEN != null) {
                 Text(
-                    media.nameEN,
+                    media.nameEN!!,
                     overflow = TextOverflow.Ellipsis,
                     color = MaterialTheme.colors.onBackground,
                     style = MaterialTheme.typography.body1,
@@ -40,7 +40,7 @@ fun MediaNameListing(media: Media, modifier: Modifier = Modifier) {
             }
             if (media.nameJP != null && (media.nameEN == null || !media.nameEN.equals(media.nameJP, true)))
                 Text(
-                    media.nameJP,
+                    media.nameJP!!,
                     Modifier.padding(2.dp, 10.dp),
                     overflow = TextOverflow.Ellipsis,
                     style = MaterialTheme.typography.subtitle2,
@@ -73,7 +73,7 @@ fun MediaGenreListing(media: Media) {
     val shape = RoundedCornerShape(16.dp)
     if (!media.genres.isNullOrBlank()) {
         FlowRow(Modifier.padding(5.dp), mainAxisAlignment = MainAxisAlignment.Center) {
-            for (genre in media.genres.split(",")) {
+            for (genre in media.genres!!.split(",")) {
                 Surface(
                     Modifier.clip(shape).padding(7.dp).height(29.dp),
                     shape = shape,
@@ -97,7 +97,7 @@ fun MediaGenreListing(media: Media) {
         if (!media.tags.isNullOrBlank()) {
             AnimatedVisibility(isExpanded.value) {
                 FlowRow(Modifier.padding(5.dp)) {
-                    media.tags.split(",").forEach { tag ->
+                    media.tags!!.split(",").forEach { tag ->
                         Surface(
                             Modifier.clip(shape).padding(7.dp).height(29.dp),
                             shape = shape,

@@ -5,7 +5,7 @@ val voyager_ver = "1.0.0-rc07"
 
 plugins {
     kotlin("jvm") version "1.9.0"
-    id("org.jetbrains.compose") version "1.5.0"
+    id("org.jetbrains.compose") version "1.5.1"
     id("org.jetbrains.kotlin.plugin.serialization") version "1.9.0"
 }
 
@@ -15,6 +15,7 @@ version = "1.0"
 repositories {
     google()
     mavenCentral()
+    mavenLocal()
     maven("https://jitpack.io")
     maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
 }
@@ -30,12 +31,8 @@ dependencies {
     implementation("cafe.adriel.voyager:voyager-transitions:$voyager_ver")
     implementation("com.russhwolf:multiplatform-settings-no-arg:1.0.0")
     // https://mvnrepository.com/artifact/org.jetbrains.compose.material/material-icons-extended-desktop
-    implementation("org.jetbrains.compose.material:material-icons-extended-desktop:1.5.0")
+    implementation("org.jetbrains.compose.material:material-icons-extended-desktop:1.5.1")
     implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.4.0")
-    implementation("io.ktor:ktor-client-okhttp-jvm:2.3.2")
-    implementation("io.ktor:ktor-client-core-jvm:2.3.2")
-    implementation("io.ktor:ktor-serialization-kotlinx-json-jvm:2.3.2")
-    implementation("io.ktor:ktor-client-content-negotiation:2.3.2")
 
     // Still gotta think about some cross-platform IO stuff
     //implementation("com.soywiz.korlibs.korio:korio:2.2.0")
@@ -44,7 +41,12 @@ dependencies {
     // implementation("org.jetbrains.compose.material3:material3-desktop:1.4.0")
 
     //implementation("dev.cbyrne:kdiscordipc:0.2.1")
+    implementation("pw.vodes:styx-types:0.1")
     implementation(kotlin("stdlib-jdk8"))
+    implementation("io.ktor:ktor-client-okhttp-jvm:2.3.4")
+    implementation("io.ktor:ktor-client-core-jvm:2.3.4")
+    implementation("io.ktor:ktor-serialization-kotlinx-json-jvm:2.3.4")
+    implementation("io.ktor:ktor-client-content-negotiation:2.3.4")
 }
 
 tasks.withType<KotlinCompile> {

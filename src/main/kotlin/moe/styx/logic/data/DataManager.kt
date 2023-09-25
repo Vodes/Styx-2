@@ -6,11 +6,11 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import moe.styx.*
 import moe.styx.moe.styx.logic.data.updateImageCache
 import moe.styx.moe.styx.logic.login.ServerStatus
+import moe.styx.types.*
 import java.io.File
 
 class DataManager() {

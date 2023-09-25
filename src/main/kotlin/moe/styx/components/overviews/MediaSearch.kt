@@ -13,11 +13,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.russhwolf.settings.get
 import moe.styx.equalsAny
-import moe.styx.logic.data.*
+import moe.styx.logic.data.favAdded
+import moe.styx.logic.data.find
 import moe.styx.moe.styx.components.misc.TwoStateIconButton
 import moe.styx.moe.styx.logic.data.getSelectedCategories
 import moe.styx.moe.styx.logic.data.getSelectedGenres
 import moe.styx.settings
+import moe.styx.types.Category
+import moe.styx.types.Media
 
 class MediaSearch(listIn: List<Media>, favs: Boolean = false) {
 
@@ -50,7 +53,7 @@ class MediaSearch(listIn: List<Media>, favs: Boolean = false) {
 
         if (selectedGenres.isNotEmpty() && !favs) {
             processedList = processedList.filter { media ->
-                var genresOfMedia = if (media.genres != null) media.genres.split(",") else listOf()
+                var genresOfMedia = if (media.genres != null) media.genres!!.split(",") else listOf()
                 selectedGenres.find { it.equalsAny(genresOfMedia) } != null
             }
         }

@@ -8,12 +8,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import moe.styx.dataManager
-import moe.styx.logic.data.ScheduleWeekday
 import moe.styx.logic.data.dayOfWeek
 import moe.styx.logic.data.getTargetTime
 import moe.styx.makeFirstLetterBig
 import moe.styx.moe.styx.components.anime.AnimeListItem
 import moe.styx.moe.styx.navigation.LocalGlobalNavigator
+import moe.styx.types.ScheduleWeekday
 import java.time.format.DateTimeFormatter
 import java.util.*
 

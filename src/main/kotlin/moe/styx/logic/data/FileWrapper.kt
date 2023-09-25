@@ -2,8 +2,8 @@ package moe.styx.moe.styx.logic.data
 
 import com.russhwolf.settings.get
 import moe.styx.dataManager
-import moe.styx.logic.data.Category
 import moe.styx.settings
+import moe.styx.types.Category
 
 fun getSelectedCategories(shows: Boolean = true): List<Category> {
     val list = mutableListOf<Category>()

@@ -3,33 +3,23 @@ package moe.styx.moe.styx.components.overviews
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.sizeIn
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.flowlayout.FlowRow
 import moe.styx.addIfNotExisting
-import moe.styx.logic.data.Category
-import moe.styx.logic.data.Media
 import moe.styx.logic.data.getCategory
-import moe.styx.moe.styx.logic.data.getSelectedCategories
-import moe.styx.moe.styx.logic.data.getSelectedGenres
-import moe.styx.moe.styx.logic.data.saveSelectedCategories
-import moe.styx.moe.styx.logic.data.saveSelectedGenres
+import moe.styx.moe.styx.logic.data.*
+import moe.styx.types.Category
+import moe.styx.types.Media
 
 @Composable
 fun <T> PrimarySelectableObject(objectIn: T, name: String, isSelected: MutableState<Boolean>, onSelection: (Boolean) -> Unit) {
@@ -38,7 +28,8 @@ fun <T> PrimarySelectableObject(objectIn: T, name: String, isSelected: MutableSt
     val shape = RoundedCornerShape(10.dp)
 
     Surface(
-        Modifier.padding(2.dp, 2.dp).sizeIn(0.dp, 36.dp).clip(shape).clickable { isSelected.value = !isSelected.value; onSelection(isSelected.value) },
+        Modifier.padding(2.dp, 2.dp).sizeIn(0.dp, 36.dp).clip(shape)
+            .clickable { isSelected.value = !isSelected.value; onSelection(isSelected.value) },
         shape = shape,
         border = BorderStroke(2.dp, MaterialTheme.colors.primary),
         color = fillColor.value,
@@ -86,7 +77,7 @@ fun GenreFilterBar(listIn: List<Media>, shows: Boolean = true, onSelected: (List
         if (m.genres == null)
             return@forEach
 
-        for (s in m.genres.split(",")) {
+        for (s in m.genres!!.split(",")) {
             genres.addIfNotExisting(s.trim())
         }
     }
