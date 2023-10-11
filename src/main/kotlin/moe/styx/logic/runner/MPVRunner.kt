@@ -1,24 +1,30 @@
 package moe.styx.moe.styx.logic.runner
 
+import androidx.compose.runtime.getValue
 import com.russhwolf.settings.get
 import kotlinx.coroutines.*
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
-import moe.styx.Endpoints
-import moe.styx.json
+import moe.styx.*
 import moe.styx.logic.login.login
-import moe.styx.settings
 import moe.styx.types.MediaEntry
 import java.io.*
 
 var currentPlayer: MpvInstance? = null
 
-fun launchMPV(entry: MediaEntry, onFail: (String) -> Unit = {}) {
+fun launchMPV(entry: MediaEntry, append: Boolean, onFail: (String) -> Unit = {}) {
     if (currentPlayer == null) {
         currentPlayer = MpvInstance()
-        currentPlayer!!.start(entry, onFail) { currentPlayer = null }
+        currentPlayer!!.start(entry, onFail) {
+            currentPlayer = null
+            if (it > 0) {
+                onFail("Playback ended with a bad status code:\n$it")
+            }
+            println("Playback ended: $it")
+            MpvStatus.current = MpvStatus.current.copy(file = "", paused = true)
+        }
     } else {
-        val result = currentPlayer!!.appendToQueue(entry)
+        val result = currentPlayer!!.play(entry, append)
         if (!result)
             onFail("Failed to add episode to the queue!")
     }
@@ -46,8 +52,9 @@ class MpvInstance {
             "run",
             "io.mpv.Mpv",
             url,
-            pipe
-        ) else listOf(mpvExecutable.absolutePath, url, pipe)
+            pipe,
+            "--keep-open=yes"
+        ) else listOf(mpvExecutable.absolutePath, url, pipe, "--keep-open=yes")
         GlobalScope.launch {
             process = ProcessBuilder(commands).directory(mpvExecutable.parentFile)
                 .redirectOutput(ProcessBuilder.Redirect.PIPE)
@@ -65,7 +72,7 @@ class MpvInstance {
 
             launch {
                 delay(2000L)
-                while (true) {
+                while (currentPlayer != null) {
                     try {
                         val socket = File(if (isWindows) "\\\\.\\pipe\\styx-mpvsocket" else "/tmp/styx-mpvsocket")
                         val socketAccess = RandomAccessFile(socket, "rw")
@@ -74,11 +81,14 @@ class MpvInstance {
                                 "pos" to JsonPrimitive("\${playback-time}"),
                                 "pos-percent" to JsonPrimitive("\${percent-pos}"),
                                 "paused" to JsonPrimitive("\${pause}"),
-                                "path" to JsonPrimitive("\${filename}")
+                                "path" to JsonPrimitive("\${filename}"),
+                                "playlist-count" to JsonPrimitive("\${playlist-count}"),
+                                "playlist-current-pos" to JsonPrimitive("\${playlist-current-pos}")
                             )
                         )
                         socketAccess.write("print-text ${json.toString()}\n".toByteArray())
-                    } catch (_: Exception) {
+                    } catch (ex: Exception) {
+                        println(ex)
                     }
                     println(MpvStatus.current)
                     delay(1500L)
@@ -88,12 +98,17 @@ class MpvInstance {
         return true
     }
 
-    fun appendToQueue(mediaEntry: MediaEntry): Boolean {
+    fun play(mediaEntry: MediaEntry, append: Boolean = true): Boolean {
         try {
+            val current = MpvStatus.current.copy()
             val socket = File(if (isWindows) "\\\\.\\pipe\\styx-mpvsocket" else "/tmp/styx-mpvsocket")
             val socketAccess = RandomAccessFile(socket, "rw")
             val url = "${Endpoints.WATCH.url()}/${mediaEntry.GUID}?token=${login!!.watchToken}"
-            socketAccess.write("loadfile \"$url\" append\n".toByteArray())
+            val appendType = if (current.percentage == 100 && current.paused) "append-play" else "append"
+            val options = if (append) " $appendType" else ""
+            socketAccess.write("loadfile \"$url\"$options\n".toByteArray())
+            if (current.percentage == 100 && current.paused)
+                socketAccess.write("set pause no\n".toByteArray())
             return true
         } catch (_: Exception) {
         }
@@ -101,25 +116,64 @@ class MpvInstance {
     }
 }
 
-data class MpvStatus(val pos: String, val percentage: Int, val file: String, val paused: Boolean) {
+data class MpvStatus(val pos: String, val percentage: Int, val file: String, val paused: Boolean, val playlistCurrent: Int, val playlistSize: Int) {
     companion object {
-        var current = MpvStatus("00:00:00", 0, "", true)
+        var current = MpvStatus("00:00:00", 0, "", true, 0, 0)
+        private var was100 = false
 
-        fun fromOut(output: String): MpvStatus {
+        fun updateCurrent(output: String) {
+
             val obj = json.decodeFromString<Map<String, String>>(output)
 
             var path = obj["path"]
             path = if (path.isNullOrBlank()) "" else
                 if (path.contains("?")) path.split("?")[0] else path
 
-            return MpvStatus(
+            val percent = obj["pos-percent"]?.toIntOrNull() ?: 0
+            val paused = obj["paused"]?.equals("yes") ?: true
+            val playlistCurrent = obj["playlist-current-pos"]?.toIntOrNull() ?: 0
+            val playlistSize = obj["playlist-count"]?.toIntOrNull() ?: 1
+
+            var shouldAutoplay = percent == 100 && paused && playlistCurrent + 1 == playlistSize
+
+            if (!was100 && shouldAutoplay && settings["mpv-play-next", true]) {
+                was100 = true
+                shouldAutoplay = true
+            } else {
+                shouldAutoplay = false
+            }
+
+            was100 = current.percentage == 100 && paused
+
+            current = MpvStatus(
                 obj["pos"] ?: "00:00:00",
-                obj["pos-percent"]?.toInt() ?: 0,
+                percent,
                 path,
-                obj["paused"]?.equals("yes") ?: true
+                paused,
+                playlistCurrent,
+                playlistSize
             )
+            if (shouldAutoplay)
+                attemptPlayNext()
         }
     }
+}
+
+fun attemptPlayNext() {
+    val entryList by dataManager.entries
+    val mediaList by dataManager.media
+
+    val entry = entryList.find { it.GUID == MpvStatus.current.file } ?: return
+    val parentMedia = mediaList.find { it.GUID == entry.mediaID } ?: return
+
+    val current = entry.entryNumber.toDoubleOrNull() ?: 0.0
+    val entries =
+        entryList.filter {
+            val num = it.entryNumber.toDoubleOrNull() ?: 0.0
+            it.mediaID == parentMedia.GUID && num > current
+        }
+    val next = entries.minByOrNull { it.entryNumber.toDoubleOrNull() ?: 9999.0 } ?: return
+    launchMPV(next, true)
 }
 
 fun parseOutput(stream: InputStream) {
@@ -128,7 +182,10 @@ fun parseOutput(stream: InputStream) {
     while (inputStream.readLine()?.also { output = it.trim() } != null) {
         if (!output.startsWith("{") || !output.endsWith("}"))
             continue
-        MpvStatus.current = MpvStatus.fromOut(output)
+        try {
+            MpvStatus.updateCurrent(output)
+        } catch (_: Exception) {
+        }
     }
     inputStream.close()
 }

@@ -18,6 +18,7 @@ import androidx.compose.ui.input.pointer.onPointerEvent
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import moe.styx.moe.styx.logic.runner.currentPlayer
 import moe.styx.moe.styx.logic.runner.launchMPV
 import moe.styx.moe.styx.navigation.LocalGlobalNavigator
 import moe.styx.readableSize
@@ -48,32 +49,27 @@ fun EpisodeList(episodes: List<MediaEntry>, showSelection: MutableState<Boolean>
             }
         }
 
+        var showFailedDialog by remember { mutableStateOf(false) }
+        var failedToPlayMessage by remember { mutableStateOf("") }
+        if (showFailedDialog) {
+            FailedDialog(failedToPlayMessage, Modifier.fillMaxWidth(0.6F), Modifier.align(Alignment.CenterHorizontally)) {
+                showFailedDialog = false
+                if (it) nav.push(SettingsView())
+            }
+        }
+        var selectedMedia by remember { mutableStateOf<MediaEntry?>(null) }
+        var showAppendDialog by remember { mutableStateOf(false) }
+        if (showAppendDialog && selectedMedia != null) {
+            AppendDialog(selectedMedia!!, Modifier.fillMaxWidth(0.6F), Modifier.align(Alignment.CenterHorizontally), {
+                showAppendDialog = false
+            }) {
+                failedToPlayMessage = it
+                showFailedDialog = true
+            }
+        }
+
         LazyColumn {
             items(episodes.size) { i ->
-                val showFailedDialog = remember { mutableStateOf(false) }
-                val failedToPlayMessage = remember { mutableStateOf("") }
-                if (showFailedDialog.value) {
-                    AlertDialog(
-                        {
-                            showFailedDialog.value = false
-                        },
-                        modifier = Modifier.fillMaxWidth(0.6F),
-                        title = { Text("Failed to start player") },
-                        text = { Text(failedToPlayMessage.value) },
-                        dismissButton = {
-                            Button(
-                                { showFailedDialog.value = false },
-                                modifier = Modifier.align(Alignment.CenterHorizontally)
-                            ) { Text("OK") }
-                        },
-                        confirmButton = {
-                            Button({
-                                showFailedDialog.value = false
-                                nav.push(SettingsView())
-                            }, modifier = Modifier.align(Alignment.CenterHorizontally)) { Text("Open Settings") }
-                        }
-                    )
-                }
                 Column(
                     Modifier.padding(10.dp, 5.dp).fillMaxWidth().defaultMinSize(0.dp, 50.dp)
                         .combinedClickable(onClick = {
@@ -81,34 +77,39 @@ fun EpisodeList(episodes: List<MediaEntry>, showSelection: MutableState<Boolean>
                                 selected.put(episodes[i].GUID, !selected.getOrDefault(episodes[i].GUID, false))
                                 return@combinedClickable
                             }
-                            launchMPV(episodes[i]) {
-                                failedToPlayMessage.value = it
-                                showFailedDialog.value = true
+                            if (currentPlayer == null) {
+                                launchMPV(episodes[i], false) {
+                                    failedToPlayMessage = it
+                                    showFailedDialog = true
+                                }
+                            } else {
+                                selectedMedia = episodes[i]
+                                showAppendDialog = true
                             }
                         }, onLongClick = {
                             showSelection.value = !showSelection.value
                         })
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        val checked = mutableStateOf(selected.getOrDefault(episodes[i].GUID, false))
-                        val isIn = mutableStateOf(false)
-                        val timeIn = mutableStateOf(0L)
+                        var checked by mutableStateOf(selected.getOrDefault(episodes[i].GUID, false))
+                        var isIn by mutableStateOf(false)
+                        var timeIn by mutableStateOf(0L)
                         val scope = rememberCoroutineScope()
                         AnimatedVisibility(showSelection.value) {
                             val pointer = Modifier.onPointerEvent(PointerEventType.Enter) {
-                                isIn.value = true
+                                isIn = true
                                 scope.launch {
-                                    while (isIn.value && timeIn.value < 85) {
-                                        timeIn.value++
+                                    while (isIn && timeIn < 85) {
+                                        timeIn++
                                         delay(20)
                                     }
                                 }
 
                             }.onPointerEvent(PointerEventType.Exit) {
-                                isIn.value = false
+                                isIn = false
                                 scope.launch {
-                                    while (!isIn.value && timeIn.value > 0) {
-                                        timeIn.value--
+                                    while (!isIn && timeIn > 0) {
+                                        timeIn--
                                         delay(2)
                                     }
                                 }
@@ -116,7 +117,7 @@ fun EpisodeList(episodes: List<MediaEntry>, showSelection: MutableState<Boolean>
 
                             Column {
                                 Column {
-                                    AnimatedVisibility(timeIn.value > 35 && i > 0) {
+                                    AnimatedVisibility(timeIn > 35 && i > 0) {
                                         IconButton({
                                             episodes.filter { episodes.indexOf(it) < i }.forEach {
                                                 selected.put(
@@ -133,12 +134,12 @@ fun EpisodeList(episodes: List<MediaEntry>, showSelection: MutableState<Boolean>
                                         Spacer(Modifier.height(2.dp))
                                     }
                                 }
-                                Checkbox(checked.value, modifier = pointer, onCheckedChange = {
-                                    checked.value = !checked.value
-                                    selected.put(episodes[i].GUID, checked.value)
+                                Checkbox(checked, modifier = pointer, onCheckedChange = {
+                                    checked = !checked
+                                    selected.put(episodes[i].GUID, checked)
                                 })
                                 Column {
-                                    AnimatedVisibility(timeIn.value > 35 && i < (episodes.size - 1)) {
+                                    AnimatedVisibility(timeIn > 35 && i < (episodes.size - 1)) {
                                         Spacer(Modifier.height(2.dp))
                                         IconButton({
                                             episodes.filter { episodes.indexOf(it) > i }.forEach {
@@ -181,4 +182,48 @@ fun EpisodeList(episodes: List<MediaEntry>, showSelection: MutableState<Boolean>
             }
         }
     }
+}
+
+@Composable
+fun FailedDialog(message: String, modifier: Modifier = Modifier, buttonModifier: Modifier = Modifier, onDismiss: (Boolean) -> Unit = {}) {
+    AlertDialog(
+        { onDismiss(false) },
+        modifier = modifier,
+        title = { Text("Failed to start player") },
+        text = { Text(message) },
+        dismissButton = {
+            Button({ onDismiss(false) }, modifier = buttonModifier) { Text("OK") }
+        },
+        confirmButton = {
+            Button({ onDismiss(true) }, modifier = buttonModifier) { Text("Open Settings") }
+        }
+    )
+}
+
+@Composable
+fun AppendDialog(
+    mediaEntry: MediaEntry,
+    modifier: Modifier = Modifier,
+    buttonModifier: Modifier = Modifier,
+    onDismiss: () -> Unit = {},
+    onFail: (String) -> Unit = {}
+) {
+    AlertDialog(
+        { onDismiss() },
+        modifier = modifier,
+        title = { Text("Choose playback") },
+        text = { Text("Do you want to start playing now or append to the current playlist?") },
+        dismissButton = {
+            Button({
+                launchMPV(mediaEntry, false) { onFail(it) }
+                onDismiss()
+            }, modifier = buttonModifier) { Text("Play now") }
+        },
+        confirmButton = {
+            Button({
+                launchMPV(mediaEntry, true) { onFail(it) }
+                onDismiss()
+            }, modifier = buttonModifier) { Text("Append") }
+        }
+    )
 }
