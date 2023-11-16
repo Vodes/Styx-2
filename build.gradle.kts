@@ -1,12 +1,13 @@
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-val voyager_ver = "1.0.0-rc07"
+val voyagerVer = "1.0.0-rc10"
+val ktorVersion = "2.3.6"
 
 plugins {
-    kotlin("jvm") version "1.9.0"
-    id("org.jetbrains.compose") version "1.5.1"
-    id("org.jetbrains.kotlin.plugin.serialization") version "1.9.0"
+    kotlin("jvm") version "1.9.20"
+    id("org.jetbrains.compose") version "1.5.10"
+    id("org.jetbrains.kotlin.plugin.serialization") version "1.9.20"
 }
 
 group = "moe.styx"
@@ -22,17 +23,17 @@ repositories {
 
 dependencies {
     implementation(compose.desktop.currentOs)
-    implementation("media.kamel:kamel-image:0.7.2")
+    implementation("media.kamel:kamel-image:0.8.3")
     implementation("ca.gosyer:accompanist-flowlayout:0.25.2")
     implementation("com.aallam.similarity:string-similarity-kotlin:0.1.0")
-    implementation("cafe.adriel.voyager:voyager-navigator:$voyager_ver")
-    implementation("cafe.adriel.voyager:voyager-tab-navigator:$voyager_ver")
-    implementation("cafe.adriel.voyager:voyager-bottom-sheet-navigator:$voyager_ver")
-    implementation("cafe.adriel.voyager:voyager-transitions:$voyager_ver")
+    implementation("cafe.adriel.voyager:voyager-navigator:$voyagerVer")
+    implementation("cafe.adriel.voyager:voyager-tab-navigator:$voyagerVer")
+    implementation("cafe.adriel.voyager:voyager-bottom-sheet-navigator:$voyagerVer")
+    implementation("cafe.adriel.voyager:voyager-transitions:$voyagerVer")
     implementation("com.russhwolf:multiplatform-settings-no-arg:1.0.0")
     // https://mvnrepository.com/artifact/org.jetbrains.compose.material/material-icons-extended-desktop
-    implementation("org.jetbrains.compose.material:material-icons-extended-desktop:1.5.1")
-    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.4.0")
+    implementation("org.jetbrains.compose.material:material-icons-extended-desktop:1.5.10")
+    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.4.1")
 
     // Still gotta think about some cross-platform IO stuff
     //implementation("com.soywiz.korlibs.korio:korio:2.2.0")
@@ -43,10 +44,10 @@ dependencies {
     //implementation("dev.cbyrne:kdiscordipc:0.2.1")
     implementation("pw.vodes:styx-types:0.1")
     implementation(kotlin("stdlib-jdk8"))
-    implementation("io.ktor:ktor-client-okhttp-jvm:2.3.4")
-    implementation("io.ktor:ktor-client-core-jvm:2.3.4")
-    implementation("io.ktor:ktor-serialization-kotlinx-json-jvm:2.3.4")
-    implementation("io.ktor:ktor-client-content-negotiation:2.3.4")
+    implementation("io.ktor:ktor-client-okhttp-jvm:$ktorVersion")
+    implementation("io.ktor:ktor-client-core-jvm:$ktorVersion")
+    implementation("io.ktor:ktor-serialization-kotlinx-json-jvm:$ktorVersion")
+    implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
 }
 
 tasks.withType<KotlinCompile> {
