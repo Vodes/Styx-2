@@ -3,9 +3,7 @@ package moe.styx.moe.styx.views.anime.tabs
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Movie
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.navigator.tab.Tab
@@ -31,13 +29,13 @@ class MovieListView() : Tab {
     @Composable
     override fun Content() {
         val vm = rememberScreenModel { MovieListViewModel(mediaSearch) }
-        val list = remember { vm.listState }
-        val useListView = remember { vm.useListViewState }
+        var list by remember { vm.listState }
+        val useListView by remember { vm.useListViewState }
 
         Column {
-            mediaSearch.component({ list.value = it }, false)
+            mediaSearch.component({ list = it }, false)
 
-            if (useListView.value) {
+            if (useListView) {
                 MediaList(list)
             } else {
                 MediaGrid(list)

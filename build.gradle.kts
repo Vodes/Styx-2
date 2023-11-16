@@ -35,6 +35,8 @@ dependencies {
     implementation("org.jetbrains.compose.material:material-icons-extended-desktop:1.5.10")
     implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.4.1")
 
+    api("io.github.kevinnzou:compose-webview-multiplatform:1.7.2")
+
     // Still gotta think about some cross-platform IO stuff
     //implementation("com.soywiz.korlibs.korio:korio:2.2.0")
 
