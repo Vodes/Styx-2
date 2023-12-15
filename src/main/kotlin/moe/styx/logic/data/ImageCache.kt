@@ -1,8 +1,6 @@
 package moe.styx.moe.styx.logic.data
 
-import io.ktor.client.call.*
 import io.ktor.client.request.*
-import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.util.*
 import io.ktor.util.cio.*
@@ -11,8 +9,8 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import moe.styx.dataManager
 import moe.styx.httpClient
-import moe.styx.toBoolean
 import moe.styx.types.Image
+import moe.styx.types.toBoolean
 import java.io.File
 
 suspend fun updateImageCache() = coroutineScope {
@@ -52,9 +50,7 @@ private fun getImageDir(): File {
 
 @OptIn(InternalAPI::class)
 suspend fun Image.downloadFile() {
-    val response: HttpResponse = httpClient.get {
-        url(getURL())
-    }.body()
+    val response = httpClient.get(getURL())
     if (response.status.isSuccess())
         response.content.copyAndClose(getFile().writeChannel())
 }
@@ -64,22 +60,20 @@ fun Image.isCached(): Boolean {
 }
 
 fun Image.getFile(): File {
-    if (hasWEBP.toBoolean())
-        return File(getImageDir(), "$GUID.webp")
-    else if (hasJPG.toBoolean())
-        return File(getImageDir(), "$GUID.jpg")
+    return if (hasWEBP?.toBoolean() == true)
+        File(getImageDir(), "$GUID.webp")
+    else if (hasJPG?.toBoolean() == true)
+        File(getImageDir(), "$GUID.jpg")
     else
-        return File(getImageDir(), "$GUID.png")
+        File(getImageDir(), "$GUID.png")
 }
 
 fun Image.getURL(): String {
-    if (externalURL.isNullOrBlank())
-        return ""
-    return if (hasWEBP.toBoolean()) {
+    return if (hasWEBP?.toBoolean() == true) {
         "https://i.styx.moe/$GUID.webp"
-    } else if (hasJPG.toBoolean()) {
+    } else if (hasJPG?.toBoolean() == true) {
         "https://i.styx.moe/$GUID.jpg"
-    } else if (hasPNG.toBoolean()) {
+    } else if (hasPNG?.toBoolean() == true) {
         "https://i.styx.moe/$GUID.png"
     } else {
         return externalURL as String

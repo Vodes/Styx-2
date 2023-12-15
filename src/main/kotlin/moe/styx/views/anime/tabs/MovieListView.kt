@@ -15,7 +15,7 @@ import moe.styx.moe.styx.components.overviews.MediaGrid
 import moe.styx.moe.styx.components.overviews.MediaList
 import moe.styx.moe.styx.components.overviews.MediaSearch
 import moe.styx.settings
-import moe.styx.toBoolean
+import moe.styx.types.toBoolean
 
 class MovieListView() : Tab {
     override val options: TabOptions

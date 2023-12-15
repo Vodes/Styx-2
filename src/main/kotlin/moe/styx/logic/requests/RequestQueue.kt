@@ -3,8 +3,8 @@ package moe.styx.moe.styx.logic.requests
 import kotlinx.coroutines.*
 import kotlinx.serialization.encodeToString
 import moe.styx.hasInternet
-import moe.styx.json
 import moe.styx.settings
+import moe.styx.types.json
 
 // This is kinda scuffed tbh but I need Favs and Watched progress to be saved locally first and then synced
 class RequestQueue {

@@ -20,7 +20,7 @@ class ScheduleView : Tab {
 
     @Composable
     override fun Content() {
-        val days = ScheduleWeekday.values()
+        val days = ScheduleWeekday.entries.toTypedArray()
         LazyColumn {
             items(items = days, itemContent = { day ->
                 ScheduleDay(day)

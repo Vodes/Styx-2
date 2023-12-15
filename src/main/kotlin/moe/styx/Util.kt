@@ -10,14 +10,9 @@ import io.ktor.http.*
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.runBlocking
-import kotlinx.serialization.json.Json
 import moe.styx.logic.login.login
 import moe.styx.moe.styx.logic.login.ServerStatus
-
-val json = Json {
-    prettyPrint = true
-    isLenient = true
-}
+import moe.styx.types.json
 
 val httpClient = HttpClient() {
     install(ContentNegotiation) {
@@ -26,7 +21,7 @@ val httpClient = HttpClient() {
 }
 
 //private const val baseURL = "http://localhost:8080"
-private const val baseURL = "https://beta.styx.moe"
+private const val baseURL = "https://api.styx.moe"
 
 enum class Endpoints(private val path: String) {
     // TODO: Login
@@ -59,7 +54,6 @@ for example gets you a list of all Media by doing
 
 val media = getList<Media>(Endpoints.MEDIA)
  */
-
 suspend inline fun <reified T> getList(endpoint: Endpoints): List<T> {
     var list = listOf<T>()
 

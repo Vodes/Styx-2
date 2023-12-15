@@ -5,9 +5,12 @@ import com.russhwolf.settings.get
 import kotlinx.coroutines.*
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
-import moe.styx.*
+import moe.styx.Endpoints
+import moe.styx.dataManager
 import moe.styx.logic.login.login
+import moe.styx.settings
 import moe.styx.types.MediaEntry
+import moe.styx.types.json
 import java.io.*
 
 var currentPlayer: MpvInstance? = null
@@ -66,7 +69,7 @@ class MpvInstance {
         }
         val url = "${Endpoints.WATCH.url()}/${mediaEntry.GUID}?token=${login!!.watchToken}"
         val pipe = if (isWindows) """--input-ipc-server=\\.\pipe\styx-mpvsocket""" else "--input-ipc-server=/tmp/styx-mpvsocket"
-        var commands = if (!isWindows && tryFlatpak) listOf(
+        val commands = if (!isWindows && tryFlatpak) listOf(
             mpvExecutable.absolutePath,
             "run",
             "io.mpv.Mpv",

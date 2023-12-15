@@ -9,8 +9,6 @@ import kotlin.math.min
 
 private val small = DecimalFormat("#.#")
 private val big = DecimalFormat("#.##")
-fun Boolean.toInt() = if (this) 1 else 0
-fun Int?.toBoolean() = if (this == null) false else (this > 0)
 
 fun Long.readableSize(useBinary: Boolean = false): String {
     val units = if (useBinary) listOf("B", "KiB", "MiB", "GiB", "TiB") else listOf("B", "KB", "MB", "GB", "TB")

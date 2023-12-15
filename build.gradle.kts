@@ -1,13 +1,13 @@
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-val voyagerVer = "1.0.0-rc10"
-val ktorVersion = "2.3.6"
+val voyagerVer = "1.0.0"
+val ktorVersion = "2.3.7"
 
 plugins {
-    kotlin("jvm") version "1.9.20"
-    id("org.jetbrains.compose") version "1.5.10"
-    id("org.jetbrains.kotlin.plugin.serialization") version "1.9.20"
+    kotlin("jvm") version "1.9.21"
+    id("org.jetbrains.compose") version "1.5.11"
+    id("org.jetbrains.kotlin.plugin.serialization") version "1.9.21"
 }
 
 group = "moe.styx"
@@ -27,6 +27,7 @@ dependencies {
     implementation("ca.gosyer:accompanist-flowlayout:0.25.2")
     implementation("com.aallam.similarity:string-similarity-kotlin:0.1.0")
     implementation("cafe.adriel.voyager:voyager-navigator:$voyagerVer")
+    implementation("cafe.adriel.voyager:voyager-screenmodel:$voyagerVer")
     implementation("cafe.adriel.voyager:voyager-tab-navigator:$voyagerVer")
     implementation("cafe.adriel.voyager:voyager-bottom-sheet-navigator:$voyagerVer")
     implementation("cafe.adriel.voyager:voyager-transitions:$voyagerVer")
@@ -44,10 +45,10 @@ dependencies {
     // implementation("org.jetbrains.compose.material3:material3-desktop:1.4.0")
 
     //implementation("dev.cbyrne:kdiscordipc:0.2.1")
-    implementation("pw.vodes:styx-types:0.1")
+    implementation("moe.styx:styx-types:0.4")
     implementation(kotlin("stdlib-jdk8"))
-    implementation("io.ktor:ktor-client-okhttp-jvm:$ktorVersion")
     implementation("io.ktor:ktor-client-core-jvm:$ktorVersion")
+    implementation("io.ktor:ktor-client-java:$ktorVersion")
     implementation("io.ktor:ktor-serialization-kotlinx-json-jvm:$ktorVersion")
     implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
 }

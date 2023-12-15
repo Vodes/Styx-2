@@ -20,8 +20,8 @@ import moe.styx.types.CreationResponse
 
 class LoginView() : Screen {
 
-    private val CreationResp: MutableState<CreationResponse> = mutableStateOf(generateCode())
-    private val Countdown: MutableState<Int> = mutableStateOf(30);
+    private val creationResponse: MutableState<CreationResponse> = mutableStateOf(generateCode())
+    private val countdown: MutableState<Int> = mutableStateOf(30);
 
     @Composable
     override fun Content() {
@@ -29,23 +29,23 @@ class LoginView() : Screen {
 
         LaunchedEffect(Unit) {
             while (!isLoggedIn()) {
-                Countdown.value--
-                val log = checkLogin(CreationResp.value.GUID, true)
+                countdown.value--
+                val log = checkLogin(creationResponse.value.GUID, true)
                 if (log != null) {
                     nav.push(LoadingView())
                     break
                 }
 
                 delay(1000)
-                if (Countdown.value < 2) {
-                    Countdown.value = 30
-                    CreationResp.value = generateCode()
+                if (countdown.value < 2) {
+                    countdown.value = 30
+                    creationResponse.value = generateCode()
                 }
             }
         }
 
-        val count = remember { Countdown }
-        val resp = remember { CreationResp }
+        val count = remember { countdown }
+        val resp = remember { creationResponse }
 
         val progressAnimation by animateFloatAsState(
             count.value / 30F,

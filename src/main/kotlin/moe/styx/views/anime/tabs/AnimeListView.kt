@@ -26,7 +26,7 @@ import moe.styx.moe.styx.components.overviews.MediaSearch
 import moe.styx.moe.styx.navigation.LocalGlobalNavigator
 import moe.styx.moe.styx.views.other.SubwaySurfers
 import moe.styx.settings
-import moe.styx.toBoolean
+import moe.styx.types.toBoolean
 
 class AnimeListView() : Tab {
     override val options: TabOptions
@@ -36,7 +36,7 @@ class AnimeListView() : Tab {
         }
 
     val mediaSearch = MediaSearch(dataManager.media.value.filter { it.isSeries.toBoolean() })
-
+    
     @Composable
     override fun Content() {
         val nav = LocalGlobalNavigator.current

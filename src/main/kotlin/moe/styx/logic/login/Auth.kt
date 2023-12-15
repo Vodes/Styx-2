@@ -8,9 +8,7 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.encodeToString
 import moe.styx.*
 import moe.styx.moe.styx.logic.login.ServerStatus.Companion.setLastKnown
-import moe.styx.types.CreationResponse
-import moe.styx.types.DeviceInfo
-import moe.styx.types.LoginResponse
+import moe.styx.types.*
 import kotlin.system.exitProcess
 
 fun generateCode(): CreationResponse = runBlocking {

@@ -1,6 +1,5 @@
 package moe.styx
 
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.VisibilityThreshold
 import androidx.compose.animation.core.spring
@@ -45,7 +44,6 @@ val desktopConfig = KamelConfig {
     resourcesFetcher()
 }
 
-@OptIn(ExperimentalAnimationApi::class)
 fun main() = application {
     requestQueue.start()
     isUiModeDark.value = settings["darkmode", true]
