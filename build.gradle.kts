@@ -22,8 +22,9 @@ repositories {
 }
 
 dependencies {
+    implementation(kotlin("stdlib-jdk8"))
     implementation(compose.desktop.currentOs)
-    implementation("media.kamel:kamel-image:0.8.3")
+    implementation("media.kamel:kamel-image:0.9.0")
     implementation("ca.gosyer:accompanist-flowlayout:0.25.2")
     implementation("com.aallam.similarity:string-similarity-kotlin:0.1.0")
     implementation("cafe.adriel.voyager:voyager-navigator:$voyagerVer")
@@ -31,26 +32,23 @@ dependencies {
     implementation("cafe.adriel.voyager:voyager-tab-navigator:$voyagerVer")
     implementation("cafe.adriel.voyager:voyager-bottom-sheet-navigator:$voyagerVer")
     implementation("cafe.adriel.voyager:voyager-transitions:$voyagerVer")
-    implementation("com.russhwolf:multiplatform-settings-no-arg:1.0.0")
-    // https://mvnrepository.com/artifact/org.jetbrains.compose.material/material-icons-extended-desktop
-    implementation("org.jetbrains.compose.material:material-icons-extended-desktop:1.5.10")
-    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.4.1")
-
+    implementation("com.russhwolf:multiplatform-settings-no-arg:1.1.1")
+    api("org.jetbrains.compose.material:material-icons-extended:1.5.11")
+    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.5.0")
     api("io.github.kevinnzou:compose-webview-multiplatform:1.7.2")
 
-    // Still gotta think about some cross-platform IO stuff
-    //implementation("com.soywiz.korlibs.korio:korio:2.2.0")
-
-    // https://mvnrepository.com/artifact/org.jetbrains.compose.material3/material3-desktop
-    // implementation("org.jetbrains.compose.material3:material3-desktop:1.4.0")
-
-    //implementation("dev.cbyrne:kdiscordipc:0.2.1")
-    implementation("moe.styx:styx-types:0.4")
-    implementation(kotlin("stdlib-jdk8"))
     implementation("io.ktor:ktor-client-core-jvm:$ktorVersion")
     implementation("io.ktor:ktor-client-java:$ktorVersion")
     implementation("io.ktor:ktor-serialization-kotlinx-json-jvm:$ktorVersion")
     implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
+
+    // Still gotta think about some cross-platform IO stuff
+    //implementation("com.soywiz.korlibs.korio:korio:2.2.0")
+    // https://mvnrepository.com/artifact/org.jetbrains.compose.material3/material3-desktop
+    // implementation("org.jetbrains.compose.material3:material3-desktop:1.4.0")
+    //implementation("dev.cbyrne:kdiscordipc:0.2.1")
+
+    implementation("moe.styx:styx-types:0.5")
 }
 
 tasks.withType<KotlinCompile> {
