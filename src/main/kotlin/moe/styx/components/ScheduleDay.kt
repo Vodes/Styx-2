@@ -27,7 +27,7 @@ fun ScheduleDay(day: ScheduleWeekday) {
         Text(
             day.name.lowercase().makeFirstLetterBig(),
             modifier = Modifier.padding(2.dp),
-            style = MaterialTheme.typography.bodyMedium
+            style = MaterialTheme.typography.titleLarge
         )
         for (schedule in schedules) {
             val media = dataManager.media.value.find { it.GUID == schedule.mediaID } ?: continue
@@ -35,7 +35,7 @@ fun ScheduleDay(day: ScheduleWeekday) {
             Text(
                 target.format(DateTimeFormatter.ofPattern("HH:mm", Locale.getDefault())),
                 modifier = Modifier.padding(6.dp),
-                style = MaterialTheme.typography.labelMedium
+                style = MaterialTheme.typography.titleMedium
             )
             Column(Modifier.padding(6.dp, 1.dp)) { AnimeListItem(LocalGlobalNavigator.current, media) }
 
