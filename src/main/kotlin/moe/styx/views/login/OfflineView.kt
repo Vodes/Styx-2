@@ -3,7 +3,7 @@ package moe.styx.moe.styx.views.login
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -15,19 +15,19 @@ import moe.styx.moe.styx.views.other.LoadingView
 
 class OfflineView : Screen {
 
+    @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     override fun Content() {
         val nav = LocalGlobalNavigator.current
-        val scaffoldState = rememberScaffoldState()
-        Scaffold(scaffoldState = scaffoldState, topBar = {
+        Scaffold(topBar = {
             TopAppBar(
                 title = { Text("Loading") },
-                backgroundColor = MaterialTheme.colors.secondary,
+//                backgroundColor = MaterialTheme.colors.secondary,
             )
         }) {
             Column(Modifier.padding(5.dp).fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-                Text("Offline-Mode", style = MaterialTheme.typography.h3)
-                Text(ServerStatus.getLastKnownText(), style = MaterialTheme.typography.h5)
+                Text("Offline-Mode", style = MaterialTheme.typography.titleMedium)
+                Text(ServerStatus.getLastKnownText(), style = MaterialTheme.typography.titleSmall)
                 Text(
                     "Feel free to keep using Styx with the data you have from your last use.",
                     Modifier.padding(20.dp).weight(1f)

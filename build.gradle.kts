@@ -24,8 +24,8 @@ repositories {
 dependencies {
     implementation(kotlin("stdlib-jdk8"))
     implementation(compose.desktop.currentOs)
+    implementation("org.jetbrains.compose.material3:material3:1.5.11")
     implementation("media.kamel:kamel-image:0.9.0")
-    implementation("ca.gosyer:accompanist-flowlayout:0.25.2")
     implementation("com.aallam.similarity:string-similarity-kotlin:0.1.0")
     implementation("cafe.adriel.voyager:voyager-navigator:$voyagerVer")
     implementation("cafe.adriel.voyager:voyager-screenmodel:$voyagerVer")

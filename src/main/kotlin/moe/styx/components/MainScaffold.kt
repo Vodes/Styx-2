@@ -1,30 +1,27 @@
 package moe.styx.moe.styx.components
 
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Scaffold
-import androidx.compose.material.ScaffoldState
-import androidx.compose.material.Text
-import androidx.compose.material.TopAppBar
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import moe.styx.moe.styx.components.misc.PopButton
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScaffold(
-    scaffoldState: ScaffoldState,
     modifier: Modifier = Modifier,
     title: String,
-    color: Color = MaterialTheme.colors.primaryVariant,
+    color: Color = MaterialTheme.colorScheme.primaryContainer,
     addPopButton: Boolean = true,
     actions: @Composable () -> Unit = {},
     content: @Composable () -> Unit
 ) {
-    //BoxWithConstraints {
-    Scaffold(scaffoldState = scaffoldState, modifier = modifier, topBar = {
+    Scaffold(modifier = modifier, topBar = {
         TopAppBar(
             title = { Text(title) },
-            backgroundColor = color,
             actions = {
                 actions()
                 if (addPopButton)
@@ -32,7 +29,8 @@ fun MainScaffold(
             }
         )
     }) {
-        content()//constraints)
+        Box(Modifier.fillMaxSize().padding(it)) {
+            content()
+        }
     }
-    //}
 }

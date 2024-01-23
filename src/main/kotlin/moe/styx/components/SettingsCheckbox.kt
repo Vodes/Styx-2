@@ -1,9 +1,9 @@
 package moe.styx.moe.styx.components
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.Checkbox
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -37,7 +37,7 @@ fun SettingsCheckbox(
                     setting.value = updated.also { settings.putBoolean(key, updated) }.also { onUpdate(updated) }
                 }
             }
-            Text(description, style = MaterialTheme.typography.subtitle2)
+            Text(description, style = MaterialTheme.typography.bodySmall)
         }
 }
 

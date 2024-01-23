@@ -5,9 +5,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
@@ -19,25 +18,25 @@ import moe.styx.moe.styx.navigation.LocalGlobalNavigator
 
 class SettingsView : Screen {
 
+    @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     override fun Content() {
-        val scaffoldState = rememberScaffoldState()
         val nav = LocalGlobalNavigator.current
-        val darkMode = remember { isUiModeDark }
+        var darkMode by remember { isUiModeDark }
 
-        Scaffold(scaffoldState = scaffoldState, topBar = {
+        Scaffold(topBar = {
             TopAppBar(
                 title = { Text("Settings") },
-                backgroundColor = MaterialTheme.colors.secondary,
+                //backgroundColor = MaterialTheme.colors.secondary,
                 actions = { PopButton(nav) }
             )
-        }) {
-            Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState(0), true)) {
+        }) { paddingValues ->
+            Column(Modifier.fillMaxSize().padding(paddingValues).verticalScroll(rememberScrollState(0), true)) {
                 Column(Modifier.padding(5.dp).weight(1F)) {
 
                     Column(Modifier.padding(5.dp)) {
-                        Text("Layout Options", style = MaterialTheme.typography.h5, modifier = Modifier.padding(5.dp))
-                        SettingsCheckbox("Darkmode", "darkmode", true, onUpdate = { darkMode.value = it })
+                        Text("Layout Options", modifier = Modifier.padding(5.dp), style = MaterialTheme.typography.bodyMedium)
+                        SettingsCheckbox("Darkmode", "darkmode", darkMode, onUpdate = { darkMode = it })
                         SettingsCheckbox("Show Names by default", "display-names", false)
 
                         Divider(Modifier.padding(5.dp), thickness = 2.dp)
@@ -47,7 +46,7 @@ class SettingsView : Screen {
                     }
 
                     Column(Modifier.padding(5.dp)) {
-                        Text("MPV Options", style = MaterialTheme.typography.h5, modifier = Modifier.padding(5.dp))
+                        Text("MPV Options", style = MaterialTheme.typography.bodyMedium, modifier = Modifier.padding(5.dp))
                         SettingsCheckbox("Use system MPV", "mpv-system", false)
                         SettingsCheckbox("Try to use flatpak (Linux only)", "mpv-flatpak", false)
                         Divider(Modifier.padding(5.dp), thickness = 2.dp)

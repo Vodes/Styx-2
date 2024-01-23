@@ -6,7 +6,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -47,7 +47,6 @@ class AnimeDetailView(val ID: String) : Screen {
     @Preview
     @Composable
     override fun Content() {
-        val scaffoldState = rememberScaffoldState()
         val nav = LocalGlobalNavigator.current
         val vm = rememberScreenModel { AnimeDetailViewModel(ID) }
 
@@ -60,21 +59,24 @@ class AnimeDetailView(val ID: String) : Screen {
         val scrollState = rememberScrollState()
         val showSelection = remember { mutableStateOf(false) }
 
-        MainScaffold(scaffoldState, title = vm.anime.name, actions = {
+        MainScaffold(title = vm.anime.name, actions = {
             FavouriteIconButton(vm.anime)
         }) {
-            Card(Modifier.padding(8.dp).fillMaxSize(), elevation = 9.dp) {
+            ElevatedCard(
+                Modifier.padding(8.dp).fillMaxSize(),
+                colors = CardDefaults.elevatedCardColors(containerColor = MaterialTheme.colorScheme.surface)
+            ) {
                 Row(Modifier.padding(5.dp).fillMaxSize()) {
                     Column(Modifier.fillMaxHeight().fillMaxWidth(.55F).verticalScroll(scrollState)) {
                         StupidImageNameArea(vm.anime)
 
                         Spacer(Modifier.height(6.dp))
 
-                        Text("About", Modifier.padding(6.dp, 2.dp), style = MaterialTheme.typography.h6)
+                        Text("About", Modifier.padding(6.dp, 2.dp), style = MaterialTheme.typography.titleLarge)
                         MediaGenreListing(vm.anime)
                         if (!vm.anime.synopsisEN.isNullOrBlank())
                             SelectionContainer {
-                                Text(vm.anime.synopsisEN!!, Modifier.padding(6.dp), style = MaterialTheme.typography.caption)
+                                Text(vm.anime.synopsisEN!!, Modifier.padding(6.dp), style = MaterialTheme.typography.bodyMedium)
                             }
 
                         if (vm.anime.sequel != null || vm.anime.prequel != null) {
@@ -114,7 +116,7 @@ fun StupidImageNameArea(media: Media) {
                 MediaNameListing(media, Modifier.align(Alignment.Start))//, Modifier.weight(0.5F))
                 Spacer(Modifier.weight(1f, true))
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    val filter = ColorFilter.tint(MaterialTheme.colors.onSurface)
+                    val filter = ColorFilter.tint(MaterialTheme.colorScheme.onSurface)
                     IconButton({ println("Test") }, Modifier.padding(7.dp, 15.dp).size(25.dp)) {
                         Image(painterResource("icons/al.svg"), "Anilist", colorFilter = filter)
                     }

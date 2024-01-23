@@ -2,8 +2,8 @@ package moe.styx.components
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -27,7 +27,7 @@ fun ScheduleDay(day: ScheduleWeekday) {
         Text(
             day.name.lowercase().makeFirstLetterBig(),
             modifier = Modifier.padding(2.dp),
-            style = MaterialTheme.typography.h6
+            style = MaterialTheme.typography.bodyMedium
         )
         for (schedule in schedules) {
             val media = dataManager.media.value.find { it.GUID == schedule.mediaID } ?: continue
@@ -35,7 +35,7 @@ fun ScheduleDay(day: ScheduleWeekday) {
             Text(
                 target.format(DateTimeFormatter.ofPattern("HH:mm", Locale.getDefault())),
                 modifier = Modifier.padding(6.dp),
-                style = MaterialTheme.typography.subtitle1
+                style = MaterialTheme.typography.labelMedium
             )
             Column(Modifier.padding(6.dp, 1.dp)) { AnimeListItem(LocalGlobalNavigator.current, media) }
 

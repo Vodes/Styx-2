@@ -3,9 +3,9 @@ package moe.styx.moe.styx.views.anime.tabs
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Card
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Tv
+import androidx.compose.material3.ElevatedCard
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -35,8 +35,8 @@ class AnimeListView() : Tab {
             return createTabOptions("Shows", Icons.Default.Tv)
         }
 
-    val mediaSearch = MediaSearch(dataManager.media.value.filter { it.isSeries.toBoolean() })
-    
+    private val mediaSearch = MediaSearch(dataManager.media.value.filter { it.isSeries.toBoolean() })
+
     @Composable
     override fun Content() {
         val nav = LocalGlobalNavigator.current
@@ -51,9 +51,9 @@ class AnimeListView() : Tab {
             })
 
             if (showSubwaySurfers) {
-                Card(Modifier.clip(RoundedCornerShape(40)).width(67.dp).height(65.dp).padding(3.dp).clickable {
+                ElevatedCard(Modifier.clip(RoundedCornerShape(40)).width(67.dp).height(65.dp).padding(3.dp).clickable {
                     nav.push(SubwaySurfers())
-                }, elevation = 5.dp) {
+                }) {
                     KamelImage(
                         lazyPainterResource("https://static.wikia.nocookie.net/subwaysurf/images/4/4b/FirstAvatar.jpg"),
                         contentDescription = "Subway Surfers",

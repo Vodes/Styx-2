@@ -4,7 +4,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Text
-import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -52,9 +51,7 @@ class SubwaySurfers : Screen {
             }
         }
 
-        val scaffoldState = rememberScaffoldState()
-
-        MainScaffold(scaffoldState, title = "Subway Surfers") {
+        MainScaffold(title = "Subway Surfers") {
             if (restartRequired || !initialized) {
                 if (restartRequired)
                     Text("Restart required.")

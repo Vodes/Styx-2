@@ -1,11 +1,9 @@
 package moe.styx.moe.styx.components.anime
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.FilterQuality
@@ -17,13 +15,14 @@ import io.kamel.image.KamelImage
 import io.kamel.image.lazyPainterResource
 import moe.styx.moe.styx.logic.data.*
 import moe.styx.moe.styx.views.anime.AnimeDetailView
+import moe.styx.theme.AppShapes
 import moe.styx.types.Media
 
-@OptIn(ExperimentalMaterialApi::class, ExperimentalComposeUiApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AnimeListItem(nav: Navigator, media: Media, elevation: Int = 1) {
+fun AnimeListItem(nav: Navigator, media: Media) {
     val image = media.thumbID.getImageFromID()
-    Card(modifier = Modifier.padding(5.dp, 2.dp).fillMaxWidth(), elevation = elevation.dp, onClick = {
+    ElevatedCard(modifier = Modifier.padding(5.dp, 2.dp).fillMaxWidth(), onClick = {
         if (nav.lastItem is AnimeDetailView) {
             nav.replace(AnimeDetailView(media.GUID))
         } else {
@@ -31,9 +30,8 @@ fun AnimeListItem(nav: Navigator, media: Media, elevation: Int = 1) {
         }
     }) {
         Row(Modifier.height(80.dp)) {
-            Card(
-                Modifier.clip(RoundedCornerShape(40)).width(67.dp).padding(3.dp),
-                elevation = 5.dp
+            ElevatedCard(
+                Modifier.clip(AppShapes.large).width(67.dp).padding(3.dp),
             ) {
                 if (image != null) {
                     KamelImage(
@@ -60,7 +58,7 @@ fun AnimeListItem(nav: Navigator, media: Media, elevation: Int = 1) {
                         overflow = TextOverflow.Ellipsis,
                         softWrap = false,
                         modifier = Modifier.padding(10.dp, 3.dp, 0.dp, 0.dp).align(Alignment.Start),
-                        style = MaterialTheme.typography.caption
+                        style = MaterialTheme.typography.labelSmall
                     )
                 }
                 if (media.nameJP != null && !media.name.equals(media.nameJP, true) && !media.nameJP.equals(
@@ -73,7 +71,7 @@ fun AnimeListItem(nav: Navigator, media: Media, elevation: Int = 1) {
                         overflow = TextOverflow.Ellipsis,
                         softWrap = false,
                         modifier = Modifier.padding(10.dp, 3.dp, 0.dp, 0.dp).align(Alignment.Start),
-                        style = MaterialTheme.typography.caption
+                        style = MaterialTheme.typography.labelSmall
                     )
                 }
             }

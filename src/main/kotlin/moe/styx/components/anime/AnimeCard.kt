@@ -3,7 +3,7 @@ package moe.styx.moe.styx.components.anime
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.*
 import androidx.compose.ui.draw.clip
@@ -21,9 +21,10 @@ import moe.styx.dataManager
 import moe.styx.moe.styx.logic.data.*
 import moe.styx.moe.styx.views.anime.AnimeDetailView
 import moe.styx.settings
+import moe.styx.theme.AppShapes
 import moe.styx.types.Media
 
-@OptIn(ExperimentalMaterialApi::class, ExperimentalComposeUiApi::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
 fun AnimeCard(nav: Navigator, media: Media, showUnseenBadge: Boolean = false) {
     val image = media.thumbID.getImageFromID()
@@ -49,19 +50,19 @@ fun AnimeCard(nav: Navigator, media: Media, showUnseenBadge: Boolean = false) {
                     contentScale = ContentScale.FillBounds,
                     modifier = Modifier.padding(2.dp).align(Alignment.Center)
                         .onPointerEvent(PointerEventType.Enter) { showName.value = !showNamesAllTheTime.value }
-                        .onPointerEvent(PointerEventType.Exit) { showName.value = showNamesAllTheTime.value }
+                        .onPointerEvent(PointerEventType.Exit) { showName.value = showNamesAllTheTime.value }.clip(AppShapes.medium)
                 )
             }
             if (showUnseenBadge) {
                 val entries = dataManager.entries.value.filter { it.mediaID == media.GUID }
-                Card(
+                ElevatedCard(
                     Modifier.clip(RoundedCornerShape(40)).size(33.dp).padding(4.dp).align(Alignment.TopEnd).zIndex(3f),
-                    elevation = 2.dp, backgroundColor = MaterialTheme.colors.primaryVariant
+                    colors = CardDefaults.elevatedCardColors(containerColor = MaterialTheme.colorScheme.primary)
                 ) {
-                    Box(Modifier.fillMaxSize().align(Alignment.Center)) {
+                    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         Text(
                             entries.size.toString(), softWrap = false,
-                            overflow = TextOverflow.Ellipsis, style = MaterialTheme.typography.caption,
+                            overflow = TextOverflow.Ellipsis, style = MaterialTheme.typography.labelSmall,
                             modifier = Modifier.align(Alignment.Center)
                         )
                     }
@@ -72,21 +73,22 @@ fun AnimeCard(nav: Navigator, media: Media, showUnseenBadge: Boolean = false) {
                     modifier = Modifier.zIndex(1f).align(Alignment.BottomCenter).padding(0.dp, 0.dp, 0.dp, 5.dp)
                         .defaultMinSize(0.dp, 25.dp)
                         .fillMaxWidth()
+                        .clip(AppShapes.small)
                         .onPointerEvent(PointerEventType.Enter) { showName.value = !showNamesAllTheTime.value }
                         .onPointerEvent(PointerEventType.Exit) { showName.value = showNamesAllTheTime.value },
-                    color = MaterialTheme.colors.surface.copy(shadowAlpha * 0.85F)
+                    color = MaterialTheme.colorScheme.surface.copy(shadowAlpha * 0.85F)
                 ) {
                     Surface(
                         modifier = Modifier.zIndex(1f).align(Alignment.Center).padding(1.dp)
                             .defaultMinSize(0.dp, 25.dp)
                             .fillMaxWidth(),
-                        color = MaterialTheme.colors.surface.copy(shadowAlpha)
+                        color = MaterialTheme.colorScheme.surface.copy(shadowAlpha)
                     ) {
                         Box(contentAlignment = Alignment.Center, modifier = Modifier.padding(5.dp)) {
                             Text(
                                 media.name, modifier = Modifier.zIndex(2f).align(Alignment.Center),
-                                color = MaterialTheme.colors.onSurface.copy(textAlpha), softWrap = false,
-                                overflow = TextOverflow.Ellipsis, style = MaterialTheme.typography.caption
+                                color = MaterialTheme.colorScheme.onSurface.copy(textAlpha), softWrap = false,
+                                overflow = TextOverflow.Ellipsis, style = MaterialTheme.typography.labelSmall
                             )
                         }
                     }

@@ -9,6 +9,7 @@ import kotlinx.serialization.encodeToString
 import moe.styx.*
 import moe.styx.moe.styx.logic.login.ServerStatus.Companion.setLastKnown
 import moe.styx.types.*
+import java.io.File
 import kotlin.system.exitProcess
 
 fun generateCode(): CreationResponse = runBlocking {
@@ -44,7 +45,12 @@ fun generateCode(): CreationResponse = runBlocking {
 var login: LoginResponse? = null
 
 fun isLoggedIn(): Boolean {
-    val token = settings["refreshToken", "4AC27790-3472-4409-87EC-625FF86B9D63"]
+    val debugFile = File(dataManager.getAppDir(), "debug.token")
+    val token = if (debugFile.exists() && debugFile.readText().isNotBlank()) {
+        debugFile.readText().trim()
+    } else {
+        settings["refreshToken", ""]
+    }
     if (token.isBlank())
         return false
 

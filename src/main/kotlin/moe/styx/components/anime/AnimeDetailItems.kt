@@ -5,7 +5,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.SelectionContainer
-import androidx.compose.material.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -16,13 +16,12 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.google.accompanist.flowlayout.FlowRow
-import com.google.accompanist.flowlayout.MainAxisAlignment
 import io.kamel.core.Resource
 import io.kamel.image.KamelImage
 import moe.styx.dataManager
 import moe.styx.moe.styx.components.misc.ExpandIconButton
 import moe.styx.moe.styx.navigation.LocalGlobalNavigator
+import moe.styx.theme.AppShapes
 import moe.styx.types.Media
 
 @Composable
@@ -33,8 +32,8 @@ fun MediaNameListing(media: Media, modifier: Modifier = Modifier) {
                 Text(
                     media.nameEN!!,
                     overflow = TextOverflow.Ellipsis,
-                    color = MaterialTheme.colors.onBackground,
-                    style = MaterialTheme.typography.body1,
+                    color = MaterialTheme.colorScheme.onBackground,
+                    style = MaterialTheme.typography.titleMedium,
                     maxLines = 3
                 )
             }
@@ -43,7 +42,7 @@ fun MediaNameListing(media: Media, modifier: Modifier = Modifier) {
                     media.nameJP!!,
                     Modifier.padding(2.dp, 10.dp),
                     overflow = TextOverflow.Ellipsis,
-                    style = MaterialTheme.typography.subtitle2,
+                    style = MaterialTheme.typography.bodyMedium,
                     maxLines = 3
                 )
         }
@@ -53,9 +52,8 @@ fun MediaNameListing(media: Media, modifier: Modifier = Modifier) {
 @Composable
 fun BigScalingCardImage(image: Resource<Painter>, modifier: Modifier = Modifier) {
     Column(modifier) {
-        Card(
+        ElevatedCard(
             Modifier.align(Alignment.Start).padding(12.dp).requiredHeightIn(150.dp, 500.dp).aspectRatio(0.71F),
-            elevation = 2.dp
         ) {
             KamelImage(
                 image,
@@ -67,25 +65,26 @@ fun BigScalingCardImage(image: Resource<Painter>, modifier: Modifier = Modifier)
     }
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun MediaGenreListing(media: Media) {
     val isExpanded = remember { mutableStateOf(false) }
-    val shape = RoundedCornerShape(16.dp)
+    val shape = AppShapes.medium
     if (!media.genres.isNullOrBlank()) {
-        FlowRow(Modifier.padding(5.dp), mainAxisAlignment = MainAxisAlignment.Center) {
+        FlowRow(Modifier.padding(5.dp), horizontalArrangement = Arrangement.Start, verticalArrangement = Arrangement.Center) {
             for (genre in media.genres!!.split(",")) {
                 Surface(
-                    Modifier.clip(shape).padding(7.dp).height(29.dp),
+                    Modifier.clip(shape).padding(7.dp).height(34.dp),
                     shape = shape,
-                    color = MaterialTheme.colors.surface,
-                    border = BorderStroke(2.dp, MaterialTheme.colors.primary),
-                    contentColor = MaterialTheme.colors.primary
+                    color = MaterialTheme.colorScheme.surface,
+                    border = BorderStroke(2.dp, MaterialTheme.colorScheme.primary),
+                    contentColor = MaterialTheme.colorScheme.primary
                 ) {
                     Row {
                         Text(
                             genre,
                             Modifier.padding(7.dp).align(Alignment.CenterVertically),
-                            style = MaterialTheme.typography.caption
+                            style = MaterialTheme.typography.labelLarge
                         )
                     }
                 }
@@ -99,17 +98,17 @@ fun MediaGenreListing(media: Media) {
                 FlowRow(Modifier.padding(5.dp)) {
                     media.tags!!.split(",").forEach { tag ->
                         Surface(
-                            Modifier.clip(shape).padding(7.dp).height(29.dp),
+                            Modifier.clip(shape).padding(7.dp).height(34.dp),
                             shape = shape,
-                            color = MaterialTheme.colors.surface,
-                            border = BorderStroke(2.dp, MaterialTheme.colors.secondary),
-                            contentColor = MaterialTheme.colors.secondary
+                            color = MaterialTheme.colorScheme.surface,
+                            border = BorderStroke(2.dp, MaterialTheme.colorScheme.secondary),
+                            contentColor = MaterialTheme.colorScheme.secondary
                         ) {
                             Row {
                                 Text(
                                     tag,
                                     Modifier.padding(7.dp).align(Alignment.CenterVertically),
-                                    style = MaterialTheme.typography.caption
+                                    style = MaterialTheme.typography.labelLarge
                                 )
                             }
                         }
@@ -122,20 +121,20 @@ fun MediaGenreListing(media: Media) {
 
 @Composable
 fun MediaRelations(media: Media) {
-    Text("Relations", Modifier.padding(6.dp, 4.dp), style = MaterialTheme.typography.h6)
+    Text("Relations", Modifier.padding(6.dp, 4.dp), style = MaterialTheme.typography.titleLarge)
     Column(Modifier.padding(5.dp, 2.dp)) {
         val pre = dataManager.media.value.find { a -> a.GUID == media.prequel }
         if (pre != null) {
             Column(Modifier.align(Alignment.Start)) {
-                Text("Prequel", Modifier.padding(4.dp, 5.dp, 4.dp, 6.dp), style = MaterialTheme.typography.caption)
-                AnimeListItem(LocalGlobalNavigator.current, pre, 5)
+                Text("Prequel", Modifier.padding(4.dp, 5.dp, 4.dp, 6.dp), style = MaterialTheme.typography.bodyMedium)
+                AnimeListItem(LocalGlobalNavigator.current, pre)//, 5)
             }
         }
         val seq = dataManager.media.value.find { a -> a.GUID == media.sequel }
         if (seq != null) {
             Column(Modifier.align(Alignment.Start)) {
-                Text("Sequel", Modifier.padding(4.dp, 5.dp, 4.dp, 6.dp), style = MaterialTheme.typography.caption)
-                AnimeListItem(LocalGlobalNavigator.current, seq, 5)
+                Text("Sequel", Modifier.padding(4.dp, 5.dp, 4.dp, 6.dp), style = MaterialTheme.typography.bodyMedium)
+                AnimeListItem(LocalGlobalNavigator.current, seq)//, 5)
             }
         }
     }

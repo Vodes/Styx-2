@@ -2,12 +2,10 @@ package moe.styx.moe.styx.components.overviews
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -19,15 +17,15 @@ import moe.styx.moe.styx.components.misc.TwoStateIconButton
 import moe.styx.moe.styx.logic.data.getSelectedCategories
 import moe.styx.moe.styx.logic.data.getSelectedGenres
 import moe.styx.settings
+import moe.styx.theme.AppShapes
 import moe.styx.types.Category
 import moe.styx.types.Media
 
-class MediaSearch(listIn: List<Media>, favs: Boolean = false) {
+class MediaSearch(listIn: List<Media>, private val favs: Boolean = false) {
 
     private var list = listIn
     val searchState = mutableStateOf("")
-    val sortTypes = listOf("Added", "Name", "English Name", "Romaji Name")
-    val favs = favs
+    private val sortTypes = listOf("Added", "Name", "English Name", "Romaji Name")
     private var lastSearch = ""
 
     fun getDefault(shows: Boolean = true, updateList: List<Media>? = null): List<Media> {
@@ -42,7 +40,13 @@ class MediaSearch(listIn: List<Media>, favs: Boolean = false) {
         )
     }
 
-    fun updateList(sort: String, search: String, descending: Boolean, selectedCategories: List<Category>, selectedGenres: List<String>): List<Media> {
+    private fun updateList(
+        sort: String,
+        search: String,
+        descending: Boolean,
+        selectedCategories: List<Category>,
+        selectedGenres: List<String>
+    ): List<Media> {
         var processedList = list
 
         if (selectedCategories.isNotEmpty() && !favs) {
@@ -53,7 +57,7 @@ class MediaSearch(listIn: List<Media>, favs: Boolean = false) {
 
         if (selectedGenres.isNotEmpty() && !favs) {
             processedList = processedList.filter { media ->
-                var genresOfMedia = if (media.genres != null) media.genres!!.split(",") else listOf()
+                val genresOfMedia = if (media.genres != null) media.genres!!.split(",") else listOf()
                 selectedGenres.find { it.equalsAny(genresOfMedia) } != null
             }
         }
@@ -61,13 +65,13 @@ class MediaSearch(listIn: List<Media>, favs: Boolean = false) {
         if (search.isNotBlank())
             processedList = processedList.filter { it.find(search) }
 
-        if (sort.lowercase() == "added" && favs) {
-            processedList = if (descending)
+        processedList = if (sort.lowercase() == "added" && favs) {
+            if (descending)
                 processedList.sortedByDescending { it.favAdded() }
             else
                 processedList.sortedBy { it.favAdded() }
         } else {
-            processedList = when (sort.lowercase()) {
+            when (sort.lowercase()) {
                 "name" -> if (descending) processedList.sortedByDescending { it.name.lowercase() } else processedList.sortedBy { it.name.lowercase() }
                 "added" -> if (descending) processedList.sortedByDescending { it.added } else processedList.sortedBy { it.added }
                 "english name" -> if (descending) processedList.sortedByDescending { it.nameEN?.lowercase() } else processedList.sortedBy { it.nameEN?.lowercase() }
@@ -82,21 +86,23 @@ class MediaSearch(listIn: List<Media>, favs: Boolean = false) {
 
     @Composable
     fun component(result: (List<Media>) -> Unit, shows: Boolean = true) {
-        val sort = remember { mutableStateOf(settings["sort", "added"]) }
-        val showSort = remember { mutableStateOf(false) }
-        val showFilters = remember { mutableStateOf(settings["show-filters", false]) }
-        val search = remember { searchState }
-        val descending = remember { mutableStateOf(settings["sort-descending", true]) }
-        val selectedGenres = remember { mutableStateOf(getSelectedGenres()) }
-        val selectedCategories = remember { mutableStateOf(getSelectedCategories()) }
+        var sort by remember { mutableStateOf(settings["sort", "added"]) }
+        var showSort by remember { mutableStateOf(false) }
+        var showFilters by remember { mutableStateOf(settings["show-filters", false]) }
+        var search by remember { searchState }
+        var descending by remember { mutableStateOf(settings["sort-descending", true]) }
+        var selectedGenres by remember { mutableStateOf(getSelectedGenres()) }
+        var selectedCategories by remember { mutableStateOf(getSelectedCategories()) }
 
-        TextField(
-            value = search.value,
+        OutlinedTextField(
+            modifier = Modifier.fillMaxWidth().padding(9.dp, 2.dp),
+            shape = AppShapes.medium,
+            value = search,
             onValueChange = {
-                search.value = it
-                result(updateList(sort.value, search.value, descending.value, selectedCategories.value, selectedGenres.value))
+                search = it
+                result(updateList(sort, search, descending, selectedCategories, selectedGenres))
             },
-            placeholder = { Text("Search") },
+            label = { Text("Search") },
             leadingIcon = { Icon(Icons.Filled.Search, null) },
             trailingIcon = {
                 Row {
@@ -106,15 +112,15 @@ class MediaSearch(listIn: List<Media>, favs: Boolean = false) {
                             false,
                             Icons.Filled.FilterAltOff,
                             Icons.Filled.FilterAlt,
-                            { showFilters.value = it })
+                            { showFilters = it })
                     }
                     IconButton(
-                        onClick = { showSort.value = true },
+                        onClick = { showSort = true },
                         content = { Icon(Icons.Filled.MoreVert, null) })
                 }
                 DropdownMenu(
-                    expanded = showSort.value,
-                    onDismissRequest = { showSort.value = false },
+                    expanded = showSort,
+                    onDismissRequest = { showSort = false },
                     content = {
                         Row {
                             Text(
@@ -122,56 +128,56 @@ class MediaSearch(listIn: List<Media>, favs: Boolean = false) {
                                 modifier = Modifier.padding(15.dp, 10.dp).align(Alignment.CenterVertically)
                             )
                             IconButton(onClick = {
-                                descending.value = !descending.value
-                                settings.putBoolean("sort-descending", descending.value)
-                                result(updateList(sort.value, search.value, descending.value, selectedCategories.value, selectedGenres.value))
+                                descending = !descending
+                                settings.putBoolean("sort-descending", descending)
+                                result(updateList(sort, search, descending, selectedCategories, selectedGenres))
                             }, content = {
                                 Icon(
-                                    if (descending.value) Icons.Default.KeyboardArrowDown else Icons.Default.KeyboardArrowUp,
+                                    if (descending) Icons.Default.KeyboardArrowDown else Icons.Default.KeyboardArrowUp,
                                     ""
                                 )
                             }, modifier = Modifier.align(Alignment.CenterVertically))
                         }
-                        sortTypes.forEachIndexed { itemIndex, itemValue ->
+                        sortTypes.forEachIndexed { _, itemValue ->
                             DropdownMenuItem(
+                                text = {
+                                    Text(text = itemValue)
+                                },
                                 onClick = {
-                                    sort.value = itemValue
+                                    sort = itemValue
                                     result(
                                         updateList(
-                                            sort.value,
-                                            search.value,
-                                            descending.value,
-                                            selectedCategories.value,
-                                            selectedGenres.value
+                                            sort,
+                                            search,
+                                            descending,
+                                            selectedCategories,
+                                            selectedGenres
                                         )
                                     )
                                     settings.putString("sort", itemValue)
-                                    showSort.value = false
+                                    showSort = false
                                 },
-                                enabled = (!itemValue.equals(sort.value, true))
-                            ) {
-                                Text(text = itemValue)
-                            }
+                                enabled = (!itemValue.equals(sort, true))
+                            )
                         }
                     })
-            },
-            modifier = Modifier.fillMaxWidth()
+            }
         )
 
-        AnimatedVisibility(showFilters.value && !favs) {
+        AnimatedVisibility(showFilters && !favs) {
             Surface(Modifier.fillMaxWidth().padding(6.dp)) {
-                Card(Modifier.fillMaxWidth().padding(3.dp), elevation = 8.dp) {
+                ElevatedCard(Modifier.fillMaxWidth().padding(3.dp)) {
                     Column {
                         Text("Category", Modifier.padding(7.dp, 4.dp, 7.dp, 3.dp))
                         CategoryFilterBar(list, shows) {
-                            selectedCategories.value = it
-                            result(updateList(sort.value, search.value, descending.value, selectedCategories.value, selectedGenres.value))
+                            selectedCategories = it
+                            result(updateList(sort, search, descending, selectedCategories, selectedGenres))
                         }
 
                         Text("Genre", Modifier.padding(7.dp, 4.dp, 7.dp, 3.dp))
                         GenreFilterBar(list, shows) {
-                            selectedGenres.value = it
-                            result(updateList(sort.value, search.value, descending.value, selectedCategories.value, selectedGenres.value))
+                            selectedGenres = it
+                            result(updateList(sort, search, descending, selectedCategories, selectedGenres))
                         }
                     }
                 }

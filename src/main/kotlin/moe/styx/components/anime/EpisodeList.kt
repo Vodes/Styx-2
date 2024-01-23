@@ -5,10 +5,10 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -25,7 +25,7 @@ import moe.styx.readableSize
 import moe.styx.types.MediaEntry
 import moe.styx.views.settings.SettingsView
 
-@OptIn(ExperimentalFoundationApi::class, ExperimentalComposeUiApi::class, ExperimentalMaterialApi::class)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalComposeUiApi::class)
 @Composable
 fun EpisodeList(episodes: List<MediaEntry>, showSelection: MutableState<Boolean>) {
     val nav = LocalGlobalNavigator.current
@@ -33,7 +33,7 @@ fun EpisodeList(episodes: List<MediaEntry>, showSelection: MutableState<Boolean>
         val selected = remember { mutableStateMapOf<String, Boolean>() }
 
         AnimatedVisibility(showSelection.value) {
-            Card(Modifier.padding(4.dp).fillMaxWidth().height(30.dp), elevation = 4.dp) {
+            ElevatedCard(Modifier.padding(4.dp).fillMaxWidth().height(30.dp)) {
                 Box {
                     Text(
                         if (selected.containsValue(true)) "Selected: ${selected.filter { it.value }.size}" else "Selection",
@@ -43,7 +43,7 @@ fun EpisodeList(episodes: List<MediaEntry>, showSelection: MutableState<Boolean>
                     Text(
                         "Imagine a download and/or seen button here",
                         Modifier.padding(4.dp).align(Alignment.TopEnd),
-                        style = MaterialTheme.typography.overline
+                        style = MaterialTheme.typography.titleSmall
                     )
                 }
             }
@@ -74,7 +74,7 @@ fun EpisodeList(episodes: List<MediaEntry>, showSelection: MutableState<Boolean>
                     Modifier.padding(10.dp, 5.dp).fillMaxWidth().defaultMinSize(0.dp, 50.dp)
                         .combinedClickable(onClick = {
                             if (showSelection.value) {
-                                selected.put(episodes[i].GUID, !selected.getOrDefault(episodes[i].GUID, false))
+                                selected[episodes[i].GUID] = !selected.getOrDefault(episodes[i].GUID, false)
                                 return@combinedClickable
                             }
                             if (currentPlayer == null) {
@@ -164,14 +164,14 @@ fun EpisodeList(episodes: List<MediaEntry>, showSelection: MutableState<Boolean>
                                     "${episodes[i].entryNumber} - ${episodes[i].nameEN}",
                                     Modifier.padding(5.dp),
                                     softWrap = false,
-                                    style = MaterialTheme.typography.subtitle2
+                                    style = MaterialTheme.typography.labelMedium
                                 )
                             }
                             Column(Modifier.align(Alignment.End)) {
                                 Text(
                                     episodes[i].fileSize.readableSize(),
                                     Modifier.padding(5.dp).align(Alignment.End),
-                                    style = MaterialTheme.typography.overline
+                                    style = MaterialTheme.typography.labelSmall
                                 )
                             }
                         }

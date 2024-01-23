@@ -3,45 +3,42 @@ package moe.styx.moe.styx.views.anime
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.QuestionMark
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
-import cafe.adriel.voyager.navigator.tab.CurrentTab
-import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
-import cafe.adriel.voyager.navigator.tab.Tab
-import cafe.adriel.voyager.navigator.tab.TabNavigator
-import moe.styx.moe.styx.navigation.LocalGlobalNavigator
-import moe.styx.moe.styx.navigation.defaultTab
-import moe.styx.moe.styx.navigation.favsTab
-import moe.styx.moe.styx.navigation.movieTab
-import moe.styx.moe.styx.navigation.scheduleTab
+import cafe.adriel.voyager.navigator.tab.*
+import moe.styx.moe.styx.navigation.*
+import moe.styx.moe.styx.views.other.FontSizeView
 import moe.styx.views.settings.SettingsView
 
 class AnimeOverview() : Screen {
 
     val tabNavigator: TabNavigator? = null
 
+    @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     override fun Content() {
-        val scaffoldState = rememberScaffoldState()
         val nav = LocalGlobalNavigator.current
 
-        Scaffold(scaffoldState = scaffoldState, topBar = {
+        Scaffold(topBar = {
             TopAppBar(
                 title = { Text("Styx 2 — Beta") },
-                backgroundColor = MaterialTheme.colors.primaryVariant,
                 actions = {
                     IconButton(onClick = { nav.push(SettingsView()) }, content = { Icon(Icons.Filled.Settings, null) })
+                    IconButton(onClick = { nav.push(FontSizeView()) }, content = { Icon(Icons.Filled.QuestionMark, null) })
                 }
             )
-        }) {
+        }) { values ->
             TabNavigator(defaultTab) {
                 Scaffold(
+                    modifier = Modifier.padding(values),
                     bottomBar = {
-                        BottomNavigation {
+                        NavigationBar(tonalElevation = 5.dp) {
                             TabNavigationItem(defaultTab)
                             TabNavigationItem(movieTab)
                             TabNavigationItem(favsTab)
@@ -59,12 +56,16 @@ class AnimeOverview() : Screen {
     private fun RowScope.TabNavigationItem(tab: Tab) {
         val tabNavigator = LocalTabNavigator.current
 
-        BottomNavigationItem(
+        NavigationBarItem(
             selected = tabNavigator.current.key == tab.key,
             onClick = { tabNavigator.current = tab },
             icon = { Icon(painter = tab.options.icon!!, contentDescription = tab.options.title) },
             label = { Text(tab.options.title) },
-            alwaysShowLabel = false
+            alwaysShowLabel = false,
+            colors = NavigationBarItemDefaults.colors(
+                selectedIconColor = MaterialTheme.colorScheme.onPrimary,
+                indicatorColor = MaterialTheme.colorScheme.primary
+            )
         )
     }
 }

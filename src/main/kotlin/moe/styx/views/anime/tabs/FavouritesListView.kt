@@ -9,9 +9,7 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Star
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.navigator.tab.Tab
@@ -36,16 +34,16 @@ class FavouritesListView() : Tab {
     @OptIn(ExperimentalFoundationApi::class)
     @Composable
     override fun Content() {
-        val list = remember { searchState }
+        var list by remember { searchState }
 
         Column {
-            mediaSearch.component({ list.value = it })
+            mediaSearch.component({ list = it })
             LazyVerticalGrid(
                 columns = GridCells.Adaptive(minSize = 160.dp),
                 contentPadding = PaddingValues(10.dp, 7.dp),
             ) {
                 itemsIndexed(
-                    items = list.value, key = { _, item -> item.GUID },
+                    items = list, key = { _, item -> item.GUID },
                 ) { _, item ->
                     Row(modifier = Modifier.animateItemPlacement()) {
                         AnimeCard(

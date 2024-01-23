@@ -4,13 +4,10 @@ import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.VisibilityThreshold
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
@@ -32,6 +29,7 @@ import moe.styx.moe.styx.logic.requests.RequestQueue
 import moe.styx.moe.styx.navigation.LocalGlobalNavigator
 import moe.styx.moe.styx.views.login.OfflineView
 import moe.styx.moe.styx.views.other.LoadingView
+import moe.styx.theme.*
 import moe.styx.views.login.LoginView
 
 val settings: Settings = Settings()
@@ -66,10 +64,11 @@ fun main() = application {
         }
     )
     {
-        StyxSurface(preferRounded) {
+        Surface(modifier = Modifier.fillMaxSize()) {
             MaterialTheme(
-                colors = (if (darkMode.value) styxDarkColors() else styxLightColors()).switch(),
-                typography = styxTypography
+                colorScheme = (if (darkMode.value) DarkColorScheme else LightColorScheme).transition(),
+                typography = AppTypography,
+                shapes = AppShapes
             ) {
                 val view = if (isLoggedIn())
                     LoadingView()
@@ -90,22 +89,6 @@ fun main() = application {
                     }
                 }
             }
-        }
-    }
-}
-
-@Composable
-fun StyxSurface(rounded: Boolean = false, content: @Composable () -> Unit) {
-    if (rounded) {
-        Surface(
-            modifier = Modifier.fillMaxSize().padding(2.dp).shadow(4.dp, RoundedCornerShape(20.dp)),
-            shape = RoundedCornerShape(20.dp)
-        ) {
-            content()
-        }
-    } else {
-        Surface(modifier = Modifier.fillMaxSize()) {
-            content()
         }
     }
 }
