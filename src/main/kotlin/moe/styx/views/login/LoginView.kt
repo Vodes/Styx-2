@@ -8,7 +8,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import kotlinx.coroutines.delay
 import moe.styx.logic.login.checkLogin
@@ -55,21 +54,20 @@ class LoginView() : Screen {
         Box(modifier = Modifier.padding(10.dp)) {
             Column(Modifier.align(Alignment.TopCenter)) {
                 Text(
-                    "Device registration", Modifier.align(Alignment.CenterHorizontally)
-                        .padding(0.dp, 0.dp, 0.dp, 24.dp)
+                    "Registration Code",
+                    Modifier.align(Alignment.CenterHorizontally).padding(0.dp, 10.dp),
+                    style = MaterialTheme.typography.titleLarge
                 )
-
-                Text("Code", Modifier.align(Alignment.CenterHorizontally).padding(0.dp, 10.dp), fontSize = 18.sp)
 
                 Text(
                     resp.value.code.toString(),
                     Modifier.align(Alignment.CenterHorizontally).padding(0.dp, 10.dp),
-                    fontSize = 30.sp, fontWeight = FontWeight.Bold
+                    style = MaterialTheme.typography.headlineLarge.copy(fontWeight = FontWeight.Bold)
                 )
 
                 CircularProgressIndicator(
                     progressAnimation,
-                    Modifier.align(Alignment.CenterHorizontally).padding(0.dp, 15.dp).fillMaxSize(.3F)
+                    Modifier.align(Alignment.CenterHorizontally).padding(0.dp, 15.dp).fillMaxSize(.3F).weight(0.5F)
                 )
             }
 

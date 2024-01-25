@@ -1,7 +1,6 @@
 package moe.styx
 
 import io.ktor.client.*
-import io.ktor.client.call.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.request.*
 import io.ktor.client.request.forms.*
@@ -12,6 +11,7 @@ import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.runBlocking
 import moe.styx.logic.login.login
 import moe.styx.moe.styx.logic.login.ServerStatus
+import moe.styx.types.Changes
 import moe.styx.types.json
 
 val httpClient = HttpClient() {
@@ -55,33 +55,31 @@ for example gets you a list of all Media by doing
 val media = getList<Media>(Endpoints.MEDIA)
  */
 suspend inline fun <reified T> getList(endpoint: Endpoints): List<T> {
-    var list = listOf<T>()
-
-    if (!hasInternet())
-        return list
-
-    val response: HttpResponse = httpClient.submitForm(
-        endpoint.url(),
-        formParameters = Parameters.build {
-            append("token", login!!.accessToken)
-        }
-    )
+    val response = runCatching {
+        httpClient.submitForm(
+            endpoint.url(),
+            formParameters = Parameters.build {
+                append("token", login!!.accessToken)
+            }
+        )
+    }.onFailure { ServerStatus.lastKnown = ServerStatus.UNKNOWN }.getOrNull() ?: return emptyList()
 
     ServerStatus.setLastKnown(response.status)
 
-    if (response.status.value in 200..203) {
-        list = json.decodeFromString(response.bodyAsText())
-    }
+    if (response.status.value in 200..203)
+        return json.decodeFromString(response.bodyAsText())
 
-    return list
+    return emptyList()
 }
 
 inline fun <reified T> sendObject(endpoint: Endpoints, data: T?): Boolean = runBlocking {
-    val request = httpClient.post {
-        url(endpoint.url())
-        contentType(ContentType.Application.Json)
-        setBody(data)
-    }
+    val request = runCatching {
+        httpClient.post {
+            url(endpoint.url())
+            contentType(ContentType.Application.Json)
+            setBody(data)
+        }
+    }.onFailure { ServerStatus.lastKnown = ServerStatus.UNKNOWN }.getOrNull() ?: return@runBlocking false
 
     ServerStatus.setLastKnown(request.status)
 
@@ -89,9 +87,11 @@ inline fun <reified T> sendObject(endpoint: Endpoints, data: T?): Boolean = runB
 }
 
 inline fun <reified T> getObject(endpoint: Endpoints): T? = runBlocking {
-    val response: HttpResponse = httpClient.get {
-        url(endpoint.url())
-    }.body()
+    val response = runCatching {
+        httpClient.get {
+            url(endpoint.url())
+        }
+    }.onFailure { ServerStatus.lastKnown = ServerStatus.UNKNOWN }.getOrNull() ?: return@runBlocking null
 
     ServerStatus.setLastKnown(response.status)
 
@@ -103,7 +103,8 @@ inline fun <reified T> getObject(endpoint: Endpoints): T? = runBlocking {
 }
 
 fun hasInternet(): Boolean {
-    return true
+    getObject<Changes>(Endpoints.CHANGES)
+    return ServerStatus.lastKnown != ServerStatus.UNKNOWN
 }
 
 suspend fun awaitAll(vararg jobs: Job) {

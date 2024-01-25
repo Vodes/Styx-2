@@ -73,7 +73,7 @@ fun main() = application {
                 val view = if (isLoggedIn())
                     LoadingView()
                 else {
-                    if (ServerStatus.lastKnown != ServerStatus.ONLINE)
+                    if (ServerStatus.lastKnown !in listOf(ServerStatus.ONLINE, ServerStatus.UNAUTHORIZED))
                         OfflineView()
                     else
                         LoginView()

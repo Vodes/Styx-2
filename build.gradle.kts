@@ -42,6 +42,8 @@ dependencies {
     implementation("io.ktor:ktor-serialization-kotlinx-json-jvm:$ktorVersion")
     implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
 
+    implementation("com.github.oshi:oshi-core:6.4.11")
+
     // Still gotta think about some cross-platform IO stuff
     //implementation("com.soywiz.korlibs.korio:korio:2.2.0")
     // https://mvnrepository.com/artifact/org.jetbrains.compose.material3/material3-desktop

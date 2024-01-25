@@ -9,29 +9,17 @@ import kotlinx.serialization.encodeToString
 import moe.styx.*
 import moe.styx.moe.styx.logic.login.ServerStatus.Companion.setLastKnown
 import moe.styx.types.*
+import oshi.SystemInfo
 import java.io.File
 import kotlin.system.exitProcess
 
+
 fun generateCode(): CreationResponse = runBlocking {
+    val info = json.encodeToString(fetchDeviceInfo())
     val response: HttpResponse = httpClient.submitForm(
         Endpoints.DEVICE_CREATE.url(),
         formParameters = Parameters.build {
-            append(
-                "info",
-                json.encodeToString(
-                    DeviceInfo(
-                        "PC",
-                        "Alex' PC",
-                        null,
-                        null,
-                        null,
-                        "Windows 10",
-                        "1904",
-                        null,
-                        null
-                    )
-                )
-            )
+            append("info", info)
         }
     )
 
@@ -40,6 +28,25 @@ fun generateCode(): CreationResponse = runBlocking {
     }
 
     return@runBlocking json.decodeFromString(response.bodyAsText())
+}
+
+fun fetchDeviceInfo(): DeviceInfo {
+    val sInfo = SystemInfo()
+    val hal = sInfo.hardware
+    val power = sInfo.hardware.powerSources
+    val gpus = hal.graphicsCards
+    val os = sInfo.operatingSystem
+    return DeviceInfo(
+        power?.firstOrNull()?.let { if (it.voltage == -1.0 || it.amperage == 0.0 || it.cycleCount == -1) "PC" else "Laptop" } ?: "PC",
+        os.networkParams.hostName,
+        null,
+        hal.processor?.processorIdentifier?.name?.trim(),
+        if (gpus.isEmpty()) null else gpus.joinToString { it.name },
+        "$os".trim(),
+        null,
+        "${System.getProperty("java.vm.name")} (${System.getProperty("java.vm.version")})",
+        System.getProperty("java.version")
+    )
 }
 
 var login: LoginResponse? = null
