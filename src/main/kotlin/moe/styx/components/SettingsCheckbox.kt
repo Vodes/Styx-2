@@ -4,8 +4,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -22,19 +21,19 @@ fun SettingsCheckbox(
     description: String = "",
     onUpdate: (Boolean) -> Unit = {}
 ) {
-    val setting = rememberSaveable { mutableStateOf(settings[key, default]) }
+    var setting by rememberSaveable { mutableStateOf(settings[key, default]) }
 
     if (description.isBlank())
         Row(modifier = Modifier.height(40.dp).padding(paddingValues)) {
-            TextWithCheckBox(title, setting.value, Modifier.align(Alignment.CenterVertically)) { updated ->
-                setting.value = updated.also { settings.putBoolean(key, updated) }.also { onUpdate(updated) }
+            TextWithCheckBox(title, setting, Modifier.align(Alignment.CenterVertically)) { updated ->
+                setting = updated.also { settings.putBoolean(key, updated) }.also { onUpdate(updated) }
             }
         }
     else
         Column(Modifier.height(90.dp).padding(paddingValues)) {
             Row {
-                TextWithCheckBox(title, setting.value, Modifier.align(Alignment.CenterVertically)) { updated ->
-                    setting.value = updated.also { settings.putBoolean(key, updated) }.also { onUpdate(updated) }
+                TextWithCheckBox(title, setting, Modifier.align(Alignment.CenterVertically)) { updated ->
+                    setting = updated.also { settings.putBoolean(key, updated) }.also { onUpdate(updated) }
                 }
             }
             Text(description, style = MaterialTheme.typography.bodySmall)

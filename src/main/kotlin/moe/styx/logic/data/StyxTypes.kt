@@ -4,10 +4,9 @@ import com.aallam.similarity.Cosine
 import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.Clock
 import kotlinx.serialization.Serializable
-import moe.styx.dataManager
-import moe.styx.getLevenshteinScore
+import moe.styx.logic.utils.getLevenshteinScore
+import moe.styx.moe.styx.logic.requests.RequestQueue
 import moe.styx.moe.styx.navigation.favsTab
-import moe.styx.requestQueue
 import moe.styx.types.*
 import java.time.*
 import java.time.temporal.TemporalAdjusters
@@ -58,13 +57,10 @@ fun Media.find(search: String): Boolean {
     return name.isClose(search.trim()) || nameEN.isClose(search.trim()) || nameJP.isClose(search.trim())
 }
 
-fun Media.isFav(): Boolean {
-    val fav = dataManager.favourites.value.find { it.mediaID.equals(GUID, true) }
-    return fav != null
-}
+fun Media.isFav() = DataManager.favourites.value.find { it.mediaID.equals(GUID, true) } != null
 
 fun setFav(media: Media, fav: Boolean = true): Boolean = runBlocking {
-    var list: MutableList<Favourite> = dataManager.favourites.value.toMutableList()
+    val list: MutableList<Favourite> = DataManager.favourites.value.toMutableList()
     if (!fav)
         list.removeIf { it.mediaID.equals(media.GUID, true) }
     else {
@@ -73,30 +69,22 @@ fun setFav(media: Media, fav: Boolean = true): Boolean = runBlocking {
         }
     }
 
-    dataManager.favourites.value = list.toList()
-    favsTab.searchState.value = favsTab.mediaSearch.getDefault(updateList = dataManager.media.value.filter { it.isFav() })
-    if (!requestQueue.syncFavs()) {
-        requestQueue.status.needsFavSync = true
-        requestQueue.save()
+    DataManager.favourites.value = list.toList()
+    favsTab.searchState.value = favsTab.mediaSearch.getDefault(updateList = DataManager.media.value.filter { it.isFav() })
+    if (!RequestQueue.syncFavs()) {
+        RequestQueue.status.needsFavSync = true
+        RequestQueue.save()
         return@runBlocking false
     }
     return@runBlocking true
 }
 
 fun Media.getCategory(): Category {
-    val categories = dataManager.categories.value.sortedByDescending { it.sort }
-    for (cat in categories) {
-        if (cat.GUID.equals(categoryID, true))
-            return cat
-    }
-    return categories.last()
-}
-
-fun Media.getCategoryName(): String {
-    return getCategory().name
+    val categories = DataManager.categories.value.sortedByDescending { it.sort }
+    return categories.find { it.GUID eqI categoryID } ?: categories.last()
 }
 
 fun Media.favAdded(): Long {
-    val fav = dataManager.favourites.value.find { it.mediaID.equals(GUID, true) }
+    val fav = DataManager.favourites.value.find { it.mediaID.equals(GUID, true) }
     return fav?.added ?: 0L
 }

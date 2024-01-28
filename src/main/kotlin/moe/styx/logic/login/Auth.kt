@@ -6,8 +6,12 @@ import io.ktor.client.statement.*
 import io.ktor.http.*
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.encodeToString
-import moe.styx.*
+import moe.styx.logic.Endpoints
+import moe.styx.logic.data.DataManager
+import moe.styx.logic.hasInternet
+import moe.styx.logic.httpClient
 import moe.styx.moe.styx.logic.login.ServerStatus.Companion.setLastKnown
+import moe.styx.settings
 import moe.styx.types.*
 import oshi.SystemInfo
 import java.io.File
@@ -52,7 +56,7 @@ fun fetchDeviceInfo(): DeviceInfo {
 var login: LoginResponse? = null
 
 fun isLoggedIn(): Boolean {
-    val debugFile = File(dataManager.getAppDir(), "debug.token")
+    val debugFile = File(DataManager.getAppDir(), "debug.token")
     val token = if (debugFile.exists() && debugFile.readText().isNotBlank()) {
         debugFile.readText().trim()
     } else {

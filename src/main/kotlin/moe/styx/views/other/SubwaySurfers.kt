@@ -15,7 +15,7 @@ import com.multiplatform.webview.web.rememberWebViewState
 import dev.datlag.kcef.KCEF
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import moe.styx.dataManager
+import moe.styx.logic.data.DataManager
 import moe.styx.moe.styx.components.MainScaffold
 import java.io.File
 import kotlin.math.max
@@ -31,7 +31,7 @@ class SubwaySurfers : Screen {
         LaunchedEffect(Unit) {
             withContext(Dispatchers.IO) {
                 KCEF.init(builder = {
-                    installDir(File(dataManager.getAppDir(), "kcef-bundle"))
+                    installDir(File(DataManager.getAppDir(), "kcef-bundle"))
                     progress {
                         onDownloading {
                             downloading = max(it, 0F)
@@ -41,7 +41,7 @@ class SubwaySurfers : Screen {
                         }
                     }
                     settings {
-                        cachePath = File(dataManager.getAppDir(), "cache").absolutePath
+                        cachePath = File(DataManager.getAppDir(), "cache").absolutePath
                     }
                 }, onError = {
                     it?.printStackTrace()

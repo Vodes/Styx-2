@@ -7,13 +7,13 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 import kotlinx.serialization.encodeToString
-import moe.styx.*
+import moe.styx.logic.*
 import moe.styx.moe.styx.logic.data.updateImageCache
 import moe.styx.moe.styx.logic.login.ServerStatus
 import moe.styx.types.*
 import java.io.File
 
-class DataManager() {
+object DataManager {
 
     val media = mutableStateOf(listOf<Media>())
     val entries = mutableStateOf(listOf<MediaEntry>())
@@ -27,16 +27,16 @@ class DataManager() {
     suspend fun load(onProgressUpdate: (String) -> Unit) = coroutineScope {
         isLoaded.value = false
 
-        val hasConnection = hasInternet() && ServerStatus.lastKnown == ServerStatus.ONLINE
+        val serverOnline = ServerStatus.lastKnown == ServerStatus.ONLINE
 
-        var lastChanges = if (hasConnection) getObject<Changes>(Endpoints.CHANGES) else Changes(0, 0)
+        var lastChanges = if (serverOnline) getObject<Changes>(Endpoints.CHANGES) else Changes(0, 0)
         if (lastChanges == null)
             lastChanges = Changes(0, 0)
 
         val shouldUpdateMedia = lastChanges.media > lastLocalChange().media
         val shouldUpdateEntries = lastChanges.entry > lastLocalChange().entry
 
-        if (hasConnection) {
+        if (serverOnline) {
             // These can be updated every time because its not a lot of data
             val jobs = mutableListOf(launch {
                 saveListEx(getList(Endpoints.SCHEDULES), "schedules.json", schedules)
@@ -82,7 +82,7 @@ class DataManager() {
             schedules.value = readList("schedules.json")
         }
 
-        delay(300)
+        delay(200)
 
         onProgressUpdate("Updating image cache...")
         updateImageCache()
@@ -135,9 +135,7 @@ class DataManager() {
     }
 
     private fun getDataDir(): File {
-        val dir = File(getAppDir(), "Data")
-        dir.mkdirs()
-        return dir
+        return File(getAppDir(), "Data").also { it.mkdirs() }
     }
 
     fun getAppDir(): File {

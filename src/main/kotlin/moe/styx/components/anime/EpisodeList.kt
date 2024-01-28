@@ -18,10 +18,10 @@ import androidx.compose.ui.input.pointer.onPointerEvent
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import moe.styx.logic.utils.readableSize
 import moe.styx.moe.styx.logic.runner.currentPlayer
 import moe.styx.moe.styx.logic.runner.launchMPV
 import moe.styx.moe.styx.navigation.LocalGlobalNavigator
-import moe.styx.readableSize
 import moe.styx.types.MediaEntry
 import moe.styx.views.settings.SettingsView
 

@@ -17,7 +17,7 @@ import cafe.adriel.voyager.navigator.Navigator
 import com.russhwolf.settings.get
 import io.kamel.image.KamelImage
 import io.kamel.image.lazyPainterResource
-import moe.styx.dataManager
+import moe.styx.logic.data.DataManager
 import moe.styx.moe.styx.logic.data.*
 import moe.styx.moe.styx.views.anime.AnimeDetailView
 import moe.styx.settings
@@ -54,7 +54,7 @@ fun AnimeCard(nav: Navigator, media: Media, showUnseenBadge: Boolean = false) {
                 )
             }
             if (showUnseenBadge) {
-                val entries = dataManager.entries.value.filter { it.mediaID == media.GUID }
+                val entries = DataManager.entries.value.filter { it.mediaID == media.GUID }
                 ElevatedCard(
                     Modifier.clip(RoundedCornerShape(40)).size(33.dp).padding(4.dp).align(Alignment.TopEnd).zIndex(3f),
                     colors = CardDefaults.elevatedCardColors(containerColor = MaterialTheme.colorScheme.primary)

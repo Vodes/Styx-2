@@ -5,8 +5,8 @@ import com.russhwolf.settings.get
 import kotlinx.coroutines.*
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
-import moe.styx.Endpoints
-import moe.styx.dataManager
+import moe.styx.logic.Endpoints
+import moe.styx.logic.data.DataManager
 import moe.styx.logic.login.login
 import moe.styx.settings
 import moe.styx.types.MediaEntry
@@ -194,8 +194,8 @@ data class MpvStatus(
 }
 
 fun attemptPlayNext() {
-    val entryList by dataManager.entries
-    val mediaList by dataManager.media
+    val entryList by DataManager.entries
+    val mediaList by DataManager.media
 
     val entry = entryList.find { it.GUID == MpvStatus.current.file } ?: return
     val parentMedia = mediaList.find { it.GUID == entry.mediaID } ?: return

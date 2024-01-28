@@ -1,5 +1,6 @@
 package moe.styx.moe.styx.logic.data
 
+import androidx.compose.runtime.getValue
 import io.ktor.client.request.*
 import io.ktor.http.*
 import io.ktor.util.*
@@ -7,16 +8,17 @@ import io.ktor.util.cio.*
 import io.ktor.utils.io.*
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
-import moe.styx.dataManager
-import moe.styx.httpClient
+import moe.styx.logic.data.DataManager
+import moe.styx.logic.httpClient
 import moe.styx.types.Image
+import moe.styx.types.eqI
 import moe.styx.types.toBoolean
 import java.io.File
 
 suspend fun updateImageCache() = coroutineScope {
-    delay(1000)
+    delay(500)
 
-    val images = dataManager.images.value
+    val images by DataManager.images
     for (i in images) {
         if (i.isCached())
             continue
@@ -32,7 +34,7 @@ private fun cleanUnusedImages() {
     if (files.isNullOrEmpty())
         return
 
-    val images = dataManager.images.value
+    val images by DataManager.images
 
     for (f in files) {
         val corresponding = images.find { it.GUID.equals(f.nameWithoutExtension, true) }
@@ -43,9 +45,7 @@ private fun cleanUnusedImages() {
 }
 
 private fun getImageDir(): File {
-    val dir = File(dataManager.getAppDir(), "Images")
-    dir.mkdirs()
-    return dir
+    return File(DataManager.getAppDir(), "Images").also { it.mkdirs() }
 }
 
 @OptIn(InternalAPI::class)
@@ -81,7 +81,5 @@ fun Image.getURL(): String {
 }
 
 fun String?.getImageFromID(): Image? {
-    if (this == null)
-        return null
-    return dataManager.images.value.find { it.GUID.equals(this, true) }
+    return this.let { DataManager.images.value.find { it.GUID eqI this } }
 }

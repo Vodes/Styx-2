@@ -18,7 +18,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import io.kamel.core.Resource
 import io.kamel.image.KamelImage
-import moe.styx.dataManager
+import moe.styx.logic.data.DataManager
 import moe.styx.moe.styx.components.misc.ExpandIconButton
 import moe.styx.moe.styx.navigation.LocalGlobalNavigator
 import moe.styx.theme.AppShapes
@@ -123,14 +123,14 @@ fun MediaGenreListing(media: Media) {
 fun MediaRelations(media: Media) {
     Text("Relations", Modifier.padding(6.dp, 4.dp), style = MaterialTheme.typography.titleLarge)
     Column(Modifier.padding(5.dp, 2.dp)) {
-        val pre = dataManager.media.value.find { a -> a.GUID == media.prequel }
+        val pre = DataManager.media.value.find { a -> a.GUID == media.prequel }
         if (pre != null) {
             Column(Modifier.align(Alignment.Start)) {
                 Text("Prequel", Modifier.padding(4.dp, 5.dp, 4.dp, 6.dp), style = MaterialTheme.typography.bodyMedium)
                 AnimeListItem(LocalGlobalNavigator.current, pre)//, 5)
             }
         }
-        val seq = dataManager.media.value.find { a -> a.GUID == media.sequel }
+        val seq = DataManager.media.value.find { a -> a.GUID == media.sequel }
         if (seq != null) {
             Column(Modifier.align(Alignment.Start)) {
                 Text("Sequel", Modifier.padding(4.dp, 5.dp, 4.dp, 6.dp), style = MaterialTheme.typography.bodyMedium)

@@ -9,7 +9,7 @@ import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
 import com.russhwolf.settings.get
-import moe.styx.dataManager
+import moe.styx.logic.data.DataManager
 import moe.styx.moe.styx.components.misc.createTabOptions
 import moe.styx.moe.styx.components.overviews.MediaGrid
 import moe.styx.moe.styx.components.overviews.MediaList
@@ -24,7 +24,7 @@ class MovieListView() : Tab {
             return createTabOptions("Movies", Icons.Default.Movie)
         }
 
-    val mediaSearch = MediaSearch(dataManager.media.value.filter { !it.isSeries.toBoolean() })
+    val mediaSearch = MediaSearch(DataManager.media.value.filter { !it.isSeries.toBoolean() })
 
     @Composable
     override fun Content() {

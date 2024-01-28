@@ -9,7 +9,7 @@ import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import moe.styx.dataManager
+import moe.styx.logic.data.DataManager
 import moe.styx.moe.styx.navigation.LocalGlobalNavigator
 import moe.styx.moe.styx.views.anime.AnimeOverview
 
@@ -22,8 +22,8 @@ class LoadingView : Screen {
         val progress = remember { mutableStateOf("") }
 
         coroutineScope.launch {
-            launch { dataManager.load { progress.value = it } }
-            while (!dataManager.isLoaded.value) {
+            launch { DataManager.load { progress.value = it } }
+            while (!DataManager.isLoaded.value) {
                 delay(500)
             }
             nav.replaceAll(AnimeOverview())

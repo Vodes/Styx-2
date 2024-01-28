@@ -14,8 +14,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import moe.styx.addIfNotExisting
 import moe.styx.logic.data.getCategory
+import moe.styx.logic.utils.addIfNotExisting
 import moe.styx.moe.styx.logic.data.*
 import moe.styx.theme.AppShapes
 import moe.styx.types.Category

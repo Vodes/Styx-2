@@ -21,7 +21,7 @@ import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
 import io.kamel.image.lazyPainterResource
-import moe.styx.dataManager
+import moe.styx.logic.data.DataManager
 import moe.styx.moe.styx.components.MainScaffold
 import moe.styx.moe.styx.components.anime.*
 import moe.styx.moe.styx.components.misc.FavouriteIconButton
@@ -133,14 +133,14 @@ fun StupidImageNameArea(media: Media) {
 }
 
 class AnimeDetailViewModel(val ID: String) : ScreenModel {
-    val anime = dataManager.media.value.find { a -> a.GUID == ID }
+    val anime = DataManager.media.value.find { a -> a.GUID == ID }
     private var episodes = listOf<MediaEntry>()
 
     fun getEpisodes(): List<MediaEntry> {
         if (episodes.isNotEmpty())
             return episodes
 
-        episodes = dataManager.entries.value.filter { it.mediaID == anime!!.GUID }.sortedByDescending { it.entryNumber }
+        episodes = DataManager.entries.value.filter { it.mediaID == anime!!.GUID }.sortedByDescending { it.entryNumber }
         return episodes
     }
 }

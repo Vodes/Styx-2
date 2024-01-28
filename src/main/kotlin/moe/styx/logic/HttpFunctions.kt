@@ -1,4 +1,4 @@
-package moe.styx
+package moe.styx.logic
 
 import io.ktor.client.*
 import io.ktor.client.plugins.contentnegotiation.*
@@ -6,8 +6,6 @@ import io.ktor.client.request.*
 import io.ktor.client.request.forms.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.Clock
 import kotlinx.serialization.encodeToString
@@ -128,8 +126,4 @@ inline fun <reified T> getObject(endpoint: Endpoints): T? = runBlocking {
 fun hasInternet(): Boolean {
     getObject<Changes>(Endpoints.CHANGES)
     return ServerStatus.lastKnown != ServerStatus.UNKNOWN
-}
-
-suspend fun awaitAll(vararg jobs: Job) {
-    jobs.asList().joinAll()
 }

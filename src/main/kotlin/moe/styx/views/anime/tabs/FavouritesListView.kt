@@ -14,7 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
-import moe.styx.dataManager
+import moe.styx.logic.data.DataManager
 import moe.styx.logic.data.isFav
 import moe.styx.moe.styx.components.anime.AnimeCard
 import moe.styx.moe.styx.components.misc.createTabOptions
@@ -28,7 +28,7 @@ class FavouritesListView() : Tab {
             return createTabOptions("Favourites", Icons.Default.Star)
         }
 
-    val mediaSearch = MediaSearch(dataManager.media.value.filter { it.isFav() }, true)
+    val mediaSearch = MediaSearch(DataManager.media.value.filter { it.isFav() }, true)
     val searchState = mutableStateOf(mediaSearch.getDefault())
 
     @OptIn(ExperimentalFoundationApi::class)

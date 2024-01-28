@@ -7,10 +7,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import moe.styx.dataManager
+import moe.styx.logic.data.DataManager
 import moe.styx.logic.data.dayOfWeek
 import moe.styx.logic.data.getTargetTime
-import moe.styx.makeFirstLetterBig
+import moe.styx.logic.utils.makeFirstLetterBig
 import moe.styx.moe.styx.components.anime.AnimeListItem
 import moe.styx.moe.styx.navigation.LocalGlobalNavigator
 import moe.styx.types.ScheduleWeekday
@@ -20,7 +20,7 @@ import java.util.*
 
 @Composable
 fun ScheduleDay(day: ScheduleWeekday) {
-    val schedules = dataManager.schedules.value.filter { it.getTargetTime().dayOfWeek == day.dayOfWeek() }
+    val schedules = DataManager.schedules.value.filter { it.getTargetTime().dayOfWeek == day.dayOfWeek() }
     if (schedules.isEmpty())
         return
     Column(Modifier.padding(2.dp, 6.dp)) {
@@ -30,7 +30,7 @@ fun ScheduleDay(day: ScheduleWeekday) {
             style = MaterialTheme.typography.titleLarge
         )
         for (schedule in schedules) {
-            val media = dataManager.media.value.find { it.GUID == schedule.mediaID } ?: continue
+            val media = DataManager.media.value.find { it.GUID == schedule.mediaID } ?: continue
             val target = schedule.getTargetTime()
             Text(
                 target.format(DateTimeFormatter.ofPattern("HH:mm", Locale.getDefault())),
@@ -38,7 +38,6 @@ fun ScheduleDay(day: ScheduleWeekday) {
                 style = MaterialTheme.typography.titleMedium
             )
             Column(Modifier.padding(6.dp, 1.dp)) { AnimeListItem(LocalGlobalNavigator.current, media) }
-
         }
     }
 }

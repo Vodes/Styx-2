@@ -1,31 +1,6 @@
-package moe.styx
+package moe.styx.logic.utils
 
-import java.math.BigDecimal
-import java.math.RoundingMode
-import java.text.DecimalFormat
 import java.util.*
-import kotlin.math.floor
-import kotlin.math.min
-
-private val small = DecimalFormat("#.#")
-private val big = DecimalFormat("#.##")
-
-fun Long.readableSize(useBinary: Boolean = false): String {
-    val units = if (useBinary) listOf("B", "KiB", "MiB", "GiB", "TiB") else listOf("B", "KB", "MB", "GB", "TB")
-    val divisor = if (useBinary) 1024 else 1000
-    var steps = 0
-    var current = this.toDouble()
-    while (floor((current / divisor)) > 0) {
-        current = (current / divisor)
-        steps++;
-    }
-    small.roundingMode = RoundingMode.CEILING.also { big.roundingMode = it }
-    return "${(if (steps > 2) big else small).format(current)} ${units[steps]}"
-}
-
-fun Double.round(decimals: Int = 2): Double {
-    return BigDecimal(this).setScale(decimals, RoundingMode.HALF_UP).toDouble()
-}
 
 fun String.makeFirstLetterBig(): String {
     return this.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }
@@ -74,7 +49,7 @@ fun String.getLevenshteinScore(other: String): Int {
             val costInsert = cost[j] + 1
             val costDelete = newCost[j - 1] + 1
 
-            newCost[j] = min(min(costInsert, costDelete), costReplace)
+            newCost[j] = kotlin.math.min(kotlin.math.min(costInsert, costDelete), costReplace)
         }
 
         val swap = cost
@@ -83,20 +58,3 @@ fun String.getLevenshteinScore(other: String): Int {
     }
     return cost[s1Length - 1]
 }
-
-fun MutableList<String>.containsIgnoreCase(s: String): Boolean {
-    for (existing in this) {
-        if (existing.trim().equals(s.trim(), true)) {
-            return true;
-        }
-    }
-    return false
-}
-
-fun MutableList<String>.addIfNotExisting(s: String) {
-    if (this.containsIgnoreCase(s))
-        return
-
-    this.add(s)
-}
-

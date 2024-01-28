@@ -18,7 +18,7 @@ import cafe.adriel.voyager.navigator.tab.TabOptions
 import com.russhwolf.settings.get
 import io.kamel.image.KamelImage
 import io.kamel.image.lazyPainterResource
-import moe.styx.dataManager
+import moe.styx.logic.data.DataManager
 import moe.styx.moe.styx.components.misc.createTabOptions
 import moe.styx.moe.styx.components.overviews.MediaGrid
 import moe.styx.moe.styx.components.overviews.MediaList
@@ -35,7 +35,7 @@ class AnimeListView() : Tab {
             return createTabOptions("Shows", Icons.Default.Tv)
         }
 
-    private val mediaSearch = MediaSearch(dataManager.media.value.filter { it.isSeries.toBoolean() })
+    private val mediaSearch = MediaSearch(DataManager.media.value.filter { it.isSeries.toBoolean() })
 
     @Composable
     override fun Content() {
