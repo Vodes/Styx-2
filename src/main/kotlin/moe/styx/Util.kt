@@ -9,8 +9,12 @@ import io.ktor.http.*
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.runBlocking
+import kotlinx.datetime.Clock
+import kotlinx.serialization.encodeToString
+import moe.styx.logic.login.isLoggedIn
 import moe.styx.logic.login.login
 import moe.styx.moe.styx.logic.login.ServerStatus
+import moe.styx.types.ApiResponse
 import moe.styx.types.Changes
 import moe.styx.types.json
 
@@ -20,8 +24,8 @@ val httpClient = HttpClient() {
     }
 }
 
-//private const val baseURL = "http://localhost:8081"
-private const val baseURL = "https://api.styx.moe"
+private const val baseURL = "http://localhost:8081"
+//private const val baseURL = "https://api.styx.moe"
 
 enum class Endpoints(private val path: String) {
     // TODO: Login
@@ -55,6 +59,10 @@ for example gets you a list of all Media by doing
 val media = getList<Media>(Endpoints.MEDIA)
  */
 suspend inline fun <reified T> getList(endpoint: Endpoints): List<T> {
+    if (Clock.System.now().epochSeconds > login!!.tokenExpiry) {
+        if (!isLoggedIn())
+            return emptyList()
+    }
     val response = runCatching {
         httpClient.submitForm(
             endpoint.url(),
@@ -72,21 +80,36 @@ suspend inline fun <reified T> getList(endpoint: Endpoints): List<T> {
     return emptyList()
 }
 
-inline fun <reified T> sendObject(endpoint: Endpoints, data: T?): Boolean = runBlocking {
+inline fun <reified T> sendObjectWithResponse(endpoint: Endpoints, data: T?): ApiResponse? = runBlocking {
+    if (Clock.System.now().epochSeconds > login!!.tokenExpiry) {
+        if (!isLoggedIn())
+            return@runBlocking null
+    }
     val request = runCatching {
-        httpClient.post {
-            url(endpoint.url())
-            contentType(ContentType.Application.Json)
-            setBody(data)
-        }
-    }.onFailure { ServerStatus.lastKnown = ServerStatus.UNKNOWN }.getOrNull() ?: return@runBlocking false
+        httpClient.submitForm(endpoint.url(), formParameters = parameters {
+            append("token", login!!.accessToken)
+            append("content", json.encodeToString(data))
+        })
+    }.onFailure { ServerStatus.lastKnown = ServerStatus.UNKNOWN }.getOrNull() ?: return@runBlocking null
 
     ServerStatus.setLastKnown(request.status)
 
-    return@runBlocking request.status.value in 200..203
+    val response = runCatching {
+        json.decodeFromString<ApiResponse>(request.bodyAsText())
+    }.getOrNull()
+
+    return@runBlocking response
+}
+
+inline fun <reified T> sendObject(endpoint: Endpoints, data: T?): Boolean = runBlocking {
+    return@runBlocking sendObjectWithResponse<T>(endpoint, data) != null
 }
 
 inline fun <reified T> getObject(endpoint: Endpoints): T? = runBlocking {
+    if (Clock.System.now().epochSeconds > login!!.tokenExpiry) {
+        if (!isLoggedIn())
+            return@runBlocking null
+    }
     val response = runCatching {
         httpClient.get {
             url(endpoint.url())
