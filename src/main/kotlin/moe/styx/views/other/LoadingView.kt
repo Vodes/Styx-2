@@ -1,4 +1,4 @@
-package moe.styx.moe.styx.views.other
+package moe.styx.views.other
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
@@ -10,8 +10,8 @@ import cafe.adriel.voyager.core.screen.Screen
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import moe.styx.logic.data.DataManager
-import moe.styx.moe.styx.navigation.LocalGlobalNavigator
-import moe.styx.moe.styx.views.anime.AnimeOverview
+import moe.styx.navigation.LocalGlobalNavigator
+import moe.styx.views.anime.AnimeOverview
 
 class LoadingView : Screen {
     @OptIn(ExperimentalMaterial3Api::class)

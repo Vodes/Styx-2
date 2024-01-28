@@ -1,4 +1,4 @@
-package moe.styx.moe.styx.components
+package moe.styx.components
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Checkbox

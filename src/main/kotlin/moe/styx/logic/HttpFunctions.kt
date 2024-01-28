@@ -11,9 +11,8 @@ import kotlinx.datetime.Clock
 import kotlinx.serialization.encodeToString
 import moe.styx.logic.login.isLoggedIn
 import moe.styx.logic.login.login
-import moe.styx.moe.styx.logic.login.ServerStatus
+import moe.styx.logic.login.ServerStatus
 import moe.styx.types.ApiResponse
-import moe.styx.types.Changes
 import moe.styx.types.json
 
 val httpClient = HttpClient() {
@@ -124,6 +123,5 @@ inline fun <reified T> getObject(endpoint: Endpoints): T? = runBlocking {
 }
 
 fun hasInternet(): Boolean {
-    getObject<Changes>(Endpoints.CHANGES)
     return ServerStatus.lastKnown != ServerStatus.UNKNOWN
 }

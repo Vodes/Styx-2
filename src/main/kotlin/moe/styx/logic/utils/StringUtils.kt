@@ -1,5 +1,6 @@
 package moe.styx.logic.utils
 
+import com.aallam.similarity.Cosine
 import java.util.*
 
 fun String.makeFirstLetterBig(): String {
@@ -57,4 +58,24 @@ fun String.getLevenshteinScore(other: String): Int {
         newCost = swap
     }
     return cost[s1Length - 1]
+}
+
+private val cos = Cosine(3)
+
+fun String?.isClose(s: String): Boolean {
+    if (!this.isNullOrEmpty()) {
+        val score = this.getLevenshteinScore(s).toDouble()
+        val maxLen = kotlin.math.max(this.length, s.length).toDouble()
+        val compensatedLevScore = (maxLen - score) / maxLen
+        val cosineScore = cos.similarity(this, s)
+        val avgScore = (compensatedLevScore + cosineScore) / 2
+
+        if (this.startsWith(s, true) ||
+            this.equals(s, true) ||
+            kotlin.math.max(cosineScore, avgScore) >= 0.3
+        ) {
+            return true
+        }
+    }
+    return false
 }

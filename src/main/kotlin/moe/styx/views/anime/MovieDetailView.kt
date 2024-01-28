@@ -1,4 +1,4 @@
-package moe.styx.moe.styx.views.anime
+package moe.styx.views.anime
 
 import androidx.compose.runtime.Composable
 import cafe.adriel.voyager.core.screen.Screen

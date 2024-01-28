@@ -23,11 +23,11 @@ import io.kamel.core.config.takeFrom
 import io.kamel.image.config.Default
 import io.kamel.image.config.resourcesFetcher
 import moe.styx.logic.login.isLoggedIn
-import moe.styx.moe.styx.logic.login.ServerStatus
-import moe.styx.moe.styx.logic.requests.RequestQueue
-import moe.styx.moe.styx.navigation.LocalGlobalNavigator
-import moe.styx.moe.styx.views.login.OfflineView
-import moe.styx.moe.styx.views.other.LoadingView
+import moe.styx.logic.loops.RequestQueue
+import moe.styx.logic.login.ServerStatus
+import moe.styx.navigation.LocalGlobalNavigator
+import moe.styx.views.login.OfflineView
+import moe.styx.views.other.LoadingView
 import moe.styx.theme.*
 import moe.styx.views.login.LoginView
 

@@ -10,7 +10,7 @@ import moe.styx.logic.Endpoints
 import moe.styx.logic.data.DataManager
 import moe.styx.logic.hasInternet
 import moe.styx.logic.httpClient
-import moe.styx.moe.styx.logic.login.ServerStatus.Companion.setLastKnown
+import moe.styx.logic.login.ServerStatus.Companion.setLastKnown
 import moe.styx.settings
 import moe.styx.types.*
 import oshi.SystemInfo

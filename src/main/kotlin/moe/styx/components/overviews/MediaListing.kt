@@ -1,4 +1,4 @@
-package moe.styx.moe.styx.components.overviews
+package moe.styx.components.overviews
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.PaddingValues
@@ -12,9 +12,9 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import moe.styx.moe.styx.components.anime.AnimeCard
-import moe.styx.moe.styx.components.anime.AnimeListItem
-import moe.styx.moe.styx.navigation.LocalGlobalNavigator
+import moe.styx.components.anime.AnimeCard
+import moe.styx.components.anime.AnimeListItem
+import moe.styx.navigation.LocalGlobalNavigator
 import moe.styx.types.Media
 
 @OptIn(ExperimentalFoundationApi::class)

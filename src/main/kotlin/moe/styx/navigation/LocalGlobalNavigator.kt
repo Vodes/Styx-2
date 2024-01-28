@@ -1,4 +1,4 @@
-package moe.styx.moe.styx.navigation
+package moe.styx.navigation
 
 import androidx.compose.runtime.ProvidableCompositionLocal
 import androidx.compose.runtime.staticCompositionLocalOf

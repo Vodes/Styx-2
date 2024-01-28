@@ -1,4 +1,4 @@
-package moe.styx.moe.styx.views.anime.tabs
+package moe.styx.views.anime.tabs
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Column
@@ -16,10 +16,10 @@ import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
 import moe.styx.logic.data.DataManager
 import moe.styx.logic.data.isFav
-import moe.styx.moe.styx.components.anime.AnimeCard
-import moe.styx.moe.styx.components.misc.createTabOptions
-import moe.styx.moe.styx.components.overviews.MediaSearch
-import moe.styx.moe.styx.navigation.LocalGlobalNavigator
+import moe.styx.components.anime.AnimeCard
+import moe.styx.components.misc.createTabOptions
+import moe.styx.components.overviews.MediaSearch
+import moe.styx.navigation.LocalGlobalNavigator
 
 class FavouritesListView() : Tab {
     override val options: TabOptions

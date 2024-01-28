@@ -1,4 +1,4 @@
-package moe.styx.moe.styx.components.overviews
+package moe.styx.components.overviews
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.BorderStroke
@@ -16,7 +16,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import moe.styx.logic.data.getCategory
 import moe.styx.logic.utils.addIfNotExisting
-import moe.styx.moe.styx.logic.data.*
+import moe.styx.logic.data.*
 import moe.styx.theme.AppShapes
 import moe.styx.types.Category
 import moe.styx.types.Media

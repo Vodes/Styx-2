@@ -1,4 +1,4 @@
-package moe.styx.moe.styx.logic.runner
+package moe.styx.logic.runner
 
 import moe.styx.types.eqI
 import java.io.File

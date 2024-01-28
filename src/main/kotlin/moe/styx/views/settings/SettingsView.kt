@@ -12,9 +12,9 @@ import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import moe.styx.isUiModeDark
 import moe.styx.logic.login.login
-import moe.styx.moe.styx.components.SettingsCheckbox
-import moe.styx.moe.styx.components.misc.PopButton
-import moe.styx.moe.styx.navigation.LocalGlobalNavigator
+import moe.styx.components.SettingsCheckbox
+import moe.styx.components.misc.PopButton
+import moe.styx.navigation.LocalGlobalNavigator
 
 class SettingsView : Screen {
 

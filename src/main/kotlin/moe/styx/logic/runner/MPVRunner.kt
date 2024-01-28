@@ -1,4 +1,4 @@
-package moe.styx.moe.styx.logic.runner
+package moe.styx.logic.runner
 
 import androidx.compose.runtime.getValue
 import com.russhwolf.settings.get

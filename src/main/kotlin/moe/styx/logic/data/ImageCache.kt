@@ -1,4 +1,4 @@
-package moe.styx.moe.styx.logic.data
+package moe.styx.logic.data
 
 import androidx.compose.runtime.getValue
 import io.ktor.client.request.*
@@ -8,7 +8,6 @@ import io.ktor.util.cio.*
 import io.ktor.utils.io.*
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
-import moe.styx.logic.data.DataManager
 import moe.styx.logic.httpClient
 import moe.styx.types.Image
 import moe.styx.types.eqI
@@ -19,13 +18,7 @@ suspend fun updateImageCache() = coroutineScope {
     delay(500)
 
     val images by DataManager.images
-    for (i in images) {
-        if (i.isCached())
-            continue
-
-        i.downloadFile()
-    }
-
+    images.filter { !it.isCached() }.forEach { it.downloadFile() }
     cleanUnusedImages()
 }
 
@@ -36,12 +29,9 @@ private fun cleanUnusedImages() {
 
     val images by DataManager.images
 
-    for (f in files) {
-        val corresponding = images.find { it.GUID.equals(f.nameWithoutExtension, true) }
-        if (corresponding == null) {
-            f.delete()
-        }
-    }
+    files.associateWith { f -> images.find { it.GUID eqI f.nameWithoutExtension } }
+        .filterValues { it == null }
+        .forEach { it.key.delete() }
 }
 
 private fun getImageDir(): File {

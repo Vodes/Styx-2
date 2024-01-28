@@ -1,4 +1,4 @@
-package moe.styx.moe.styx.views.anime.tabs
+package moe.styx.views.anime.tabs
 
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -8,7 +8,7 @@ import androidx.compose.runtime.Composable
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
 import moe.styx.components.ScheduleDay
-import moe.styx.moe.styx.components.misc.createTabOptions
+import moe.styx.components.misc.createTabOptions
 import moe.styx.types.ScheduleWeekday
 
 class ScheduleView : Tab {

@@ -1,4 +1,4 @@
-package moe.styx.moe.styx.components.anime
+package moe.styx.components.anime
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
@@ -13,8 +13,8 @@ import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.navigator.Navigator
 import io.kamel.image.KamelImage
 import io.kamel.image.lazyPainterResource
-import moe.styx.moe.styx.logic.data.*
-import moe.styx.moe.styx.views.anime.AnimeDetailView
+import moe.styx.logic.data.*
+import moe.styx.views.anime.AnimeDetailView
 import moe.styx.theme.AppShapes
 import moe.styx.types.Media
 

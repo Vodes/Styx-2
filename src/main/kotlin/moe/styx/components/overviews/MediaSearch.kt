@@ -1,4 +1,4 @@
-package moe.styx.moe.styx.components.overviews
+package moe.styx.components.overviews
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.*
@@ -13,9 +13,9 @@ import com.russhwolf.settings.get
 import moe.styx.logic.data.favAdded
 import moe.styx.logic.data.find
 import moe.styx.logic.utils.equalsAny
-import moe.styx.moe.styx.components.misc.TwoStateIconButton
-import moe.styx.moe.styx.logic.data.getSelectedCategories
-import moe.styx.moe.styx.logic.data.getSelectedGenres
+import moe.styx.components.misc.TwoStateIconButton
+import moe.styx.logic.data.getSelectedCategories
+import moe.styx.logic.data.getSelectedGenres
 import moe.styx.settings
 import moe.styx.theme.AppShapes
 import moe.styx.types.Category

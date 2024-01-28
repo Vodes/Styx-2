@@ -1,4 +1,4 @@
-package moe.styx.moe.styx.views.login
+package moe.styx.views.login
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -9,9 +9,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
-import moe.styx.moe.styx.logic.login.ServerStatus
-import moe.styx.moe.styx.navigation.LocalGlobalNavigator
-import moe.styx.moe.styx.views.other.LoadingView
+import moe.styx.logic.login.ServerStatus
+import moe.styx.navigation.LocalGlobalNavigator
+import moe.styx.views.other.LoadingView
 
 class OfflineView : Screen {
 

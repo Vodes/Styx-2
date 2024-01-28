@@ -1,4 +1,4 @@
-package moe.styx.moe.styx.components.misc
+package moe.styx.components.misc
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
@@ -14,7 +14,7 @@ import cafe.adriel.voyager.navigator.Navigator
 import kotlinx.datetime.Clock
 import moe.styx.logic.data.isFav
 import moe.styx.logic.data.setFav
-import moe.styx.moe.styx.navigation.LocalGlobalNavigator
+import moe.styx.navigation.LocalGlobalNavigator
 import moe.styx.types.Media
 
 var lastPop = 0L

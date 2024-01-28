@@ -1,4 +1,4 @@
-package moe.styx.moe.styx.components.overviews
+package moe.styx.components.overviews
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.material.icons.Icons
@@ -9,7 +9,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.*
 import com.russhwolf.settings.get
-import moe.styx.moe.styx.components.misc.ToolTipWrapper
+import moe.styx.components.misc.ToolTipWrapper
 import moe.styx.settings
 
 @OptIn(ExperimentalFoundationApi::class)

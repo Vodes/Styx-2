@@ -1,4 +1,4 @@
-package moe.styx.moe.styx.logic.login
+package moe.styx.logic.login
 
 import io.ktor.http.*
 

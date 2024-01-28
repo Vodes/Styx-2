@@ -1,4 +1,4 @@
-package moe.styx.moe.styx.views.anime
+package moe.styx.views.anime
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.RowScope
@@ -12,8 +12,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.tab.*
-import moe.styx.moe.styx.navigation.*
-import moe.styx.moe.styx.views.other.FontSizeView
+import moe.styx.navigation.*
+import moe.styx.views.other.FontSizeView
 import moe.styx.views.settings.SettingsView
 
 class AnimeOverview() : Screen {

@@ -1,38 +1,13 @@
-package moe.styx.logic.data
+package moe.styx.logic.utils
 
-import com.aallam.similarity.Cosine
 import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.Clock
-import kotlinx.serialization.Serializable
-import moe.styx.logic.utils.getLevenshteinScore
-import moe.styx.moe.styx.logic.requests.RequestQueue
-import moe.styx.moe.styx.navigation.favsTab
+import moe.styx.logic.data.DataManager
+import moe.styx.logic.loops.RequestQueue
+import moe.styx.navigation.favsTab
 import moe.styx.types.*
 import java.time.*
 import java.time.temporal.TemporalAdjusters
-
-@Serializable
-data class Changes(val media: Long, val entry: Long)
-
-val cos = Cosine(3)
-
-fun String?.isClose(s: String): Boolean {
-    if (!this.isNullOrEmpty()) {
-        val score = this.getLevenshteinScore(s).toDouble()
-        val maxLen = kotlin.math.max(this.length, s.length).toDouble()
-        val compensatedLevScore = (maxLen - score) / maxLen
-        val cosineScore = cos.similarity(this, s)
-        val avgScore = (compensatedLevScore + cosineScore) / 2
-
-        if (this.startsWith(s, true) ||
-            this.equals(s, true) ||
-            kotlin.math.max(cosineScore, avgScore) >= 0.3
-        ) {
-            return true
-        }
-    }
-    return false
-}
 
 fun ScheduleWeekday.dayOfWeek(): DayOfWeek {
     return when (this) {

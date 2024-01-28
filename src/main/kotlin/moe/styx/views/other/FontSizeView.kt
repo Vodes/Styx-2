@@ -1,11 +1,11 @@
-package moe.styx.moe.styx.views.other
+package moe.styx.views.other
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import cafe.adriel.voyager.core.screen.Screen
-import moe.styx.moe.styx.components.MainScaffold
+import moe.styx.components.MainScaffold
 
 class FontSizeView : Screen {
 

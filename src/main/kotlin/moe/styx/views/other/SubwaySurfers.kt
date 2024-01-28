@@ -1,4 +1,4 @@
-package moe.styx.moe.styx.views.other
+package moe.styx.views.other
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -16,7 +16,7 @@ import dev.datlag.kcef.KCEF
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import moe.styx.logic.data.DataManager
-import moe.styx.moe.styx.components.MainScaffold
+import moe.styx.components.MainScaffold
 import java.io.File
 import kotlin.math.max
 

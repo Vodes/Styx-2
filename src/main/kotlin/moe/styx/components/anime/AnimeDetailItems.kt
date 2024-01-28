@@ -1,4 +1,4 @@
-package moe.styx.moe.styx.components.anime
+package moe.styx.components.anime
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.BorderStroke
@@ -19,8 +19,8 @@ import androidx.compose.ui.unit.dp
 import io.kamel.core.Resource
 import io.kamel.image.KamelImage
 import moe.styx.logic.data.DataManager
-import moe.styx.moe.styx.components.misc.ExpandIconButton
-import moe.styx.moe.styx.navigation.LocalGlobalNavigator
+import moe.styx.components.misc.ExpandIconButton
+import moe.styx.navigation.LocalGlobalNavigator
 import moe.styx.theme.AppShapes
 import moe.styx.types.Media
 

@@ -1,6 +1,6 @@
-package moe.styx.moe.styx.navigation
+package moe.styx.navigation
 
-import moe.styx.moe.styx.views.anime.tabs.*
+import moe.styx.views.anime.tabs.*
 
 val defaultTab = AnimeListView()
 val movieTab = MovieListView()

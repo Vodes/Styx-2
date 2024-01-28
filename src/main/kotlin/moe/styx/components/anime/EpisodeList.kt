@@ -1,4 +1,4 @@
-package moe.styx.moe.styx.components.anime
+package moe.styx.components.anime
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -19,9 +19,9 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import moe.styx.logic.utils.readableSize
-import moe.styx.moe.styx.logic.runner.currentPlayer
-import moe.styx.moe.styx.logic.runner.launchMPV
-import moe.styx.moe.styx.navigation.LocalGlobalNavigator
+import moe.styx.logic.runner.currentPlayer
+import moe.styx.logic.runner.launchMPV
+import moe.styx.navigation.LocalGlobalNavigator
 import moe.styx.types.MediaEntry
 import moe.styx.views.settings.SettingsView
 

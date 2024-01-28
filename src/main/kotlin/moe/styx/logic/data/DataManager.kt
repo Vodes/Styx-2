@@ -8,8 +8,8 @@ import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 import kotlinx.serialization.encodeToString
 import moe.styx.logic.*
-import moe.styx.moe.styx.logic.data.updateImageCache
-import moe.styx.moe.styx.logic.login.ServerStatus
+import moe.styx.logic.data.updateImageCache
+import moe.styx.logic.login.ServerStatus
 import moe.styx.types.*
 import java.io.File
 

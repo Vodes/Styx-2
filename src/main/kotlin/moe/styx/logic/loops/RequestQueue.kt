@@ -1,4 +1,4 @@
-package moe.styx.moe.styx.logic.requests
+package moe.styx.logic.loops
 
 import kotlinx.coroutines.*
 import kotlinx.serialization.encodeToString

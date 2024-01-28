@@ -11,8 +11,8 @@ import moe.styx.logic.data.DataManager
 import moe.styx.logic.data.dayOfWeek
 import moe.styx.logic.data.getTargetTime
 import moe.styx.logic.utils.makeFirstLetterBig
-import moe.styx.moe.styx.components.anime.AnimeListItem
-import moe.styx.moe.styx.navigation.LocalGlobalNavigator
+import moe.styx.components.anime.AnimeListItem
+import moe.styx.navigation.LocalGlobalNavigator
 import moe.styx.types.ScheduleWeekday
 import java.time.format.DateTimeFormatter
 import java.util.*

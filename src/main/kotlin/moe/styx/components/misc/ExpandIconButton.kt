@@ -1,4 +1,4 @@
-package moe.styx.moe.styx.components.misc
+package moe.styx.components.misc
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.TooltipArea

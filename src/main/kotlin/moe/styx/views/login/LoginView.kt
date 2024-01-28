@@ -13,8 +13,8 @@ import kotlinx.coroutines.delay
 import moe.styx.logic.login.checkLogin
 import moe.styx.logic.login.generateCode
 import moe.styx.logic.login.isLoggedIn
-import moe.styx.moe.styx.navigation.LocalGlobalNavigator
-import moe.styx.moe.styx.views.other.LoadingView
+import moe.styx.navigation.LocalGlobalNavigator
+import moe.styx.views.other.LoadingView
 import moe.styx.types.CreationResponse
 
 class LoginView() : Screen {

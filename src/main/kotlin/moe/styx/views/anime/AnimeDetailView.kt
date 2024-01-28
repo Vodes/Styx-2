@@ -1,4 +1,4 @@
-package moe.styx.moe.styx.views.anime
+package moe.styx.views.anime
 
 import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.Image
@@ -22,11 +22,11 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
 import io.kamel.image.lazyPainterResource
 import moe.styx.logic.data.DataManager
-import moe.styx.moe.styx.components.MainScaffold
-import moe.styx.moe.styx.components.anime.*
-import moe.styx.moe.styx.components.misc.FavouriteIconButton
-import moe.styx.moe.styx.logic.data.*
-import moe.styx.moe.styx.navigation.LocalGlobalNavigator
+import moe.styx.components.MainScaffold
+import moe.styx.components.anime.*
+import moe.styx.components.misc.FavouriteIconButton
+import moe.styx.logic.data.*
+import moe.styx.navigation.LocalGlobalNavigator
 import moe.styx.types.Media
 import moe.styx.types.MediaEntry
 import java.util.*

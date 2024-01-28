@@ -1,4 +1,4 @@
-package moe.styx.moe.styx.views.anime.tabs
+package moe.styx.views.anime.tabs
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -19,12 +19,12 @@ import com.russhwolf.settings.get
 import io.kamel.image.KamelImage
 import io.kamel.image.lazyPainterResource
 import moe.styx.logic.data.DataManager
-import moe.styx.moe.styx.components.misc.createTabOptions
-import moe.styx.moe.styx.components.overviews.MediaGrid
-import moe.styx.moe.styx.components.overviews.MediaList
-import moe.styx.moe.styx.components.overviews.MediaSearch
-import moe.styx.moe.styx.navigation.LocalGlobalNavigator
-import moe.styx.moe.styx.views.other.SubwaySurfers
+import moe.styx.components.misc.createTabOptions
+import moe.styx.components.overviews.MediaGrid
+import moe.styx.components.overviews.MediaList
+import moe.styx.components.overviews.MediaSearch
+import moe.styx.navigation.LocalGlobalNavigator
+import moe.styx.views.other.SubwaySurfers
 import moe.styx.settings
 import moe.styx.types.toBoolean
 
