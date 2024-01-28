@@ -8,7 +8,6 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.encodeToString
 import moe.styx.logic.Endpoints
 import moe.styx.logic.data.DataManager
-import moe.styx.logic.hasInternet
 import moe.styx.logic.httpClient
 import moe.styx.logic.login.ServerStatus.Companion.setLastKnown
 import moe.styx.settings
@@ -65,7 +64,7 @@ fun isLoggedIn(): Boolean {
     if (token.isBlank())
         return false
 
-    if (login != null || !hasInternet())
+    if (login != null)
         return true
 
     val loginTry = checkLogin(token)
@@ -78,12 +77,14 @@ fun isLoggedIn(): Boolean {
 }
 
 fun checkLogin(token: String, first: Boolean = false): LoginResponse? = runBlocking {
-    val response: HttpResponse = httpClient.submitForm(
-        (if (first) Endpoints.DEVICE_FIRST_AUTH else Endpoints.LOGIN).url(),
-        formParameters = Parameters.build {
-            append("token", token)
-        }
-    )
+    val response = runCatching {
+        httpClient.submitForm(
+            (if (first) Endpoints.DEVICE_FIRST_AUTH else Endpoints.LOGIN).url(),
+            formParameters = Parameters.build {
+                append("token", token)
+            }
+        )
+    }.onFailure { it.printStackTrace().also { ServerStatus.lastKnown = ServerStatus.UNKNOWN } }.getOrNull() ?: return@runBlocking null
 
     setLastKnown(response.status)
 

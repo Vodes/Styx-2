@@ -59,12 +59,18 @@ class MpvInstance {
     }
 
     fun start(mediaEntry: MediaEntry, onFail: (String) -> Unit = {}, onFinish: (Int) -> Unit = {}): Boolean {
-        var mpvExecutable = getExecutableFromPath(if (isWindows) "mpv.exe" else "mpv")
+        var mpvExecutable = getExecutableFromPath("mpv")
         if (!isWindows && tryFlatpak) {
             mpvExecutable = getExecutableFromPath("flatpak")
         }
         if (mpvExecutable == null) {
             onFail("MPV could not be found.")
+            currentPlayer = null
+            return false
+        }
+        if (login == null || login!!.watchToken.isBlank()) {
+            onFail("You are not logged in right now.")
+            currentPlayer = null
             return false
         }
         val url = "${Endpoints.WATCH.url()}/${mediaEntry.GUID}?token=${login!!.watchToken}"

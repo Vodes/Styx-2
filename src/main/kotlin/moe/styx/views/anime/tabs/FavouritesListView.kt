@@ -14,11 +14,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
-import moe.styx.logic.data.DataManager
-import moe.styx.logic.data.isFav
 import moe.styx.components.anime.AnimeCard
 import moe.styx.components.misc.createTabOptions
 import moe.styx.components.overviews.MediaSearch
+import moe.styx.logic.data.DataManager
+import moe.styx.logic.utils.isFav
 import moe.styx.navigation.LocalGlobalNavigator
 
 class FavouritesListView() : Tab {

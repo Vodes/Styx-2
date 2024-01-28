@@ -25,13 +25,10 @@ class OfflineView : Screen {
 //                backgroundColor = MaterialTheme.colors.secondary,
             )
         }) {
-            Column(Modifier.padding(5.dp).fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-                Text("Offline-Mode", style = MaterialTheme.typography.titleMedium)
-                Text(ServerStatus.getLastKnownText(), style = MaterialTheme.typography.titleSmall)
-                Text(
-                    "Feel free to keep using Styx with the data you have from your last use.",
-                    Modifier.padding(20.dp).weight(1f)
-                )
+            Column(Modifier.padding(it).fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+                Text("Offline-Mode", style = MaterialTheme.typography.displaySmall)
+                Text(ServerStatus.getLastKnownText(), style = MaterialTheme.typography.headlineSmall)
+                Text("Feel free to keep using Styx with the data you have from your last use.", Modifier.padding(0.dp, 15.dp).weight(1f))
 
                 Button({ nav.replaceAll(LoadingView()) }) {
                     Text("OK")

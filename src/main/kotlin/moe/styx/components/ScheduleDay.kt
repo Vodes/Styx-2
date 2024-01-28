@@ -7,11 +7,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import moe.styx.logic.data.DataManager
-import moe.styx.logic.data.dayOfWeek
-import moe.styx.logic.data.getTargetTime
-import moe.styx.logic.utils.makeFirstLetterBig
 import moe.styx.components.anime.AnimeListItem
+import moe.styx.logic.data.DataManager
+import moe.styx.logic.utils.dayOfWeek
+import moe.styx.logic.utils.getTargetTime
+import moe.styx.logic.utils.makeFirstLetterBig
 import moe.styx.navigation.LocalGlobalNavigator
 import moe.styx.types.ScheduleWeekday
 import java.time.format.DateTimeFormatter

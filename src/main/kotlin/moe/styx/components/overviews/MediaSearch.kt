@@ -10,12 +10,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.russhwolf.settings.get
-import moe.styx.logic.data.favAdded
-import moe.styx.logic.data.find
-import moe.styx.logic.utils.equalsAny
 import moe.styx.components.misc.TwoStateIconButton
 import moe.styx.logic.data.getSelectedCategories
 import moe.styx.logic.data.getSelectedGenres
+import moe.styx.logic.utils.equalsAny
+import moe.styx.logic.utils.favAdded
+import moe.styx.logic.utils.find
 import moe.styx.settings
 import moe.styx.theme.AppShapes
 import moe.styx.types.Category

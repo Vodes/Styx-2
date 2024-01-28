@@ -6,14 +6,12 @@ import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.StarOutline
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import cafe.adriel.voyager.navigator.Navigator
 import kotlinx.datetime.Clock
-import moe.styx.logic.data.isFav
-import moe.styx.logic.data.setFav
+import moe.styx.logic.utils.isFav
+import moe.styx.logic.utils.setFav
 import moe.styx.navigation.LocalGlobalNavigator
 import moe.styx.types.Media
 
@@ -36,12 +34,12 @@ fun PopButton(nav: Navigator? = null) {
 
 @Composable
 fun FavouriteIconButton(media: Media, modifier: Modifier = Modifier) {
-    val isFav = remember { mutableStateOf(media.isFav()) }
+    var isFav by remember { mutableStateOf(media.isFav()) }
     IconButton({
-        if (setFav(media, !isFav.value))
-            isFav.value = media.isFav()
+        if (setFav(media, !isFav))
+            isFav = media.isFav()
     }) {
-        if (isFav.value)
+        if (isFav)
             Icon(Icons.Filled.Star, "Fav")
         else
             Icon(Icons.Outlined.StarOutline, "Not fav")
