@@ -11,6 +11,7 @@ import moe.styx.types.*
 
 object Heartbeats {
     var currentUsers: List<ActiveUser> = emptyList()
+    var listeningTo: String? = null
     fun start() {
         launchGlobal {
             while (true) {
@@ -25,13 +26,16 @@ object Heartbeats {
                 if (response != null && response.code == 200 && !response.message.isNullOrBlank()) {
                     currentUsers = json.decodeFromString(response.message!!)
                 }
-                if (currentUsers.isNotEmpty())
-                    println("Online Users:\n${currentUsers.map { "${it.user.name} (${it.deviceType})" }}")
+//                if (currentUsers.isNotEmpty())
+//                    println("Online Users:\n${currentUsers.map { "${it.user.name} (${it.deviceType})" }}")
+
+                if (listeningTo != null && currentUsers.find { it.user.GUID eqI listeningTo } == null)
+                    listeningTo = null
                 // TODO: Once we establish the use of `listeningTo` we should also only wait 5000 if that's given
                 if (mediaActivity == null)
-                    delay(10000)
+                    delay(7000)
                 else
-                    delay(5000)
+                    delay(3000)
             }
         }
     }

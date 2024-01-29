@@ -114,8 +114,7 @@ class MpvInstance {
                         )
                     )
                     runCommand("print-text ${json.toString()}")
-                    println(MpvStatus.current)
-                    delay(1500L)
+                    delay(650L)
                 }
             }
         }
