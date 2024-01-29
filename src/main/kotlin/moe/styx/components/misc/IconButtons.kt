@@ -10,9 +10,11 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import cafe.adriel.voyager.navigator.Navigator
 import kotlinx.datetime.Clock
+import moe.styx.logic.data.DataManager
+import moe.styx.logic.loops.RequestQueue
 import moe.styx.logic.utils.isFav
-import moe.styx.logic.utils.setFav
 import moe.styx.navigation.LocalGlobalNavigator
+import moe.styx.navigation.favsTab
 import moe.styx.types.Media
 
 var lastPop = 0L
@@ -36,8 +38,12 @@ fun PopButton(nav: Navigator? = null) {
 fun FavouriteIconButton(media: Media, modifier: Modifier = Modifier) {
     var isFav by remember { mutableStateOf(media.isFav()) }
     IconButton({
-        if (setFav(media, !isFav))
-            isFav = media.isFav()
+        if (!isFav)
+            RequestQueue.addFav(media)
+        else
+            RequestQueue.removeFav(media)
+        isFav = media.isFav()
+        favsTab.searchState.value = favsTab.mediaSearch.getDefault(updateList = DataManager.media.value.filter { it.isFav() })
     }) {
         if (isFav)
             Icon(Icons.Filled.Star, "Fav")

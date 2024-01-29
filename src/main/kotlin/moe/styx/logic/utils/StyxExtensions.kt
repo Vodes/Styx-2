@@ -1,10 +1,6 @@
 package moe.styx.logic.utils
 
-import kotlinx.coroutines.runBlocking
-import kotlinx.datetime.Clock
 import moe.styx.logic.data.DataManager
-import moe.styx.logic.loops.RequestQueue
-import moe.styx.navigation.favsTab
 import moe.styx.types.*
 import java.time.*
 import java.time.temporal.TemporalAdjusters
@@ -33,26 +29,6 @@ fun Media.find(search: String): Boolean {
 }
 
 fun Media.isFav() = DataManager.favourites.value.find { it.mediaID.equals(GUID, true) } != null
-
-fun setFav(media: Media, fav: Boolean = true): Boolean = runBlocking {
-    val list: MutableList<Favourite> = DataManager.favourites.value.toMutableList()
-    if (!fav)
-        list.removeIf { it.mediaID.equals(media.GUID, true) }
-    else {
-        if (!media.isFav()) {
-            list.add(Favourite(media.GUID, "", Clock.System.now().epochSeconds))
-        }
-    }
-
-    DataManager.favourites.value = list.toList()
-    favsTab.searchState.value = favsTab.mediaSearch.getDefault(updateList = DataManager.media.value.filter { it.isFav() })
-    if (!RequestQueue.syncFavs()) {
-        RequestQueue.status.needsFavSync = true
-        RequestQueue.save()
-        return@runBlocking false
-    }
-    return@runBlocking true
-}
 
 fun Media.getCategory(): Category {
     val categories = DataManager.categories.value.sortedByDescending { it.sort }

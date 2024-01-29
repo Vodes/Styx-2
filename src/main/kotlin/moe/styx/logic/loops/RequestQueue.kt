@@ -1,41 +1,81 @@
 package moe.styx.logic.loops
 
-import kotlinx.coroutines.*
+import com.russhwolf.settings.get
+import kotlinx.coroutines.delay
+import kotlinx.datetime.Clock
 import kotlinx.serialization.encodeToString
-import moe.styx.logic.hasInternet
+import moe.styx.logic.*
+import moe.styx.logic.data.DataManager
+import moe.styx.logic.login.isLoggedIn
+import moe.styx.logic.login.login
 import moe.styx.settings
-import moe.styx.types.json
+import moe.styx.types.*
 
-// This is kinda scuffed tbh but I need Favs and Watched progress to be saved locally first and then synced
 object RequestQueue {
-    var status = QueuedSyncs(false, false)
-    private val key = "request-queue-status"
+    private var queuedFavChanges = QueuedFavChanges()
 
     fun start() {
-        val queueJob = Job()
-        val scope = CoroutineScope(queueJob)
-        scope.launch {
+        val savedFavs = settings["queued-favs", ""]
+        if (savedFavs.isNotBlank())
+            queuedFavChanges = json.decodeFromString(savedFavs)
+
+        launchGlobal {
             while (true) {
-                if (hasInternet()) {
-                    if (status.needsFavSync) {
-                        if (syncFavs()) {
-                            status.needsFavSync = false
-                            save()
-                        }
-                    }
+                if (!hasInternet() || !isLoggedIn()) {
+                    delay(30000L)
+                    continue
                 }
+                if (queuedFavChanges.toAdd.isNotEmpty() || queuedFavChanges.toRemove.isNotEmpty())
+                    syncFavs()
                 delay(15000L)
             }
         }
     }
 
     fun save() {
-        settings.putString(key, json.encodeToString(status))
+        settings.putString("queued-favs", json.encodeToString(queuedFavChanges))
     }
 
-    fun syncFavs(): Boolean {
-        return true
+    fun addFav(media: Media) {
+        val favs = DataManager.favourites.value.toMutableList()
+        val existing = favs.find { it.mediaID eqI media.GUID }
+        if (existing != null)
+            return
+        val fav = Favourite(media.GUID, login?.userID ?: "", Clock.System.now().epochSeconds)
+        favs.add(fav)
+        DataManager.saveListEx(favs.toList(), "favourites.json", DataManager.favourites)
+        queuedFavChanges.toAdd.removeIf { it.mediaID eqI media.GUID }
+        queuedFavChanges.toRemove.removeIf { it.mediaID eqI media.GUID }
+
+        if (!hasInternet() || !isLoggedIn() || !sendObject(Endpoints.FAVOURITES_ADD, fav)) {
+            queuedFavChanges.toAdd.add(fav)
+            save()
+        }
+        println(queuedFavChanges)
+    }
+
+    fun removeFav(media: Media) {
+        val favs = DataManager.favourites.value.toMutableList()
+        val fav = favs.find { it.mediaID eqI media.GUID } ?: return
+        favs.remove(fav)
+        DataManager.saveListEx(favs.toList(), "favourites.json", DataManager.favourites)
+        queuedFavChanges.toAdd.removeIf { it.mediaID eqI media.GUID }
+        queuedFavChanges.toRemove.removeIf { it.mediaID eqI media.GUID }
+
+        if (!hasInternet() || !isLoggedIn() || !sendObject(Endpoints.FAVOURITES_DELETE, fav)) {
+            queuedFavChanges.toRemove.add(fav)
+            save()
+        }
+        println(queuedFavChanges)
+    }
+
+    private fun syncFavs() {
+        if (hasInternet() && isLoggedIn() && sendObject(Endpoints.FAVOURITES_SYNC, queuedFavChanges)) {
+            queuedFavChanges.toAdd.clear()
+            queuedFavChanges.toRemove.clear()
+            save()
+            println("Synced queued favourites!")
+        }
     }
 }
 
-data class QueuedSyncs(var needsFavSync: Boolean, var needsWatchedSync: Boolean)

@@ -8,7 +8,6 @@ import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 import kotlinx.serialization.encodeToString
 import moe.styx.logic.*
-import moe.styx.logic.data.updateImageCache
 import moe.styx.logic.login.ServerStatus
 import moe.styx.types.*
 import java.io.File
@@ -104,13 +103,13 @@ object DataManager {
         )
     }
 
-    private inline fun <reified T> saveList(list: List<T>, file: String): List<T> {
+    inline fun <reified T> saveList(list: List<T>, file: String): List<T> {
         val open = File(getDataDir(), file)
         open.writeText(json.encodeToString(list))
         return list
     }
 
-    private inline fun <reified T> saveListEx(list: List<T>, file: String, target: MutableState<List<T>>) {
+    inline fun <reified T> saveListEx(list: List<T>, file: String, target: MutableState<List<T>>) {
         target.value = saveList(list, file)
     }
 
@@ -134,7 +133,7 @@ object DataManager {
         return json.decodeFromString(changesFile.readText())
     }
 
-    private fun getDataDir(): File {
+    fun getDataDir(): File {
         return File(getAppDir(), "Data").also { it.mkdirs() }
     }
 

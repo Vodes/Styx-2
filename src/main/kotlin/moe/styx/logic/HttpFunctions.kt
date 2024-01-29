@@ -21,27 +21,30 @@ val httpClient = HttpClient() {
     }
 }
 
-private const val baseURL = "http://localhost:8081"
-//private const val baseURL = "https://api.styx.moe"
+//private const val baseURL = "http://localhost:8081"
+private const val baseURL = "https://api.styx.moe"
 
 enum class Endpoints(private val path: String) {
-    // TODO: Login
     LOGIN("/login"),
     DEVICE_CREATE("/device/create"),
     DEVICE_FIRST_AUTH("/device/firstAuth"),
     HEARTBEAT("/heartbeat"),
 
-    // TODO: Media
     MEDIA("/media/list"),
     MEDIA_ENTRIES("/media/entries"),
     IMAGES("/media/images"),
     CATEGORIES("/media/categories"),
     SCHEDULES("/media/schedules"),
 
-    // TODO: Favourites
     FAVOURITES("/favourites/list"),
-    FAVOURITES_ADD("/favourites/add/"),
-    FAVOURITES_DELETE("/favourites/delete/"),
+    FAVOURITES_ADD("/favourites/add"),
+    FAVOURITES_DELETE("/favourites/delete"),
+    FAVOURITES_SYNC("/favourites/sync"),
+
+    WATCHED("/watched/list"),
+    WATCHED_ADD("/watched/add"),
+    WATCHED_DELETE("/watched/delete"),
+    WATCHED_SYNC("/watched/sync"),
 
     CHANGES("/changes"),
     WATCH("/watch");
@@ -91,6 +94,10 @@ inline fun <reified T> sendObjectWithResponse(endpoint: Endpoints, data: T?): Ap
     }.onFailure { ServerStatus.lastKnown = ServerStatus.UNKNOWN }.getOrNull() ?: return@runBlocking null
 
     ServerStatus.setLastKnown(request.status)
+
+    if (!request.status.isSuccess()) {
+        println("Request Failed for Endpoint `$endpoint`\n${request.bodyAsText()}")
+    }
 
     val response = runCatching {
         json.decodeFromString<ApiResponse>(request.bodyAsText())
