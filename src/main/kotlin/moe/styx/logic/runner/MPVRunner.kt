@@ -45,13 +45,12 @@ class MpvInstance {
     }
 
     fun runCommand(command: String): Boolean {
-        try {
+        runCatching {
             val socket = openSocket()
             socket.write((command + "\n").toByteArray())
-            return true
-        } catch (_: Exception) {
-        }
-        return false
+            runCatching { socket.close() }
+        }.onFailure { return false }
+        return true
     }
 
     fun createScope(): CoroutineScope {
@@ -138,10 +137,7 @@ class MpvInstance {
         while (inputStream.readLine()?.also { output = it.trim() } != null) {
             if (!output.startsWith("{") || !output.endsWith("}"))
                 continue
-            try {
-                MpvStatus.updateCurrent(output)
-            } catch (_: Exception) {
-            }
+            runCatching { MpvStatus.updateCurrent(output) }
         }
         inputStream.close()
     }
