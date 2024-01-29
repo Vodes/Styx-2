@@ -9,9 +9,9 @@ import io.ktor.http.*
 import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.Clock
 import kotlinx.serialization.encodeToString
+import moe.styx.logic.login.ServerStatus
 import moe.styx.logic.login.isLoggedIn
 import moe.styx.logic.login.login
-import moe.styx.logic.login.ServerStatus
 import moe.styx.types.ApiResponse
 import moe.styx.types.json
 
@@ -29,6 +29,7 @@ enum class Endpoints(private val path: String) {
     LOGIN("/login"),
     DEVICE_CREATE("/device/create"),
     DEVICE_FIRST_AUTH("/device/firstAuth"),
+    HEARTBEAT("/heartbeat"),
 
     // TODO: Media
     MEDIA("/media/list"),

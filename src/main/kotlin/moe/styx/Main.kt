@@ -22,14 +22,15 @@ import io.kamel.core.config.KamelConfig
 import io.kamel.core.config.takeFrom
 import io.kamel.image.config.Default
 import io.kamel.image.config.resourcesFetcher
-import moe.styx.logic.login.isLoggedIn
-import moe.styx.logic.loops.RequestQueue
 import moe.styx.logic.login.ServerStatus
+import moe.styx.logic.login.isLoggedIn
+import moe.styx.logic.loops.Heartbeats
+import moe.styx.logic.loops.RequestQueue
 import moe.styx.navigation.LocalGlobalNavigator
-import moe.styx.views.login.OfflineView
-import moe.styx.views.other.LoadingView
 import moe.styx.theme.*
 import moe.styx.views.login.LoginView
+import moe.styx.views.login.OfflineView
+import moe.styx.views.other.LoadingView
 
 val settings: Settings = Settings()
 var isUiModeDark: MutableState<Boolean> = mutableStateOf(true)
@@ -41,6 +42,7 @@ val desktopConfig = KamelConfig {
 
 fun main() = application {
     RequestQueue.start()
+    Heartbeats.start()
     isUiModeDark.value = settings["darkmode", true]
     val darkMode = remember { isUiModeDark }
     val nav = LocalNavigator.current

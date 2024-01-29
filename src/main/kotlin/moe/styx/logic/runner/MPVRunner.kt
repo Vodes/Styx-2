@@ -168,7 +168,7 @@ data class MpvStatus(
             path = if (path.isNullOrBlank()) "" else
                 if (path.contains("?")) path.split("?")[0] else path
 
-            val percent = obj["pos-percent"]?.toIntOrNull() ?: 0
+            val percent = obj["pos-percent"]?.toIntOrNull() ?: -1
             val eof = obj["eof"]?.equals("yes") ?: false
             val playlistCurrent = obj["playlist-current-pos"]?.toIntOrNull() ?: 0
             val playlistSize = obj["playlist-count"]?.toIntOrNull() ?: 1
@@ -197,6 +197,12 @@ data class MpvStatus(
                 attemptPlayNext()
         }
     }
+
+    val seconds: Int
+        get() {
+            val time = java.time.LocalTime.parse(pos)
+            return time.hour * 3600 + time.minute * 60 + time.second
+        }
 }
 
 fun attemptPlayNext() {
