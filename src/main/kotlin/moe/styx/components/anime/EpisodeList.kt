@@ -25,6 +25,7 @@ import moe.styx.logic.runner.currentPlayer
 import moe.styx.logic.runner.launchMPV
 import moe.styx.logic.utils.currentUnixSeconds
 import moe.styx.logic.utils.readableSize
+import moe.styx.logic.utils.toDateString
 import moe.styx.navigation.LocalGlobalNavigator
 import moe.styx.settings
 import moe.styx.types.MediaEntry
@@ -107,6 +108,7 @@ fun EpisodeList(episodes: List<MediaEntry>, showSelection: MutableState<Boolean>
                                 softWrap = false,
                                 style = MaterialTheme.typography.labelLarge
                             )
+                            Text(ep.timestamp.toDateString(), Modifier.padding(5.dp, 0.dp, 0.dp, 4.dp), style = MaterialTheme.typography.labelMedium)
                             val summary = if (!ep.synopsisDE.isNullOrBlank() && preferGerman) ep.synopsisDE else ep.synopsisEN
                             if (!summary.isNullOrBlank() && showSummaries)
                                 ExpandableText(summary, Modifier.padding(8.dp, 2.dp, 5.dp, 2.dp))

@@ -69,7 +69,7 @@ class AnimeDetailView(val ID: String) : Screen {
                 colors = CardDefaults.elevatedCardColors(containerColor = MaterialTheme.colorScheme.surface)
             ) {
                 Row(Modifier.padding(5.dp).fillMaxSize()) {
-                    Column(Modifier.fillMaxHeight().fillMaxWidth(.55F).verticalScroll(scrollState)) {
+                    Column(Modifier.fillMaxHeight().fillMaxWidth(.52F).verticalScroll(scrollState)) {
                         StupidImageNameArea(vm.anime)
 
                         Spacer(Modifier.height(6.dp))
