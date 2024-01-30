@@ -30,6 +30,7 @@ fun AppendDialog(
     modifier: Modifier = Modifier,
     buttonModifier: Modifier = Modifier,
     onDismiss: () -> Unit = {},
+    execUpdate: () -> Unit = {},
     onFail: (String) -> Unit = {}
 ) {
     AlertDialog(
@@ -39,13 +40,13 @@ fun AppendDialog(
         text = { Text("Do you want to start playing now or append to the current playlist?") },
         dismissButton = {
             Button({
-                launchMPV(mediaEntry, false, { onFail(it) }) { }
+                launchMPV(mediaEntry, false, { onFail(it) }, execUpdate = execUpdate)
                 onDismiss()
             }, modifier = buttonModifier) { Text("Play now") }
         },
         confirmButton = {
             Button({
-                launchMPV(mediaEntry, true, { onFail(it) }) { }
+                launchMPV(mediaEntry, true, { onFail(it) }, execUpdate = execUpdate)
                 onDismiss()
             }, modifier = buttonModifier) { Text("Append") }
         }

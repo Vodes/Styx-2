@@ -9,9 +9,7 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.SnapshotStateMap
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
-import androidx.compose.ui.Modifier
+import androidx.compose.ui.*
 import androidx.compose.ui.input.pointer.PointerButton
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.onPointerEvent
@@ -41,6 +39,8 @@ fun EpisodeList(episodes: List<MediaEntry>, showSelection: MutableState<Boolean>
         if (!showSelection.value)
             selected.clear()
 
+        val watched = episodes.associateWith { ep -> DataManager.watched.value.find { ep.GUID eqI it.entryID } }
+
         AnimatedVisibility(showSelection.value) { SelectedCard(selected, onUpdate = { needsRepaint++ }) }
 
         var showFailedDialog by remember { mutableStateOf(false) }
@@ -56,6 +56,8 @@ fun EpisodeList(episodes: List<MediaEntry>, showSelection: MutableState<Boolean>
         if (showAppendDialog && selectedMedia != null) {
             AppendDialog(selectedMedia!!, Modifier.fillMaxWidth(0.6F), Modifier.align(Alignment.CenterHorizontally), {
                 showAppendDialog = false
+            }, execUpdate = {
+                needsRepaint++
             }) {
                 failedToPlayMessage = it
                 showFailedDialog = true
@@ -101,6 +103,10 @@ fun EpisodeList(episodes: List<MediaEntry>, showSelection: MutableState<Boolean>
                                 )
                             }
                             Column(Modifier.align(Alignment.End)) {
+                                val watchProgress = watched[episodes[i]]
+                                if (watchProgress != null) {
+                                    WatchedIndicator(watchProgress, Modifier.align(Alignment.End))
+                                }
                                 Text(
                                     episodes[i].fileSize.readableSize(),
                                     Modifier.padding(5.dp).align(Alignment.End),
@@ -230,6 +236,21 @@ fun SelectedCard(selected: SnapshotStateMap<String, Boolean>, onUpdate: () -> Un
             IconButton(onClick = {
                 println("Not implemented yet.")
             }) { Icon(Icons.Default.Delete, "Delete downloaded") }
+        }
+    }
+}
+
+@Composable
+fun WatchedIndicator(mediaWatched: MediaWatched, modifier: Modifier = Modifier) {
+    Box(modifier, contentAlignment = Alignment.Center) {
+        CircularProgressIndicator(
+            mediaWatched.progressPercent / 100,
+            Modifier.size(26.dp),
+            color = MaterialTheme.colorScheme.secondary,
+            trackColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5F)
+        )
+        if (mediaWatched.maxProgress > 85) {
+            Icon(Icons.Default.Done, "Has been watched", Modifier.size(17.dp).zIndex(1f), tint = MaterialTheme.colorScheme.primary)
         }
     }
 }
