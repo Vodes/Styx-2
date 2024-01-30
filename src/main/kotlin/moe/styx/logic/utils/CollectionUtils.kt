@@ -16,3 +16,11 @@ fun MutableList<String>.addIfNotExisting(s: String) {
     this.add(s)
 }
 
+fun <T> MutableList<T>.replaceIfNotNull(toReplace: T?, replaceWith: T): MutableList<T> {
+    if (toReplace != null) {
+        val index = this.indexOf(toReplace)
+        this[index] = replaceWith
+    } else
+        this.add(replaceWith)
+    return this
+}

@@ -16,6 +16,7 @@ object DataManager {
 
     val media = mutableStateOf(listOf<Media>())
     val entries = mutableStateOf(listOf<MediaEntry>())
+    val watched = mutableStateOf(listOf<MediaWatched>())
     val categories = mutableStateOf(listOf<Category>())
     val images = mutableStateOf(listOf<Image>())
     val favourites = mutableStateOf(listOf<Favourite>())
@@ -41,6 +42,7 @@ object DataManager {
                 saveListEx(getList(Endpoints.SCHEDULES), "schedules.json", schedules)
                 saveListEx(getList(Endpoints.CATEGORIES), "categories.json", categories)
                 saveListEx(getList(Endpoints.FAVOURITES), "favourites.json", favourites)
+                saveListEx(getList(Endpoints.WATCHED), "watched.json", watched)
             })
 
             if (shouldUpdateEntries || shouldUpdateMedia) {
@@ -79,6 +81,7 @@ object DataManager {
             images.value = readList("images.json")
             favourites.value = readList("favourites.json")
             schedules.value = readList("schedules.json")
+            watched.value = readList("watched.json")
         }
 
         delay(200)

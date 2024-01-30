@@ -21,7 +21,6 @@ import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
 import io.kamel.image.lazyPainterResource
-import moe.styx.logic.data.DataManager
 import moe.styx.components.MainScaffold
 import moe.styx.components.anime.*
 import moe.styx.components.misc.FavouriteIconButton
@@ -140,7 +139,7 @@ class AnimeDetailViewModel(val ID: String) : ScreenModel {
         if (episodes.isNotEmpty())
             return episodes
 
-        episodes = DataManager.entries.value.filter { it.mediaID == anime!!.GUID }.sortedByDescending { it.entryNumber }
+        episodes = DataManager.entries.value.filter { it.mediaID == anime!!.GUID }.sortedByDescending { it.entryNumber.toDoubleOrNull() ?: 0.0 }
         return episodes
     }
 }

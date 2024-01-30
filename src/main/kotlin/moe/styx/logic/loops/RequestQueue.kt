@@ -8,16 +8,22 @@ import moe.styx.logic.*
 import moe.styx.logic.data.DataManager
 import moe.styx.logic.login.isLoggedIn
 import moe.styx.logic.login.login
+import moe.styx.logic.utils.replaceIfNotNull
 import moe.styx.settings
 import moe.styx.types.*
 
 object RequestQueue {
     private var queuedFavChanges = QueuedFavChanges()
+    private var queuedWatchedChanges = QueuedWatchedChanges()
 
     fun start() {
         val savedFavs = settings["queued-favs", ""]
         if (savedFavs.isNotBlank())
             queuedFavChanges = json.decodeFromString(savedFavs)
+
+        val savedWatched = settings["queued-watched", ""]
+        if (savedWatched.isNotBlank())
+            queuedWatchedChanges = json.decodeFromString(savedWatched)
 
         launchGlobal {
             while (true) {
@@ -27,6 +33,8 @@ object RequestQueue {
                 }
                 if (queuedFavChanges.toAdd.isNotEmpty() || queuedFavChanges.toRemove.isNotEmpty())
                     syncFavs()
+                if (queuedWatchedChanges.toUpdate.isNotEmpty() || queuedWatchedChanges.toRemove.isNotEmpty())
+                    syncWatched()
                 delay(15000L)
             }
         }
@@ -34,6 +42,7 @@ object RequestQueue {
 
     fun save() {
         settings.putString("queued-favs", json.encodeToString(queuedFavChanges))
+        settings.putString("queued-watched", json.encodeToString(queuedWatchedChanges))
     }
 
     fun addFav(media: Media) {
@@ -75,6 +84,72 @@ object RequestQueue {
             queuedFavChanges.toRemove.clear()
             save()
             println("Synced queued favourites!")
+        }
+    }
+
+    fun updateWatched(mediaWatched: MediaWatched) {
+        val existingList = DataManager.watched.value.toMutableList()
+        val existing = existingList.find { it.entryID eqI mediaWatched.entryID }
+        val existingMax = existing?.maxProgress ?: -1F
+        val new = if (existingMax > mediaWatched.maxProgress) mediaWatched.copy(maxProgress = existingMax) else mediaWatched
+        DataManager.saveListEx(existingList.replaceIfNotNull(existing, new).toList(), "watched.json", DataManager.watched)
+        queuedWatchedChanges.toUpdate.removeIf { it.entryID eqI mediaWatched.entryID }
+        queuedWatchedChanges.toRemove.removeIf { it.entryID eqI mediaWatched.entryID }
+        if (!hasInternet() || !isLoggedIn() || !sendObject(Endpoints.WATCHED_ADD, new)) {
+            queuedWatchedChanges.toUpdate.add(new)
+            save()
+        }
+    }
+
+    fun addMultipleWatched(entries: List<MediaEntry>) {
+        val existingList = DataManager.watched.value.toMutableList()
+        val now = Clock.System.now().epochSeconds
+        entries.forEach { entry ->
+            val existing = existingList.find { it.entryID eqI entry.GUID }
+            val new = MediaWatched(entry.GUID, login?.userID ?: "", now, 0, 0F, 100F)
+            existingList.replaceIfNotNull(existing, new)
+            queuedWatchedChanges.toUpdate.removeIf { it.entryID eqI entry.GUID }
+            queuedWatchedChanges.toRemove.removeIf { it.entryID eqI entry.GUID }
+            queuedWatchedChanges.toUpdate.add(new)
+        }
+        DataManager.saveListEx(existingList.toList(), "watched.json", DataManager.watched)
+    }
+
+    fun removeMultipleWatched(entries: List<MediaEntry>) {
+        val existingList = DataManager.watched.value.toMutableList()
+        entries.forEach { entry ->
+            val existing = existingList.find { it.entryID eqI entry.GUID }
+            if (existing == null)
+                return@forEach
+            existingList.remove(existing)
+            queuedWatchedChanges.toUpdate.removeIf { it.entryID eqI entry.GUID }
+            queuedWatchedChanges.toRemove.removeIf { it.entryID eqI entry.GUID }
+            queuedWatchedChanges.toRemove.add(existing)
+        }
+        DataManager.saveListEx(existingList.toList(), "watched.json", DataManager.watched)
+    }
+
+    fun removeWatched(entry: MediaEntry) {
+        val existingList = DataManager.watched.value.toMutableList()
+        val existing = existingList.find { it.entryID eqI entry.GUID }
+        if (existing == null)
+            return
+        existingList.remove(existing)
+        DataManager.saveListEx(existingList.toList(), "watched.json", DataManager.watched)
+        queuedWatchedChanges.toUpdate.removeIf { it.entryID eqI entry.GUID }
+        queuedWatchedChanges.toRemove.removeIf { it.entryID eqI entry.GUID }
+        if (!hasInternet() || !isLoggedIn() || !sendObject(Endpoints.WATCHED_DELETE, existing)) {
+            queuedWatchedChanges.toRemove.add(existing)
+            save()
+        }
+    }
+
+    private fun syncWatched() {
+        if (hasInternet() && isLoggedIn() && sendObject(Endpoints.WATCHED_SYNC, queuedWatchedChanges)) {
+            queuedWatchedChanges.toUpdate.clear()
+            queuedWatchedChanges.toRemove.clear()
+            save()
+            println("Synced queued playback tracking!")
         }
     }
 }
