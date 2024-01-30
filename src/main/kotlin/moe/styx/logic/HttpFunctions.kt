@@ -7,11 +7,11 @@ import io.ktor.client.request.forms.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import kotlinx.coroutines.runBlocking
-import kotlinx.datetime.Clock
 import kotlinx.serialization.encodeToString
 import moe.styx.logic.login.ServerStatus
 import moe.styx.logic.login.isLoggedIn
 import moe.styx.logic.login.login
+import moe.styx.logic.utils.currentUnixSeconds
 import moe.styx.types.ApiResponse
 import moe.styx.types.json
 
@@ -60,7 +60,7 @@ for example gets you a list of all Media by doing
 val media = getList<Media>(Endpoints.MEDIA)
  */
 suspend inline fun <reified T> getList(endpoint: Endpoints): List<T> {
-    if (Clock.System.now().epochSeconds > login!!.tokenExpiry) {
+    if (currentUnixSeconds() > login!!.tokenExpiry) {
         if (!isLoggedIn())
             return emptyList()
     }
@@ -82,7 +82,7 @@ suspend inline fun <reified T> getList(endpoint: Endpoints): List<T> {
 }
 
 inline fun <reified T> sendObjectWithResponse(endpoint: Endpoints, data: T?): ApiResponse? = runBlocking {
-    if (Clock.System.now().epochSeconds > login!!.tokenExpiry) {
+    if (currentUnixSeconds() > login!!.tokenExpiry) {
         if (!isLoggedIn())
             return@runBlocking null
     }
@@ -111,7 +111,7 @@ inline fun <reified T> sendObject(endpoint: Endpoints, data: T?): Boolean = runB
 }
 
 inline fun <reified T> getObject(endpoint: Endpoints): T? = runBlocking {
-    if (Clock.System.now().epochSeconds > login!!.tokenExpiry) {
+    if (currentUnixSeconds() > login!!.tokenExpiry) {
         if (!isLoggedIn())
             return@runBlocking null
     }

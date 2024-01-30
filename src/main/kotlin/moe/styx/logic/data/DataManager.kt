@@ -5,10 +5,10 @@ import androidx.compose.runtime.mutableStateOf
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.datetime.Clock
 import kotlinx.serialization.encodeToString
 import moe.styx.logic.*
 import moe.styx.logic.login.ServerStatus
+import moe.styx.logic.utils.currentUnixSeconds
 import moe.styx.types.*
 import java.io.File
 
@@ -93,7 +93,7 @@ object DataManager {
     }
 
     private fun updateLocalChange(media: Boolean, entry: Boolean) {
-        val now = Clock.System.now().epochSeconds
+        val now = currentUnixSeconds()
         val changesFile = File(getAppDir(), "changes.json")
         val current = lastLocalChange()
         changesFile.writeText(

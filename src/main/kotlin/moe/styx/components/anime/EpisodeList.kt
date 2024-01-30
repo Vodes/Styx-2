@@ -19,12 +19,15 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import moe.styx.logic.data.DataManager
+import moe.styx.logic.login.login
 import moe.styx.logic.loops.RequestQueue
 import moe.styx.logic.runner.currentPlayer
 import moe.styx.logic.runner.launchMPV
+import moe.styx.logic.utils.currentUnixSeconds
 import moe.styx.logic.utils.readableSize
 import moe.styx.navigation.LocalGlobalNavigator
 import moe.styx.types.MediaEntry
+import moe.styx.types.MediaWatched
 import moe.styx.types.eqI
 import moe.styx.views.settings.SettingsView
 
@@ -74,10 +77,10 @@ fun EpisodeList(episodes: List<MediaEntry>, showSelection: MutableState<Boolean>
                                 return@combinedClickable
                             }
                             if (currentPlayer == null) {
-                                launchMPV(episodes[i], false) {
+                                launchMPV(episodes[i], false, {
                                     failedToPlayMessage = it
                                     showFailedDialog = true
-                                }
+                                }) { needsRepaint++ }
                             } else {
                                 selectedMedia = episodes[i]
                                 showAppendDialog = true
@@ -188,9 +191,18 @@ fun SelectedCard(selected: SnapshotStateMap<String, Boolean>, onUpdate: () -> Un
                 val current = selected.filter { it.value }
                 if (current.isEmpty())
                     return@IconButton
-                RequestQueue.addMultipleWatched(current
-                    .map { pair -> DataManager.entries.value.find { pair.key eqI it.GUID } }
-                    .filterNotNull())
+                if (current.size == 1) {
+                    val entry = DataManager.entries.value.find { selected.entries.first().key eqI it.GUID }
+                    if (entry == null)
+                        return@IconButton
+                    RequestQueue.updateWatched(
+                        MediaWatched(entry.GUID, login?.userID ?: "", currentUnixSeconds(), 0, 100F, 100F)
+                    )
+                } else {
+                    RequestQueue.addMultipleWatched(current
+                        .map { pair -> DataManager.entries.value.find { pair.key eqI it.GUID } }
+                        .filterNotNull())
+                }
                 onUpdate()
             }) { Icon(Icons.Default.Visibility, "Set Watched") }
 
@@ -198,9 +210,16 @@ fun SelectedCard(selected: SnapshotStateMap<String, Boolean>, onUpdate: () -> Un
                 val current = selected.filter { it.value }
                 if (current.isEmpty())
                     return@IconButton
-                RequestQueue.removeMultipleWatched(current
-                    .map { pair -> DataManager.entries.value.find { pair.key eqI it.GUID } }
-                    .filterNotNull())
+                if (current.size == 1) {
+                    val entry = DataManager.entries.value.find { selected.entries.first().key eqI it.GUID }
+                    if (entry == null)
+                        return@IconButton
+                    RequestQueue.removeWatched(entry)
+                } else {
+                    RequestQueue.removeMultipleWatched(current
+                        .map { pair -> DataManager.entries.value.find { pair.key eqI it.GUID } }
+                        .filterNotNull())
+                }
                 onUpdate()
             }) { Icon(Icons.Default.VisibilityOff, "Set Unwatched") }
 

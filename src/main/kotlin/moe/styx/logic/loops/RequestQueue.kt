@@ -2,12 +2,12 @@ package moe.styx.logic.loops
 
 import com.russhwolf.settings.get
 import kotlinx.coroutines.delay
-import kotlinx.datetime.Clock
 import kotlinx.serialization.encodeToString
 import moe.styx.logic.*
 import moe.styx.logic.data.DataManager
 import moe.styx.logic.login.isLoggedIn
 import moe.styx.logic.login.login
+import moe.styx.logic.utils.currentUnixSeconds
 import moe.styx.logic.utils.replaceIfNotNull
 import moe.styx.settings
 import moe.styx.types.*
@@ -50,17 +50,19 @@ object RequestQueue {
         val existing = favs.find { it.mediaID eqI media.GUID }
         if (existing != null)
             return
-        val fav = Favourite(media.GUID, login?.userID ?: "", Clock.System.now().epochSeconds)
+        val fav = Favourite(media.GUID, login?.userID ?: "", currentUnixSeconds())
         favs.add(fav)
         DataManager.saveListEx(favs.toList(), "favourites.json", DataManager.favourites)
-        queuedFavChanges.toAdd.removeIf { it.mediaID eqI media.GUID }
-        queuedFavChanges.toRemove.removeIf { it.mediaID eqI media.GUID }
 
-        if (!hasInternet() || !isLoggedIn() || !sendObject(Endpoints.FAVOURITES_ADD, fav)) {
-            queuedFavChanges.toAdd.add(fav)
-            save()
+        launchThreaded {
+            queuedFavChanges.toAdd.removeIf { it.mediaID eqI media.GUID }
+            queuedFavChanges.toRemove.removeIf { it.mediaID eqI media.GUID }
+
+            if (!hasInternet() || !isLoggedIn() || !sendObject(Endpoints.FAVOURITES_ADD, fav)) {
+                queuedFavChanges.toAdd.add(fav)
+                save()
+            }
         }
-        println(queuedFavChanges)
     }
 
     fun removeFav(media: Media) {
@@ -68,14 +70,15 @@ object RequestQueue {
         val fav = favs.find { it.mediaID eqI media.GUID } ?: return
         favs.remove(fav)
         DataManager.saveListEx(favs.toList(), "favourites.json", DataManager.favourites)
-        queuedFavChanges.toAdd.removeIf { it.mediaID eqI media.GUID }
-        queuedFavChanges.toRemove.removeIf { it.mediaID eqI media.GUID }
+        launchThreaded {
+            queuedFavChanges.toAdd.removeIf { it.mediaID eqI media.GUID }
+            queuedFavChanges.toRemove.removeIf { it.mediaID eqI media.GUID }
 
-        if (!hasInternet() || !isLoggedIn() || !sendObject(Endpoints.FAVOURITES_DELETE, fav)) {
-            queuedFavChanges.toRemove.add(fav)
-            save()
+            if (!hasInternet() || !isLoggedIn() || !sendObject(Endpoints.FAVOURITES_DELETE, fav)) {
+                queuedFavChanges.toRemove.add(fav)
+                save()
+            }
         }
-        println(queuedFavChanges)
     }
 
     private fun syncFavs() {
@@ -93,17 +96,19 @@ object RequestQueue {
         val existingMax = existing?.maxProgress ?: -1F
         val new = if (existingMax > mediaWatched.maxProgress) mediaWatched.copy(maxProgress = existingMax) else mediaWatched
         DataManager.saveListEx(existingList.replaceIfNotNull(existing, new).toList(), "watched.json", DataManager.watched)
-        queuedWatchedChanges.toUpdate.removeIf { it.entryID eqI mediaWatched.entryID }
-        queuedWatchedChanges.toRemove.removeIf { it.entryID eqI mediaWatched.entryID }
-        if (!hasInternet() || !isLoggedIn() || !sendObject(Endpoints.WATCHED_ADD, new)) {
-            queuedWatchedChanges.toUpdate.add(new)
-            save()
+        launchThreaded {
+            queuedWatchedChanges.toUpdate.removeIf { it.entryID eqI mediaWatched.entryID }
+            queuedWatchedChanges.toRemove.removeIf { it.entryID eqI mediaWatched.entryID }
+            if (!hasInternet() || !isLoggedIn() || !sendObject(Endpoints.WATCHED_ADD, new)) {
+                queuedWatchedChanges.toUpdate.add(new)
+                save()
+            }
         }
     }
 
     fun addMultipleWatched(entries: List<MediaEntry>) {
         val existingList = DataManager.watched.value.toMutableList()
-        val now = Clock.System.now().epochSeconds
+        val now = currentUnixSeconds()
         entries.forEach { entry ->
             val existing = existingList.find { it.entryID eqI entry.GUID }
             val new = MediaWatched(entry.GUID, login?.userID ?: "", now, 0, 0F, 100F)
@@ -113,6 +118,7 @@ object RequestQueue {
             queuedWatchedChanges.toUpdate.add(new)
         }
         DataManager.saveListEx(existingList.toList(), "watched.json", DataManager.watched)
+        save()
     }
 
     fun removeMultipleWatched(entries: List<MediaEntry>) {
@@ -127,6 +133,7 @@ object RequestQueue {
             queuedWatchedChanges.toRemove.add(existing)
         }
         DataManager.saveListEx(existingList.toList(), "watched.json", DataManager.watched)
+        save()
     }
 
     fun removeWatched(entry: MediaEntry) {
@@ -136,11 +143,13 @@ object RequestQueue {
             return
         existingList.remove(existing)
         DataManager.saveListEx(existingList.toList(), "watched.json", DataManager.watched)
-        queuedWatchedChanges.toUpdate.removeIf { it.entryID eqI entry.GUID }
-        queuedWatchedChanges.toRemove.removeIf { it.entryID eqI entry.GUID }
-        if (!hasInternet() || !isLoggedIn() || !sendObject(Endpoints.WATCHED_DELETE, existing)) {
-            queuedWatchedChanges.toRemove.add(existing)
-            save()
+        launchThreaded {
+            queuedWatchedChanges.toUpdate.removeIf { it.entryID eqI entry.GUID }
+            queuedWatchedChanges.toRemove.removeIf { it.entryID eqI entry.GUID }
+            if (!hasInternet() || !isLoggedIn() || !sendObject(Endpoints.WATCHED_DELETE, existing)) {
+                queuedWatchedChanges.toRemove.add(existing)
+                save()
+            }
         }
     }
 
