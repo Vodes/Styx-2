@@ -20,12 +20,14 @@ import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
+import com.russhwolf.settings.get
 import io.kamel.image.lazyPainterResource
 import moe.styx.components.MainScaffold
 import moe.styx.components.anime.*
 import moe.styx.components.misc.FavouriteIconButton
 import moe.styx.logic.data.*
 import moe.styx.navigation.LocalGlobalNavigator
+import moe.styx.settings
 import moe.styx.types.Media
 import moe.styx.types.MediaEntry
 import java.util.*
@@ -55,6 +57,7 @@ class AnimeDetailView(val ID: String) : Screen {
         }
         val episodes = vm.getEpisodes()
 
+        val preferGerman = settings["prefer-german-metadata", false]
         val scrollState = rememberScrollState()
         val showSelection = remember { mutableStateOf(false) }
 
@@ -73,9 +76,10 @@ class AnimeDetailView(val ID: String) : Screen {
 
                         Text("About", Modifier.padding(6.dp, 2.dp), style = MaterialTheme.typography.titleLarge)
                         MediaGenreListing(vm.anime)
-                        if (!vm.anime.synopsisEN.isNullOrBlank())
+                        val synopsis = if (!vm.anime.synopsisDE.isNullOrBlank() && preferGerman) vm.anime.synopsisDE else vm.anime.synopsisEN
+                        if (!synopsis.isNullOrBlank())
                             SelectionContainer {
-                                Text(vm.anime.synopsisEN!!, Modifier.padding(6.dp), style = MaterialTheme.typography.bodyMedium)
+                                Text(synopsis, Modifier.padding(6.dp), style = MaterialTheme.typography.bodyMedium)
                             }
 
                         if (vm.anime.sequel != null || vm.anime.prequel != null) {

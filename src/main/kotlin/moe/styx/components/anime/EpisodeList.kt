@@ -14,8 +14,10 @@ import androidx.compose.ui.input.pointer.PointerButton
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.onPointerEvent
 import androidx.compose.ui.unit.dp
+import com.russhwolf.settings.get
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import moe.styx.components.misc.ExpandableText
 import moe.styx.logic.data.DataManager
 import moe.styx.logic.login.login
 import moe.styx.logic.loops.RequestQueue
@@ -24,6 +26,7 @@ import moe.styx.logic.runner.launchMPV
 import moe.styx.logic.utils.currentUnixSeconds
 import moe.styx.logic.utils.readableSize
 import moe.styx.navigation.LocalGlobalNavigator
+import moe.styx.settings
 import moe.styx.types.MediaEntry
 import moe.styx.types.MediaWatched
 import moe.styx.types.eqI
@@ -36,6 +39,8 @@ fun EpisodeList(episodes: List<MediaEntry>, showSelection: MutableState<Boolean>
     Column(Modifier.fillMaxHeight().fillMaxWidth()) {
         val selected = remember { mutableStateMapOf<String, Boolean>() }
         var needsRepaint by remember { mutableStateOf(0) }
+        val preferGerman = settings["prefer-german-metadata", false]
+        val showSummaries = settings["display-ep-synopsis", false]
         if (!showSelection.value)
             selected.clear()
 
@@ -66,52 +71,55 @@ fun EpisodeList(episodes: List<MediaEntry>, showSelection: MutableState<Boolean>
 
         LazyColumn {
             items(episodes.size) { i ->
+                val ep = episodes[i]
                 Column(
                     Modifier.padding(10.dp, 5.dp).fillMaxWidth().defaultMinSize(0.dp, 50.dp)
                         .onClick(true, matcher = PointerMatcher.mouse(PointerButton.Secondary)) {
                             showSelection.value = !showSelection.value
                             if (showSelection.value)
-                                selected[episodes[i].GUID] = !selected.getOrDefault(episodes[i].GUID, false)
+                                selected[ep.GUID] = !selected.getOrDefault(ep.GUID, false)
                         }
                         .combinedClickable(onClick = {
                             if (showSelection.value) {
-                                selected[episodes[i].GUID] = !selected.getOrDefault(episodes[i].GUID, false)
+                                selected[ep.GUID] = !selected.getOrDefault(ep.GUID, false)
                                 return@combinedClickable
                             }
                             if (currentPlayer == null) {
-                                launchMPV(episodes[i], false, {
+                                launchMPV(ep, false, {
                                     failedToPlayMessage = it
                                     showFailedDialog = true
                                 }) { needsRepaint++ }
                             } else {
-                                selectedMedia = episodes[i]
+                                selectedMedia = ep
                                 showAppendDialog = true
                             }
                         }, onLongClick = {
                             showSelection.value = !showSelection.value
                         })
                 ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
+                    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                         SelectionCheckboxes(showSelection, selected, episodes, i)
-                        Column(Modifier.fillMaxWidth().align(Alignment.CenterVertically)) {
-                            Row(Modifier.align(Alignment.Start)) {
-                                Text(
-                                    "${episodes[i].entryNumber} - ${episodes[i].nameEN}",
-                                    Modifier.padding(5.dp),
-                                    softWrap = false,
-                                    style = MaterialTheme.typography.labelMedium
-                                )
-                            }
-                            Column(Modifier.align(Alignment.End)) {
-                                val watchProgress = watched[episodes[i]]
-                                if (watchProgress != null) {
-                                    WatchedIndicator(watchProgress, Modifier.align(Alignment.End))
-                                }
-                                Text(
-                                    episodes[i].fileSize.readableSize(),
-                                    Modifier.padding(5.dp).align(Alignment.End),
-                                    style = MaterialTheme.typography.labelSmall
-                                )
+                        Column(Modifier.weight(1f)) {
+                            val title = if (!ep.nameDE.isNullOrBlank() && preferGerman) ep.nameDE else ep.nameEN
+                            Text(
+                                "${ep.entryNumber}${if (!title.isNullOrBlank()) " - $title" else ""}",
+                                Modifier.padding(5.dp),
+                                softWrap = false,
+                                style = MaterialTheme.typography.labelLarge
+                            )
+                            val summary = if (!ep.synopsisDE.isNullOrBlank() && preferGerman) ep.synopsisDE else ep.synopsisEN
+                            if (!summary.isNullOrBlank() && showSummaries)
+                                ExpandableText(summary, Modifier.padding(8.dp, 2.dp, 5.dp, 2.dp))
+                        }
+                        Column(verticalArrangement = Arrangement.Bottom) {
+                            val watchProgress = watched[ep]
+                            Text(
+                                episodes[i].fileSize.readableSize(),
+                                Modifier.padding(5.dp),
+                                style = MaterialTheme.typography.labelSmall
+                            )
+                            if (watchProgress != null) {
+                                WatchedIndicator(watchProgress, Modifier.align(Alignment.CenterHorizontally))
                             }
                         }
                     }

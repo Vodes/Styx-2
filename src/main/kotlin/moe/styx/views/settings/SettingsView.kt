@@ -48,6 +48,9 @@ class SettingsView : Screen {
                         SettingsCheckbox("Darkmode", "darkmode", darkMode, onUpdate = { darkMode = it })
                         SettingsCheckbox("Show Names by default", "display-names", false)
 
+                        SettingsCheckbox("Show episode summaries", "display-ep-synopsis", false)
+                        SettingsCheckbox("Prefer german titles and summaries", "prefer-german-metadata", false)
+
                         Divider(Modifier.padding(5.dp), thickness = 2.dp)
 
                         SettingsCheckbox("Use list for shows", "shows-list", false)

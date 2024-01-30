@@ -65,7 +65,7 @@ class MpvInstance {
             val socket = openSocket()
             socket.write((command + "\n").toByteArray())
             runCatching { socket.close() }
-        }.onFailure { it.printStackTrace().also { return false } }
+        }.onFailure { return false }
         return true
     }
 
@@ -133,7 +133,6 @@ class MpvInstance {
                         )
                     )
                     runCommand("print-text ${json.toString()}")
-                    println(MpvStatus.current)
                     delay(650L)
                 }
             }
