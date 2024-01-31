@@ -9,7 +9,9 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.SnapshotStateMap
-import androidx.compose.ui.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.PointerButton
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.onPointerEvent
@@ -74,7 +76,7 @@ fun EpisodeList(episodes: List<MediaEntry>, showSelection: MutableState<Boolean>
             items(episodes.size) { i ->
                 val ep = episodes[i]
                 Column(
-                    Modifier.padding(10.dp, 5.dp).fillMaxWidth().defaultMinSize(0.dp, 50.dp)
+                    Modifier.padding(10.dp, 5.dp).fillMaxWidth().defaultMinSize(0.dp, 75.dp)
                         .onClick(true, matcher = PointerMatcher.mouse(PointerButton.Secondary)) {
                             showSelection.value = !showSelection.value
                             if (showSelection.value)
@@ -99,30 +101,35 @@ fun EpisodeList(episodes: List<MediaEntry>, showSelection: MutableState<Boolean>
                         })
                 ) {
                     Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                        val watchProgress = watched[ep]
                         SelectionCheckboxes(showSelection, selected, episodes, i)
-                        Column(Modifier.weight(1f)) {
-                            val title = if (!ep.nameDE.isNullOrBlank() && preferGerman) ep.nameDE else ep.nameEN
-                            Text(
-                                "${ep.entryNumber}${if (!title.isNullOrBlank()) " - $title" else ""}",
-                                Modifier.padding(5.dp),
-                                softWrap = false,
-                                style = MaterialTheme.typography.labelLarge
-                            )
-                            Text(ep.timestamp.toDateString(), Modifier.padding(5.dp, 0.dp, 0.dp, 4.dp), style = MaterialTheme.typography.labelMedium)
-                            val summary = if (!ep.synopsisDE.isNullOrBlank() && preferGerman) ep.synopsisDE else ep.synopsisEN
-                            if (!summary.isNullOrBlank() && showSummaries)
-                                ExpandableText(summary, Modifier.padding(8.dp, 2.dp, 5.dp, 2.dp))
-                        }
-                        Column(verticalArrangement = Arrangement.Bottom) {
-                            val watchProgress = watched[ep]
-                            Text(
-                                episodes[i].fileSize.readableSize(),
-                                Modifier.padding(5.dp),
-                                style = MaterialTheme.typography.labelSmall
-                            )
-                            if (watchProgress != null) {
-                                WatchedIndicator(watchProgress, Modifier.align(Alignment.CenterHorizontally))
+                        Column(Modifier.fillMaxWidth()) {
+                            Column {
+                                val title = if (!ep.nameDE.isNullOrBlank() && preferGerman) ep.nameDE else ep.nameEN
+                                Text(
+                                    "${ep.entryNumber}${if (!title.isNullOrBlank()) " - $title" else ""}",
+                                    Modifier.padding(5.dp).basicMarquee(animationMode = MarqueeAnimationMode.WhileFocused),
+                                    softWrap = false,
+                                    style = MaterialTheme.typography.labelLarge
+                                )
+                                Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                                    Text(
+                                        ep.timestamp.toDateString(),
+                                        Modifier.padding(5.dp, 0.dp, 0.dp, 4.dp).weight(1f),
+                                        style = MaterialTheme.typography.labelMedium
+                                    )
+                                    Text(
+                                        episodes[i].fileSize.readableSize(),
+                                        Modifier.padding(5.dp),
+                                        style = MaterialTheme.typography.labelSmall
+                                    )
+                                }
+                                val summary = if (!ep.synopsisDE.isNullOrBlank() && preferGerman) ep.synopsisDE else ep.synopsisEN
+                                if (!summary.isNullOrBlank() && showSummaries)
+                                    ExpandableText(summary, Modifier.padding(8.dp, 2.dp, 5.dp, 2.dp))
                             }
+                            if (watchProgress != null)
+                                WatchedIndicator(watchProgress, Modifier.fillMaxWidth().padding(0.dp, 2.dp, 0.dp, 5.dp))
                         }
                     }
                 }
@@ -212,7 +219,7 @@ fun SelectedCard(selected: SnapshotStateMap<String, Boolean>, onUpdate: () -> Un
                     if (entry == null)
                         return@IconButton
                     RequestQueue.updateWatched(
-                        MediaWatched(entry.GUID, login?.userID ?: "", currentUnixSeconds(), 0, 100F, 100F)
+                        MediaWatched(entry.GUID, login?.userID ?: "", currentUnixSeconds(), 0, 0F, 100F)
                     )
                 } else {
                     RequestQueue.addMultipleWatched(current
@@ -252,15 +259,14 @@ fun SelectedCard(selected: SnapshotStateMap<String, Boolean>, onUpdate: () -> Un
 
 @Composable
 fun WatchedIndicator(mediaWatched: MediaWatched, modifier: Modifier = Modifier) {
-    Box(modifier, contentAlignment = Alignment.Center) {
-        CircularProgressIndicator(
-            mediaWatched.progressPercent / 100,
-            Modifier.size(26.dp),
-            color = MaterialTheme.colorScheme.secondary,
-            trackColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5F)
-        )
-        if (mediaWatched.maxProgress > 85) {
-            Icon(Icons.Default.Done, "Has been watched", Modifier.size(17.dp).zIndex(1f), tint = MaterialTheme.colorScheme.primary)
-        }
+    Row(modifier, verticalAlignment = Alignment.CenterVertically) {
+        LinearProgressIndicator(mediaWatched.progressPercent / 100, Modifier.fillMaxWidth().weight(1f).padding(7.dp, 2.dp))
+        if (mediaWatched.maxProgress > 85)
+            Icon(
+                Icons.Default.CheckCircle,
+                "Has been watched",
+                Modifier.size(20.dp).padding(0.dp, 0.dp, 6.dp, 0.dp),
+                tint = MaterialTheme.colorScheme.primary
+            )
     }
 }

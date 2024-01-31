@@ -26,6 +26,7 @@ import moe.styx.logic.login.ServerStatus
 import moe.styx.logic.login.isLoggedIn
 import moe.styx.logic.loops.Heartbeats
 import moe.styx.logic.loops.RequestQueue
+import moe.styx.logic.utils.Log
 import moe.styx.navigation.LocalGlobalNavigator
 import moe.styx.theme.*
 import moe.styx.views.login.LoginView
@@ -63,6 +64,7 @@ fun main() = application {
         }
     )
     {
+        Log.i { "Compose window initialized with: ${this.window.renderApi}" }
         Surface(modifier = Modifier.fillMaxSize()) {
             MaterialTheme(
                 colorScheme = (if (darkMode.value) DarkColorScheme else LightColorScheme).transition(),

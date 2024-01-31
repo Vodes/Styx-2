@@ -12,3 +12,8 @@ fun Long.toDateString(): String {
     val datetime = instant.toLocalDateTime(TimeZone.currentSystemDefault())
     return "${datetime.year}-${datetime.monthNumber.padString()}-${datetime.dayOfMonth.padString()} "
 }
+
+fun LocalDateTime.formattedStr(): String {
+    return "${this.year}-${this.monthNumber.padString()}-${this.dayOfMonth.padString()} " +
+            "${this.hour.padString()}:${this.minute.padString()}:${this.second.padString()}"
+}

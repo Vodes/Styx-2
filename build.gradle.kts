@@ -43,6 +43,9 @@ dependencies {
     implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
 
     implementation("com.github.oshi:oshi-core:6.4.11")
+    implementation("com.github.ajalt.mordant:mordant:2.2.0")
+    // https://mvnrepository.com/artifact/org.slf4j/slf4j-simple
+    implementation("org.slf4j:slf4j-simple:2.0.9")
 
     // Still gotta think about some cross-platform IO stuff
     //implementation("com.soywiz.korlibs.korio:korio:2.2.0")
