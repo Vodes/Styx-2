@@ -11,6 +11,7 @@ import kotlinx.serialization.encodeToString
 import moe.styx.logic.login.ServerStatus
 import moe.styx.logic.login.isLoggedIn
 import moe.styx.logic.login.login
+import moe.styx.logic.utils.Log
 import moe.styx.logic.utils.currentUnixSeconds
 import moe.styx.types.ApiResponse
 import moe.styx.types.json
@@ -49,9 +50,7 @@ enum class Endpoints(private val path: String) {
     CHANGES("/changes"),
     WATCH("/watch");
 
-    fun url(): String {
-        return baseURL + path
-    }
+    fun url() = baseURL + path
 }
 
 /*
@@ -71,7 +70,9 @@ suspend inline fun <reified T> getList(endpoint: Endpoints): List<T> {
                 append("token", login!!.accessToken)
             }
         )
-    }.onFailure { ServerStatus.lastKnown = ServerStatus.UNKNOWN }.getOrNull() ?: return emptyList()
+    }.onFailure {
+        Log.e("getList for Endpoint $endpoint", it) { "Request Failed" }.also { ServerStatus.lastKnown = ServerStatus.UNKNOWN }
+    }.getOrNull() ?: return emptyList()
 
     ServerStatus.setLastKnown(response.status)
 
@@ -91,7 +92,9 @@ inline fun <reified T> sendObjectWithResponse(endpoint: Endpoints, data: T?): Ap
             append("token", login!!.accessToken)
             append("content", json.encodeToString(data))
         })
-    }.onFailure { ServerStatus.lastKnown = ServerStatus.UNKNOWN }.getOrNull() ?: return@runBlocking null
+    }.onFailure {
+        Log.e("sendObjectWithResponse for Endpoint $endpoint", it) { "Request Failed" }.also { ServerStatus.lastKnown = ServerStatus.UNKNOWN }
+    }.getOrNull() ?: return@runBlocking null
 
     ServerStatus.setLastKnown(request.status)
 
@@ -119,7 +122,9 @@ inline fun <reified T> getObject(endpoint: Endpoints): T? = runBlocking {
         httpClient.get {
             url(endpoint.url())
         }
-    }.onFailure { ServerStatus.lastKnown = ServerStatus.UNKNOWN }.getOrNull() ?: return@runBlocking null
+    }.onFailure {
+        Log.e("getObject for Endpoint $endpoint", it) { "Request Failed" }.also { ServerStatus.lastKnown = ServerStatus.UNKNOWN }
+    }.getOrNull() ?: return@runBlocking null
 
     ServerStatus.setLastKnown(response.status)
 

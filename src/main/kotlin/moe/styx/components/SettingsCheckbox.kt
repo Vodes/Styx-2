@@ -24,13 +24,13 @@ fun SettingsCheckbox(
     var setting by rememberSaveable { mutableStateOf(settings[key, default]) }
 
     if (description.isBlank())
-        Row(modifier = Modifier.height(40.dp).padding(paddingValues)) {
+        Row(modifier = Modifier.height(45.dp).padding(paddingValues)) {
             TextWithCheckBox(title, setting, Modifier.align(Alignment.CenterVertically)) { updated ->
                 setting = updated.also { settings.putBoolean(key, updated) }.also { onUpdate(updated) }
             }
         }
     else
-        Column(Modifier.height(90.dp).padding(paddingValues)) {
+        Column(Modifier.height(85.dp).padding(paddingValues)) {
             Row {
                 TextWithCheckBox(title, setting, Modifier.align(Alignment.CenterVertically)) { updated ->
                     setting = updated.also { settings.putBoolean(key, updated) }.also { onUpdate(updated) }
@@ -42,7 +42,7 @@ fun SettingsCheckbox(
 
 @Composable
 private fun TextWithCheckBox(title: String, value: Boolean, modifier: Modifier = Modifier, onUpdate: (Boolean) -> Unit) {
-    Text(text = title, modifier = modifier)
+    Text(text = title, modifier = modifier, style = MaterialTheme.typography.bodyLarge)
     Checkbox(
         checked = value, onCheckedChange = {
             onUpdate(it)
