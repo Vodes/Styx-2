@@ -33,6 +33,7 @@ enum class Endpoints(private val path: String) {
 
     MEDIA("/media/list"),
     MEDIA_ENTRIES("/media/entries"),
+    MEDIAINFO("/media/info"),
     IMAGES("/media/images"),
     CATEGORIES("/media/categories"),
     SCHEDULES("/media/schedules"),

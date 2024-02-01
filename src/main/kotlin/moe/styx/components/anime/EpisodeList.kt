@@ -60,6 +60,7 @@ fun EpisodeList(episodes: List<MediaEntry>, showSelection: MutableState<Boolean>
             }
         }
         var selectedMedia by remember { mutableStateOf<MediaEntry?>(null) }
+        var showMediaInfoDialog by remember { mutableStateOf(false) }
         var showAppendDialog by remember { mutableStateOf(false) }
         if (showAppendDialog && selectedMedia != null) {
             AppendDialog(selectedMedia!!, Modifier.fillMaxWidth(0.6F), Modifier.align(Alignment.CenterHorizontally), {
@@ -70,6 +71,10 @@ fun EpisodeList(episodes: List<MediaEntry>, showSelection: MutableState<Boolean>
                 failedToPlayMessage = it
                 showFailedDialog = true
             }
+        }
+
+        if (showMediaInfoDialog && selectedMedia != null) {
+            MediaInfoDialog(selectedMedia!!) { showMediaInfoDialog = false }
         }
 
         LazyColumn {
@@ -119,8 +124,11 @@ fun EpisodeList(episodes: List<MediaEntry>, showSelection: MutableState<Boolean>
                                         style = MaterialTheme.typography.labelMedium
                                     )
                                     Text(
-                                        episodes[i].fileSize.readableSize(),
-                                        Modifier.padding(5.dp),
+                                        ep.fileSize.readableSize(),
+                                        Modifier.padding(5.dp).clickable {
+                                            selectedMedia = ep
+                                            showMediaInfoDialog = true
+                                        },
                                         style = MaterialTheme.typography.labelSmall
                                     )
                                 }

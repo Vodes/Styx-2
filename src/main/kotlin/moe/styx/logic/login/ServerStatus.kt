@@ -27,6 +27,7 @@ enum class ServerStatus {
 
                 UNAUTHORIZED -> "Your device is not authorized. Please login."
                 BANNED -> "You have been banned. Please contact the admin."
+                UNKNOWN -> "An unknown error occurred when connecting.\nIf you know for sure that the server is up, please check your connection."
 
                 else -> "An error has occurred on the server side.\nPlease contact the admin."
             }

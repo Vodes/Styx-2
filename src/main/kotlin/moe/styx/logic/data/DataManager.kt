@@ -17,6 +17,7 @@ object DataManager {
     val media = mutableStateOf(listOf<Media>())
     val entries = mutableStateOf(listOf<MediaEntry>())
     val watched = mutableStateOf(listOf<MediaWatched>())
+    val mediainfo = mutableStateOf(listOf<MediaInfo>())
     val categories = mutableStateOf(listOf<Category>())
     val images = mutableStateOf(listOf<Image>())
     val favourites = mutableStateOf(listOf<Favourite>())
@@ -50,6 +51,9 @@ object DataManager {
                 jobs.add(launch {
                     saveListEx(getList(Endpoints.IMAGES), "images.json", images)
                 })
+                jobs.add(launch {
+                    saveListEx(getList(Endpoints.MEDIAINFO), "mediainfo.json", mediainfo)
+                })
 
                 if (shouldUpdateMedia)
                     jobs.add(launch {
@@ -68,6 +72,7 @@ object DataManager {
                     readListEx("entries.json", entries)
             } else {
                 readListEx("entries.json", entries)
+                readListEx("mediainfo.json", mediainfo)
                 readListEx("media.json", media)
                 readListEx("images.json", images)
             }
@@ -82,6 +87,7 @@ object DataManager {
             favourites.value = readList("favourites.json")
             schedules.value = readList("schedules.json")
             watched.value = readList("watched.json")
+            mediainfo.value = readList("mediainfo.json")
         }
 
         delay(200)

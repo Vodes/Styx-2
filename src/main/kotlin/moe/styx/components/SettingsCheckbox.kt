@@ -41,10 +41,10 @@ fun SettingsCheckbox(
 }
 
 @Composable
-private fun TextWithCheckBox(title: String, value: Boolean, modifier: Modifier = Modifier, onUpdate: (Boolean) -> Unit) {
+fun TextWithCheckBox(title: String, value: Boolean, modifier: Modifier = Modifier, enabled: Boolean = true, onUpdate: (Boolean) -> Unit = {}) {
     Text(text = title, modifier = modifier, style = MaterialTheme.typography.bodyLarge)
     Checkbox(
-        checked = value, onCheckedChange = {
+        checked = value, enabled = enabled, onCheckedChange = {
             onUpdate(it)
         },
         modifier = modifier
