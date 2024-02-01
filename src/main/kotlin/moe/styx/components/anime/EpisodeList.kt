@@ -278,8 +278,3 @@ fun WatchedIndicator(mediaWatched: MediaWatched, modifier: Modifier = Modifier) 
             )
     }
 }
-
-@Composable
-fun MediaInfoTooltip() {
-
-}
