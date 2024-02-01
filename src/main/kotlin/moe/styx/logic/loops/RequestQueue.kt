@@ -3,13 +3,13 @@ package moe.styx.logic.loops
 import com.russhwolf.settings.get
 import kotlinx.coroutines.delay
 import kotlinx.serialization.encodeToString
+import moe.styx.Main.settings
 import moe.styx.logic.*
 import moe.styx.logic.data.DataManager
 import moe.styx.logic.login.isLoggedIn
 import moe.styx.logic.login.login
 import moe.styx.logic.utils.currentUnixSeconds
 import moe.styx.logic.utils.replaceIfNotNull
-import moe.styx.settings
 import moe.styx.types.*
 
 object RequestQueue {

@@ -10,7 +10,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.russhwolf.settings.get
-import moe.styx.settings
+import moe.styx.Main.settings
 
 @Composable
 fun SettingsCheckbox(

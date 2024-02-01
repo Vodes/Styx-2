@@ -5,13 +5,13 @@ import com.russhwolf.settings.get
 import kotlinx.coroutines.*
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
+import moe.styx.Main.settings
 import moe.styx.logic.Endpoints
 import moe.styx.logic.data.DataManager
 import moe.styx.logic.launchThreaded
 import moe.styx.logic.login.login
 import moe.styx.logic.loops.RequestQueue
 import moe.styx.logic.utils.currentUnixSeconds
-import moe.styx.settings
 import moe.styx.types.*
 import java.io.*
 

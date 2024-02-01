@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.dp
 import com.russhwolf.settings.get
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import moe.styx.Main.settings
 import moe.styx.components.misc.ExpandableText
 import moe.styx.logic.data.DataManager
 import moe.styx.logic.login.login
@@ -29,7 +30,6 @@ import moe.styx.logic.utils.currentUnixSeconds
 import moe.styx.logic.utils.readableSize
 import moe.styx.logic.utils.toDateString
 import moe.styx.navigation.LocalGlobalNavigator
-import moe.styx.settings
 import moe.styx.types.MediaEntry
 import moe.styx.types.MediaWatched
 import moe.styx.types.eqI

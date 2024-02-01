@@ -17,12 +17,11 @@ import cafe.adriel.voyager.navigator.Navigator
 import com.russhwolf.settings.get
 import io.kamel.image.KamelImage
 import io.kamel.image.lazyPainterResource
-import moe.styx.logic.data.DataManager
+import moe.styx.Main.settings
 import moe.styx.logic.data.*
-import moe.styx.views.anime.AnimeDetailView
-import moe.styx.settings
 import moe.styx.theme.AppShapes
 import moe.styx.types.Media
+import moe.styx.views.anime.AnimeDetailView
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable

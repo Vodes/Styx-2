@@ -2,7 +2,7 @@ import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 val voyagerVer = "1.0.0"
-val ktorVersion = "2.3.7"
+val ktorVersion = "2.3.8"
 
 plugins {
     kotlin("jvm") version "1.9.21"
@@ -11,7 +11,7 @@ plugins {
 }
 
 group = "moe.styx"
-version = "1.0"
+version = "0.0.1"
 
 repositories {
     google()
@@ -33,9 +33,8 @@ dependencies {
     implementation("cafe.adriel.voyager:voyager-bottom-sheet-navigator:$voyagerVer")
     implementation("cafe.adriel.voyager:voyager-transitions:$voyagerVer")
     implementation("com.russhwolf:multiplatform-settings-no-arg:1.1.1")
-    api("org.jetbrains.compose.material:material-icons-extended:1.5.11")
+    implementation("org.jetbrains.compose.material:material-icons-extended:1.5.11")
     implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.5.0")
-    api("io.github.kevinnzou:compose-webview-multiplatform:1.7.2")
 
     implementation("io.ktor:ktor-client-core-jvm:$ktorVersion")
     implementation("io.ktor:ktor-client-java:$ktorVersion")
@@ -64,9 +63,27 @@ compose.desktop {
     application {
         mainClass = "moe.styx.MainKt"
         nativeDistributions {
+            includeAllModules = true
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb, TargetFormat.Rpm, TargetFormat.AppImage)
-            packageName = "Styx-2"
-            packageVersion = "1.0.0"
+            packageName = "Styx 2"
+            copyright = "© 2024 Vodes. All rights reserved."
+            vendor = "Styx.moe"
+            licenseFile.set(project.file("LICENSE"))
+            windows {
+                menuGroup = "Styx"
+                upgradeUuid = System.getenv("STYX_APP_GUID")
+                iconFile.set(project.file("src/main/resources/icons/icon.ico"))
+            }
+            linux {
+                appCategory = "AudioVideo"
+                appRelease = "1"
+                iconFile.set(project.file("src/main/resources/icons/icon.png"))
+            }
+            macOS {
+                packageVersion = "1.0.0"
+                appStore = false
+                iconFile.set(project.file("src/main/resources/icons/icon.icns"))
+            }
         }
     }
 }

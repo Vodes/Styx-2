@@ -2,7 +2,7 @@ package moe.styx.logic.data
 
 import androidx.compose.runtime.getValue
 import com.russhwolf.settings.get
-import moe.styx.settings
+import moe.styx.Main.settings
 import moe.styx.types.Category
 import moe.styx.types.eqI
 

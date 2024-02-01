@@ -1,31 +1,21 @@
 package moe.styx.views.anime.tabs
 
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.layout.Column
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Tv
-import androidx.compose.material3.ElevatedCard
 import androidx.compose.runtime.*
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
 import com.russhwolf.settings.get
-import io.kamel.image.KamelImage
-import io.kamel.image.lazyPainterResource
-import moe.styx.logic.data.DataManager
+import moe.styx.Main.settings
 import moe.styx.components.misc.createTabOptions
 import moe.styx.components.overviews.MediaGrid
 import moe.styx.components.overviews.MediaList
 import moe.styx.components.overviews.MediaSearch
+import moe.styx.logic.data.DataManager
 import moe.styx.navigation.LocalGlobalNavigator
-import moe.styx.views.other.SubwaySurfers
-import moe.styx.settings
 import moe.styx.types.toBoolean
 
 class AnimeListView() : Tab {
@@ -43,30 +33,12 @@ class AnimeListView() : Tab {
         val vm = rememberScreenModel { AnimeListViewModel(mediaSearch) }
         var list by remember { vm.listState }
         val useListView by remember { vm.useListViewState }
-        var showSubwaySurfers by remember { mutableStateOf(false) }
         Column {
-            mediaSearch.component({
-                list = it
-                showSubwaySurfers = mediaSearch.searchState.value.equals("SubwaySurfers", true)
-            })
-
-            if (showSubwaySurfers) {
-                ElevatedCard(Modifier.clip(RoundedCornerShape(40)).width(67.dp).height(65.dp).padding(3.dp).clickable {
-                    nav.push(SubwaySurfers())
-                }) {
-                    KamelImage(
-                        lazyPainterResource("https://static.wikia.nocookie.net/subwaysurf/images/4/4b/FirstAvatar.jpg"),
-                        contentDescription = "Subway Surfers",
-                        contentScale = ContentScale.Fit,
-                        modifier = Modifier.padding(1.dp)
-                    )
-                }
+            mediaSearch.component({ list = it })
+            if (useListView) {
+                MediaList(list)
             } else {
-                if (useListView) {
-                    MediaList(list)
-                } else {
-                    MediaGrid(list)
-                }
+                MediaGrid(list)
             }
         }
     }

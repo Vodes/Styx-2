@@ -2,12 +2,10 @@ package moe.styx.components.misc
 
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.russhwolf.settings.get
-import moe.styx.settings
+import moe.styx.Main.settings
 
 @Composable
 fun TwoStateIconButton(
@@ -19,28 +17,28 @@ fun TwoStateIconButton(
     trueTooltip: String? = null,
     falseTooltip: String? = null
 ) {
-    val setting = remember { mutableStateOf(settings[key, default]) }
+    var setting by remember { mutableStateOf(settings[key, default]) }
     IconButton(
         {
-            setting.value = !setting.value
-            settings.putBoolean(key, setting.value)
-            onChange(setting.value)
+            setting = !setting
+            settings.putBoolean(key, setting)
+            onChange(setting)
         },
         content = {
-            if (setting.value) {
+            if (setting) {
                 if (!trueTooltip.isNullOrBlank()) {
                     ToolTipWrapper(trueTooltip) {
-                        Icon(if (setting.value) iconTrue else iconFalse, "")
+                        Icon(if (setting) iconTrue else iconFalse, "")
                     }
                 } else
-                    Icon(if (setting.value) iconTrue else iconFalse, "")
+                    Icon(if (setting) iconTrue else iconFalse, "")
             } else {
                 if (!falseTooltip.isNullOrBlank()) {
                     ToolTipWrapper(falseTooltip) {
-                        Icon(if (setting.value) iconTrue else iconFalse, "")
+                        Icon(if (setting) iconTrue else iconFalse, "")
                     }
                 } else
-                    Icon(if (setting.value) iconTrue else iconFalse, "")
+                    Icon(if (setting) iconTrue else iconFalse, "")
             }
         }
     )

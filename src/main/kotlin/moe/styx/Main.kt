@@ -8,6 +8,7 @@ import androidx.compose.material.Surface
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
@@ -16,12 +17,11 @@ import androidx.compose.ui.window.application
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.transitions.SlideTransition
+import com.russhwolf.settings.PreferencesSettings
 import com.russhwolf.settings.Settings
 import com.russhwolf.settings.get
-import io.kamel.core.config.KamelConfig
-import io.kamel.core.config.takeFrom
-import io.kamel.image.config.Default
-import io.kamel.image.config.resourcesFetcher
+import moe.styx.Main.isUiModeDark
+import moe.styx.Main.settings
 import moe.styx.logic.login.ServerStatus
 import moe.styx.logic.login.isLoggedIn
 import moe.styx.logic.loops.Heartbeats
@@ -32,20 +32,19 @@ import moe.styx.theme.*
 import moe.styx.views.login.LoginView
 import moe.styx.views.login.OfflineView
 import moe.styx.views.other.LoadingView
+import java.util.prefs.Preferences
 
-val settings: Settings = Settings()
-var isUiModeDark: MutableState<Boolean> = mutableStateOf(true)
-
-val desktopConfig = KamelConfig {
-    takeFrom(KamelConfig.Default)
-    resourcesFetcher()
+object Main {
+    private val delegate = Preferences.userNodeForPackage(this.javaClass)
+    val settings: Settings = PreferencesSettings(delegate)
+    var isUiModeDark: MutableState<Boolean> = mutableStateOf(true)
 }
 
 fun main() = application {
     RequestQueue.start()
     Heartbeats.start()
     isUiModeDark.value = settings["darkmode", true]
-    val darkMode = remember { isUiModeDark }
+    val darkMode by remember { isUiModeDark }
     val nav = LocalNavigator.current
 
     val preferRounded = settings["rounded-corners", false]
@@ -56,6 +55,7 @@ fun main() = application {
         state = WindowState(width = 750.dp, height = 750.dp),
         undecorated = preferRounded,
         transparent = preferRounded,
+        icon = painterResource("icons/icon.ico"),
         onKeyEvent = {
             if (nav != null && nav.canPop)
                 nav.pop()
@@ -67,7 +67,7 @@ fun main() = application {
         Log.i { "Compose window initialized with: ${this.window.renderApi}" }
         Surface(modifier = Modifier.fillMaxSize()) {
             MaterialTheme(
-                colorScheme = (if (darkMode.value) DarkColorScheme else LightColorScheme).transition(),
+                colorScheme = (if (darkMode) DarkColorScheme else LightColorScheme).transition(),
                 typography = AppTypography,
                 shapes = AppShapes
             ) {

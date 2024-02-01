@@ -22,6 +22,7 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
 import com.russhwolf.settings.get
 import io.kamel.image.lazyPainterResource
+import moe.styx.Main.settings
 import moe.styx.components.MainScaffold
 import moe.styx.components.anime.*
 import moe.styx.components.misc.FavouriteIconButton
@@ -29,7 +30,6 @@ import moe.styx.logic.data.*
 import moe.styx.logic.utils.StackType
 import moe.styx.logic.utils.getURLFromMap
 import moe.styx.navigation.LocalGlobalNavigator
-import moe.styx.settings
 import moe.styx.theme.AppShapes
 import moe.styx.types.Media
 import moe.styx.types.MediaEntry

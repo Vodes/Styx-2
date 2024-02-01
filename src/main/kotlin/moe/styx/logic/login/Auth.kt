@@ -6,11 +6,11 @@ import io.ktor.client.statement.*
 import io.ktor.http.*
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.encodeToString
+import moe.styx.Main.settings
 import moe.styx.logic.Endpoints
 import moe.styx.logic.data.DataManager
 import moe.styx.logic.httpClient
 import moe.styx.logic.login.ServerStatus.Companion.setLastKnown
-import moe.styx.settings
 import moe.styx.types.*
 import oshi.SystemInfo
 import java.io.File
@@ -61,8 +61,11 @@ fun isLoggedIn(): Boolean {
     } else {
         settings["refreshToken", ""]
     }
-    if (token.isBlank())
+
+    if (token.isBlank()) {
+        ServerStatus.lastKnown = ServerStatus.UNAUTHORIZED
         return false
+    }
 
     if (login != null)
         return true
