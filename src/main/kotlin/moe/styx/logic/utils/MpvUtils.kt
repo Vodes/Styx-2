@@ -1,11 +1,23 @@
 package moe.styx.logic.utils
 
 import com.russhwolf.settings.get
+import com.russhwolf.settings.set
+import io.ktor.client.request.*
+import io.ktor.client.statement.*
+import io.ktor.http.*
+import io.ktor.util.cio.*
+import io.ktor.utils.io.*
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.Serializable
 import moe.styx.Main
+import moe.styx.logic.Endpoints
 import moe.styx.logic.data.DataManager
+import moe.styx.logic.httpClient
+import moe.styx.logic.launchThreaded
 import moe.styx.types.eqI
 import moe.styx.types.json
+import net.lingala.zip4j.ZipFile
 import java.io.File
 
 val videoOutputDriverChoices = listOf("gpu-next", "gpu")
@@ -64,10 +76,8 @@ data class MpvPreferences(
     val preferDeDub: Boolean = false,
 )
 
-fun getPreferences() = runCatching { json.decodeFromString<MpvPreferences>(Main.settings["mpv-preferences", ""]) }.getOrNull() ?: MpvPreferences()
-
 fun generateNewConfig() {
-    val pref = getPreferences()
+    val pref = MpvUtils.getPreferences()
     val baseConfig = File(DataManager.getMpvConfDir(), "base.conf")
     val dynamics = File(DataManager.getMpvConfDir(), "dynamic-profiles")
     val profiles = File(dynamics, "quality.conf")
@@ -103,25 +113,73 @@ ${profiles.readText()}
     File(DataManager.getMpvConfDir(), "mpv.conf").writeText(newConfig)
 }
 
-fun getSlangArg(): String {
-    val pref = getPreferences()
-    return if (pref.preferGerman)
-        "de,ger,en,eng"
-    else
-        "en,eng,de,ger"
+object MpvUtils {
+    var isMpvDownloading = false
+
+    fun getPreferences() = runCatching { json.decodeFromString<MpvPreferences>(Main.settings["mpv-preferences", ""]) }.getOrNull() ?: MpvPreferences()
+
+    fun getSlangArg(): String {
+        val pref = getPreferences()
+        return if (pref.preferGerman)
+            "de,ger,en,eng"
+        else
+            "en,eng,de,ger"
+    }
+
+    fun getAlangArg(): String {
+        val pref = getPreferences()
+        return if (pref.preferEnDub)
+            "en,eng,jp,jpn,de,ger"
+        else if (pref.preferDeDub)
+            "de,ger,jp,jpn,en,eng"
+        else
+            "jp,jpn,en,eng,de,ger"
+    }
+
+    fun getProfile(): String {
+        val pref = getPreferences()
+        return "styx${pref.profile.makeFirstLetterBig()}"
+    }
+
+    fun checkVersionAndDownload() {
+        launchThreaded {
+            delay(8000)
+            val response = httpClient.get(Endpoints.MPV.url())
+
+            if (!response.status.isSuccess()) {
+                Log.w("MpvUtils::checkVersionAndDownload") { "Failed to check for mpv version." }
+                return@launchThreaded
+            }
+            isMpvDownloading = true
+            val version = response.bodyAsText().trim()
+            if (Main.settings["mpv-version", "None"].trim() eqI version && DataManager.getMpvDir().exists()) {
+                Log.i("MpvUtils::checkVersionAndDownload") { "mpv version is up-to-date." }
+                isMpvDownloading = false
+                return@launchThreaded
+            }
+
+            val downloadResp = httpClient.get(Endpoints.MPV_DOWNLOAD.url())
+            if (!downloadResp.status.isSuccess()) {
+                Log.w("MpvUtils::checkVersionAndDownload") { "Failed to establish download connection" }
+                isMpvDownloading = false
+                return@launchThreaded
+            }
+            if (DataManager.getMpvDir().exists())
+                DataManager.getMpvDir().deleteRecursively()
+
+            val temp = File(DataManager.getAppDir(), "temp.zip")
+            val channel = downloadResp.bodyAsChannel()
+            runBlocking {
+                Log.i("MpvUtils::checkVersionAndDownload") { "Downloading" }
+                channel.copyAndClose(temp.writeChannel())
+                ZipFile(temp).extractAll(DataManager.getMpvDir().absolutePath)
+                Main.settings["mpv-version"] = version
+                isMpvDownloading = false
+                temp.delete()
+                generateNewConfig()
+            }
+            isMpvDownloading = false
+        }
+    }
 }
 
-fun getAlangArg(): String {
-    val pref = getPreferences()
-    return if (pref.preferEnDub)
-        "en,eng,jp,jpn,de,ger"
-    else if (pref.preferDeDub)
-        "de,ger,jp,jpn,en,eng"
-    else
-        "jp,jpn,en,eng,de,ger"
-}
-
-fun getProfile(): String {
-    val pref = getPreferences()
-    return "styx${pref.profile.makeFirstLetterBig()}"
-}

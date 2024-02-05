@@ -18,6 +18,7 @@ import cafe.adriel.voyager.navigator.Navigator
 import moe.styx.Main.isUiModeDark
 import moe.styx.components.MainScaffold
 import moe.styx.components.SettingsCheckbox
+import moe.styx.components.misc.MpvVersionAndDownload
 import moe.styx.logic.login.ServerStatus
 import moe.styx.logic.login.isLoggedIn
 import moe.styx.logic.login.login
@@ -49,9 +50,10 @@ class SettingsView : Screen {
                     Divider(Modifier.padding(5.dp), thickness = 2.dp)
 
                     Text("MPV Options", style = MaterialTheme.typography.titleLarge, modifier = Modifier.padding(5.dp))
-                    Button({ nav.push(MpvConfigView()) }) {
+                    Button({ nav.push(MpvConfigView()) }, Modifier.padding(5.dp, 4.dp)) {
                         Text("Open Mpv Configuration")
                     }
+                    MpvVersionAndDownload()
                 }
                 Divider(Modifier.padding(5.dp), thickness = 2.dp)
                 LoggedInComponent(nav)

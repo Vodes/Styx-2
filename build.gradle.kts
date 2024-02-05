@@ -45,6 +45,8 @@ dependencies {
     implementation("com.github.ajalt.mordant:mordant:2.2.0")
     // https://mvnrepository.com/artifact/org.slf4j/slf4j-simple
     implementation("org.slf4j:slf4j-simple:2.0.9")
+    // https://mvnrepository.com/artifact/net.lingala.zip4j/zip4j
+    implementation("net.lingala.zip4j:zip4j:2.11.5")
 
     // Still gotta think about some cross-platform IO stuff
     //implementation("com.soywiz.korlibs.korio:korio:2.2.0")

@@ -21,7 +21,7 @@ import moe.styx.types.json
 class MpvConfigView : Screen {
     @Composable
     override fun Content() {
-        var preferences by mutableStateOf(getPreferences())
+        var preferences by remember { mutableStateOf(MpvUtils.getPreferences()) }
         MainScaffold(title = "Mpv Configuration") {
             Column {
                 Column(Modifier.padding(8.dp).fillMaxWidth().weight(1f).verticalScroll(rememberScrollState())) {

@@ -28,6 +28,7 @@ import moe.styx.logic.login.login
 import moe.styx.logic.loops.Heartbeats
 import moe.styx.logic.loops.RequestQueue
 import moe.styx.logic.utils.Log
+import moe.styx.logic.utils.MpvUtils
 import moe.styx.navigation.LocalGlobalNavigator
 import moe.styx.theme.*
 import moe.styx.views.login.LoginView
@@ -74,6 +75,7 @@ fun main() = application {
             ) {
                 val view = if (isLoggedIn()) {
                     Log.i { "Logged in as: ${login?.name}" }
+                    MpvUtils.checkVersionAndDownload()
                     LoadingView()
                 } else {
                     if (ServerStatus.lastKnown !in listOf(ServerStatus.ONLINE, ServerStatus.UNAUTHORIZED))

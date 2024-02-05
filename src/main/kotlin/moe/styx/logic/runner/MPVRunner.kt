@@ -105,11 +105,11 @@ class MpvInstance {
             pipe,
             "--keep-open=yes"
         ) else mutableListOf(mpvExecutable.absolutePath, url, pipe, "--keep-open=yes")
-        commands.add("-slang=${getSlangArg()}")
-        commands.add("-alang=${getAlangArg()}")
+        commands.add("-slang=${MpvUtils.getSlangArg()}")
+        commands.add("-alang=${MpvUtils.getAlangArg()}")
         if (useConfigRegardless || !systemMpv) {
             commands.add("--config-dir=${DataManager.getMpvConfDir().absolutePath}")
-            commands.add("--profile=${getProfile()}")
+            commands.add("--profile=${MpvUtils.getProfile()}")
         }
 
         val watched = DataManager.watched.value.find { it.entryID eqI mediaEntry.GUID }

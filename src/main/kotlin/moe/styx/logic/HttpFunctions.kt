@@ -49,7 +49,10 @@ enum class Endpoints(private val path: String) {
     WATCHED_SYNC("/watched/sync"),
 
     CHANGES("/changes"),
-    WATCH("/watch");
+    WATCH("/watch"),
+    
+    MPV("/mpv"),
+    MPV_DOWNLOAD("/mpv/download");
 
     fun url() = baseURL + path
 }
