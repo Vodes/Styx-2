@@ -11,7 +11,8 @@ import moe.styx.logic.data.DataManager
 import moe.styx.logic.launchThreaded
 import moe.styx.logic.login.login
 import moe.styx.logic.loops.RequestQueue
-import moe.styx.logic.utils.currentUnixSeconds
+import moe.styx.logic.utils.*
+import moe.styx.logic.utils.Log
 import moe.styx.types.*
 import java.io.*
 
@@ -50,7 +51,7 @@ fun launchMPV(entry: MediaEntry, append: Boolean, onFail: (String) -> Unit = {},
 
 class MpvInstance {
     private lateinit var process: Process
-    private val isWindows = System.getProperty("os.name").contains("win", true)
+    private val isWindows = isWin()
     private val tryFlatpak = settings["mpv-flatpak", false]
     private val instanceJob = Job()
     val execUpdate: () -> Unit = {}
@@ -74,11 +75,17 @@ class MpvInstance {
     }
 
     fun start(mediaEntry: MediaEntry, onFail: (String) -> Unit = {}, execUpdate: () -> Unit = {}, onFinish: (Int) -> Unit = {}): Boolean {
-        var mpvExecutable = getExecutableFromPath("mpv")
-        if (!isWindows && tryFlatpak) {
-            mpvExecutable = getExecutableFromPath("flatpak")
-        }
-        if (mpvExecutable == null) {
+        val systemMpv = settings["mpv-system", !isWindows]
+        val useConfigRegardless = settings["mpv-system-styx-conf", false]
+        val mpvExecutable = if (systemMpv || !isWindows) {
+            if (!isWindows && tryFlatpak)
+                getExecutableFromPath("flatpak")
+            else
+                getExecutableFromPath("mpv")
+        } else
+            File(DataManager.getMpvDir(), "mpv.exe")
+
+        if (mpvExecutable == null || !mpvExecutable.exists()) {
             onFail("MPV could not be found.")
             currentPlayer = null
             return false
@@ -98,8 +105,15 @@ class MpvInstance {
             pipe,
             "--keep-open=yes"
         ) else mutableListOf(mpvExecutable.absolutePath, url, pipe, "--keep-open=yes")
+        commands.add("-slang=${getSlangArg()}")
+        commands.add("-alang=${getAlangArg()}")
+        if (useConfigRegardless || !systemMpv) {
+            commands.add("--config-dir=${DataManager.getMpvConfDir().absolutePath}")
+            commands.add("--profile=${getProfile()}")
+        }
+
         val watched = DataManager.watched.value.find { it.entryID eqI mediaEntry.GUID }
-        if (watched != null)
+        if (watched != null && watched.progress > 5)
             commands.add("--start=${watched.progress - 5}")
 
         createScope().launch {
@@ -169,8 +183,13 @@ class MpvInstance {
         var output = ""
         val inputStream = BufferedReader(InputStreamReader(stream))
         while (inputStream.readLine()?.also { output = it.trim() } != null) {
-            if (!output.startsWith("{") || !output.endsWith("}"))
+            if (output.isBlank())
                 continue
+            if (!output.startsWith("{") || !output.endsWith("}")) {
+                if (!output.startsWith("AV"))
+                    Log.d { "MPV: $output" }
+                continue
+            }
             runCatching { MpvStatus.updateCurrent(output) }
         }
         inputStream.close()

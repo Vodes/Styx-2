@@ -6,9 +6,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Divider
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
@@ -51,14 +49,9 @@ class SettingsView : Screen {
                     Divider(Modifier.padding(5.dp), thickness = 2.dp)
 
                     Text("MPV Options", style = MaterialTheme.typography.titleLarge, modifier = Modifier.padding(5.dp))
-                    SettingsCheckbox("Use system MPV", "mpv-system", false)
-                    SettingsCheckbox("Try to use flatpak (Linux only)", "mpv-flatpak", false)
-                    SettingsCheckbox(
-                        "Play next automatically",
-                        "mpv-play-next",
-                        true,
-                        description = "Plays next episode (if any) when you reached the end and are paused/stopped."
-                    )
+                    Button({ nav.push(MpvConfigView()) }) {
+                        Text("Open Mpv Configuration")
+                    }
                 }
                 Divider(Modifier.padding(5.dp), thickness = 2.dp)
                 LoggedInComponent(nav)

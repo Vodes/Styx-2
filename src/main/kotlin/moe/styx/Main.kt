@@ -24,6 +24,7 @@ import moe.styx.Main.isUiModeDark
 import moe.styx.Main.settings
 import moe.styx.logic.login.ServerStatus
 import moe.styx.logic.login.isLoggedIn
+import moe.styx.logic.login.login
 import moe.styx.logic.loops.Heartbeats
 import moe.styx.logic.loops.RequestQueue
 import moe.styx.logic.utils.Log
@@ -71,9 +72,10 @@ fun main() = application {
                 typography = AppTypography,
                 shapes = AppShapes
             ) {
-                val view = if (isLoggedIn())
+                val view = if (isLoggedIn()) {
+                    Log.i { "Logged in as: ${login?.name}" }
                     LoadingView()
-                else {
+                } else {
                     if (ServerStatus.lastKnown !in listOf(ServerStatus.ONLINE, ServerStatus.UNAUTHORIZED))
                         OfflineView()
                     else

@@ -160,4 +160,12 @@ object DataManager {
             dir
         }
     }
+
+    fun getMpvDir(): File {
+        return File(getAppDir(), "mpv")
+    }
+
+    fun getMpvConfDir(): File {
+        return File(getMpvDir(), "portable_config")
+    }
 }
