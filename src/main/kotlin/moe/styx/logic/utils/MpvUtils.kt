@@ -60,6 +60,12 @@ object MpvDesc {
         Keep at gpu-next if you don't know what you're doing and if not causing issues.
         This is in theory faster and has higher quality.
     """.trimIndent()
+
+    val downmix = """
+        This forces a custom downmix for surround sound audio.
+        May be useful if you think that surround audio sounds like crap on your headphones.
+        Or if you just don't have a 5.1+ setup.
+    """.trimIndent()
 }
 
 @Serializable
@@ -71,6 +77,7 @@ data class MpvPreferences(
     val debandIterations: String = debandIterationsChoices[0],
     val hwDecoding: Boolean = true,
     val oversampleInterpol: Boolean = false,
+    val customDownmix: Boolean = false,
     val preferGerman: Boolean = false,
     val preferEnDub: Boolean = false,
     val preferDeDub: Boolean = false,
@@ -81,6 +88,7 @@ fun generateNewConfig() {
     val baseConfig = File(DataManager.getMpvConfDir(), "base.conf")
     val dynamics = File(DataManager.getMpvConfDir(), "dynamic-profiles")
     val profiles = File(dynamics, "quality.conf")
+    val downmix = File(dynamics, "downmix.conf")
     val oversample = File(dynamics, "oversample-interpolate.conf")
     val customConf = File(DataManager.getAppDir(), "custom-mpv.conf")
     val customStr = if (customConf.exists()) "## Custom conf file\n\n${customConf.readText().trim()}\n\n## End" else "\n\n##End"
@@ -105,8 +113,8 @@ hwdec=${if (pref.hwDecoding) "auto-safe" else "no"}
         
 $customStr
         
-${if (pref.oversampleInterpol) oversample.readText() else ""}
-        
+${if (pref.oversampleInterpol) "${oversample.readText()}\n" else ""}
+${if (pref.customDownmix) "${downmix.readText()}\n" else ""}
 ${profiles.readText()}
     """.trimIndent()
 
@@ -153,7 +161,7 @@ object MpvUtils {
             isMpvDownloading = true
             val version = response.bodyAsText().trim()
             if (Main.settings["mpv-version", "None"].trim() eqI version && DataManager.getMpvDir().exists()) {
-                Log.i("MpvUtils::checkVersionAndDownload") { "mpv version is up-to-date." }
+                Log.i { "mpv version is up-to-date." }
                 isMpvDownloading = false
                 return@launchThreaded
             }

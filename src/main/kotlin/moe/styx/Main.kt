@@ -29,6 +29,7 @@ import moe.styx.logic.loops.Heartbeats
 import moe.styx.logic.loops.RequestQueue
 import moe.styx.logic.utils.Log
 import moe.styx.logic.utils.MpvUtils
+import moe.styx.logic.utils.setupLogFile
 import moe.styx.navigation.LocalGlobalNavigator
 import moe.styx.theme.*
 import moe.styx.views.login.LoginView
@@ -42,7 +43,9 @@ object Main {
     var isUiModeDark: MutableState<Boolean> = mutableStateOf(true)
 }
 
-fun main() = application {
+fun main(args: Array<String>) = application {
+    if (!args.contains("-debug"))
+        setupLogFile()
     RequestQueue.start()
     Heartbeats.start()
     isUiModeDark.value = settings["darkmode", true]

@@ -5,6 +5,9 @@ import com.github.ajalt.mordant.terminal.Terminal
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
+import moe.styx.logic.data.DataManager
+import java.io.File
+import java.io.PrintStream
 
 object Log {
     private val terminal = Terminal()
@@ -51,4 +54,14 @@ object Log {
         if (printStack)
             exception?.printStackTrace()
     }
+}
+
+fun setupLogFile() {
+    val time = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).formattedStrFile()
+    val dir = File(DataManager.getAppDir(), "Logs")
+    dir.mkdirs()
+    val file = File(dir, "Log - $time.txt")
+    val stream = PrintStream(file.outputStream())
+    System.setOut(stream)
+    System.setErr(stream)
 }

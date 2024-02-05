@@ -18,4 +18,10 @@ fun LocalDateTime.formattedStr(): String {
             "${this.hour.padString()}:${this.minute.padString()}:${this.second.padString()}"
 }
 
+fun LocalDateTime.formattedStrFile(): String {
+    return "${this.year}-${this.monthNumber.padString()}-${this.dayOfMonth.padString()} " +
+            "${this.hour.padString()}-${this.minute.padString()}-${this.second.padString()}"
+}
+
+
 fun isWin() = System.getProperty("os.name").contains("win", true)

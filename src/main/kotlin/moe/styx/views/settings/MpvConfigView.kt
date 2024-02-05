@@ -74,6 +74,11 @@ class MpvConfigView : Screen {
                             preferences = preferences.copy(videoOutputDriver = it)
                             it
                         }
+                        MpvCheckbox(
+                            "Force Downmix Algorithm",
+                            preferences.customDownmix,
+                            MpvDesc.downmix
+                        ) { preferences = preferences.copy(customDownmix = it) }
                     }
                     Divider(Modifier.fillMaxWidth().padding(12.dp, 8.dp), thickness = 2.dp)
                     Text("Language Preferences", style = MaterialTheme.typography.titleLarge)
