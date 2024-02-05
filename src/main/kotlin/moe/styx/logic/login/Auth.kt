@@ -85,6 +85,7 @@ fun checkLogin(token: String, first: Boolean = false): LoginResponse? = runBlock
             (if (first) Endpoints.DEVICE_FIRST_AUTH else Endpoints.LOGIN).url(),
             formParameters = Parameters.build {
                 append("token", token)
+                append("info", runCatching { json.encodeToString(fetchDeviceInfo()) }.getOrNull() ?: "")
             }
         )
     }.onFailure { it.printStackTrace().also { ServerStatus.lastKnown = ServerStatus.UNKNOWN } }.getOrNull() ?: return@runBlocking null
