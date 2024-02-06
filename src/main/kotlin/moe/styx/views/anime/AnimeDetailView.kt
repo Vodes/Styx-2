@@ -29,6 +29,7 @@ import moe.styx.components.misc.FavouriteIconButton
 import moe.styx.logic.data.*
 import moe.styx.logic.utils.StackType
 import moe.styx.logic.utils.getURLFromMap
+import moe.styx.logic.utils.removeSomeHTMLTags
 import moe.styx.navigation.LocalGlobalNavigator
 import moe.styx.theme.AppShapes
 import moe.styx.types.Media
@@ -84,7 +85,7 @@ class AnimeDetailView(val ID: String) : Screen {
                         val synopsis = if (!vm.anime.synopsisDE.isNullOrBlank() && preferGerman) vm.anime.synopsisDE else vm.anime.synopsisEN
                         if (!synopsis.isNullOrBlank())
                             SelectionContainer {
-                                Text(synopsis, Modifier.padding(6.dp), style = MaterialTheme.typography.bodyMedium)
+                                Text(synopsis.removeSomeHTMLTags(), Modifier.padding(6.dp), style = MaterialTheme.typography.bodyMedium)
                             }
 
                         if (vm.anime.sequel != null || vm.anime.prequel != null) {

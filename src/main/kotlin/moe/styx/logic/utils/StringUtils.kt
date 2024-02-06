@@ -18,6 +18,10 @@ fun String.equalsAny(vararg strings: String, trim: Boolean = true, ignoreCase: B
     return false
 }
 
+fun String.removeSomeHTMLTags(): String {
+    return this.replace("<i>", "").replace("</i>", "").replace("<b>", "").replace("</b>", "")
+}
+
 fun String.equalsAny(strings: List<String>, trim: Boolean = true, ignoreCase: Boolean = true): Boolean {
     return equalsAny(*strings.toTypedArray(), trim = trim, ignoreCase = ignoreCase)
 }
