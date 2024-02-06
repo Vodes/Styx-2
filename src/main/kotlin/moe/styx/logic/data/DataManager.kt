@@ -9,6 +9,7 @@ import kotlinx.serialization.encodeToString
 import moe.styx.logic.*
 import moe.styx.logic.login.ServerStatus
 import moe.styx.logic.utils.currentUnixSeconds
+import moe.styx.logic.utils.uselessEPTitleRegex
 import moe.styx.types.*
 import java.io.File
 
@@ -88,6 +89,28 @@ object DataManager {
             schedules.value = readList("schedules.json")
             watched.value = readList("watched.json")
             mediainfo.value = readList("mediainfo.json")
+        }
+
+        entries.value = entries.value.map {
+            var changed = false
+            val nameDE = if (!it.nameDE.isNullOrBlank()) {
+                if (uselessEPTitleRegex.matchEntire(it.nameDE!!) != null) {
+                    changed = true
+                    null
+                } else
+                    it.nameEN
+            } else it.nameDE
+
+            val nameEN = if (!it.nameEN.isNullOrBlank()) {
+                if (uselessEPTitleRegex.matchEntire(it.nameEN!!) != null) {
+                    changed = true
+                    null
+                } else
+                    it.nameEN
+            } else it.nameEN
+
+            if (changed) it.copy(nameEN = nameEN, nameDE = nameDE)
+            else it
         }
 
         delay(200)

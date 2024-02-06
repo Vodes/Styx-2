@@ -3,6 +3,8 @@ package moe.styx.logic.utils
 import com.aallam.similarity.Cosine
 import java.util.*
 
+val uselessEPTitleRegex = "^(?:Folge|Episode) \\d+\$".toRegex(RegexOption.IGNORE_CASE)
+
 fun String.makeFirstLetterBig(): String {
     return this.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }
 }
