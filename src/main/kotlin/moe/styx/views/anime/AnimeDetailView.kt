@@ -89,7 +89,7 @@ class AnimeDetailView(val ID: String) : Screen {
                             }
 
                         if (vm.anime.sequel != null || vm.anime.prequel != null) {
-                            Divider(Modifier.fillMaxWidth().padding(0.dp, 4.dp, 0.dp, 2.dp), thickness = 3.dp)
+                            Divider(Modifier.fillMaxWidth().padding(0.dp, 4.dp, 0.dp, 2.dp), thickness = 2.dp)
                             MediaRelations(vm.anime)
                         }
                     }
