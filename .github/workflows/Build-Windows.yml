@@ -54,7 +54,7 @@ jobs:
           protocol: ftps
           security: loose
           local-dir: "./build/compose/binaries/main-release/"
-          server-dir: "/${{ inputs.version }}/"
+          server-dir: "/${{ inputs.version }}/win/binaries/"
       - name: "Upload jars to FTP"
         uses: "SamKirkland/FTP-Deploy-Action@v4.3.4"
         with:
@@ -64,4 +64,4 @@ jobs:
           protocol: ftps
           security: loose
           local-dir: "./build/compose/jars/"
-          server-dir: "/${{ inputs.version }}/"
+          server-dir: "/${{ inputs.version }}/win/jars/"
