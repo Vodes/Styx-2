@@ -102,11 +102,14 @@ compose.desktop {
 }
 
 buildConfig {
+    val siteURL = System.getenv("STYX_SITEURL")
     buildConfigField("APP_NAME", project.name)
     buildConfigField("APP_VERSION", provider { "${project.version}" })
     buildConfigField("APP_SECRET", System.getenv("STYX_SECRET"))
-    buildConfigField("BASE_URL", System.getenv("STYX_BASEURL"))
-    buildConfigField("SITE_URL", System.getenv("STYX_SITEURL"))
+    buildConfigField("BASE_URL", System.getenv("STYX_BASEURL")) // Example: https://api.company.com
+    buildConfigField("SITE_URL", siteURL) // Example: https://company.com
+    buildConfigField("IMAGE_URL", System.getenv("STYX_IMAGEURL")) // Example: https://images.company.com
+    buildConfigField("SITE", siteURL.split("https://").getOrElse(1) { siteURL })
     buildConfigField("BUILD_TIME", (System.currentTimeMillis() / 1000))
     buildConfigField("VERSION_CHECK_URL", "https://raw.githubusercontent.com/Vodes/Styx-2/master/build.gradle.kts")
 }

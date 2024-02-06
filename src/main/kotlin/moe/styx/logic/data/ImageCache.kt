@@ -8,6 +8,7 @@ import io.ktor.util.cio.*
 import io.ktor.utils.io.*
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
+import moe.styx.Styx__.BuildConfig
 import moe.styx.logic.httpClient
 import moe.styx.types.Image
 import moe.styx.types.eqI
@@ -60,11 +61,11 @@ fun Image.getFile(): File {
 
 fun Image.getURL(): String {
     return if (hasWEBP?.toBoolean() == true) {
-        "https://i.styx.moe/$GUID.webp"
+        "${BuildConfig.IMAGE_URL}/$GUID.webp"
     } else if (hasJPG?.toBoolean() == true) {
-        "https://i.styx.moe/$GUID.jpg"
+        "${BuildConfig.IMAGE_URL}/$GUID.jpg"
     } else if (hasPNG?.toBoolean() == true) {
-        "https://i.styx.moe/$GUID.png"
+        "${BuildConfig.IMAGE_URL}/$GUID.png"
     } else {
         return externalURL as String
     }

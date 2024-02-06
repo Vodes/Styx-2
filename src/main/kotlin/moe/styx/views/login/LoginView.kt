@@ -78,7 +78,7 @@ class LoginView() : Screen {
                 if (Desktop.isDesktopSupported())
                     Desktop.getDesktop().browse(URI(BuildConfig.SITE_URL))
             }, Modifier.height(38.dp).align(Alignment.BottomCenter)) {
-                Text("Open styx.moe")
+                Text("Open ${BuildConfig.SITE}")
             }
         }
     }

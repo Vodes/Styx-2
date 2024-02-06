@@ -39,6 +39,7 @@ object DataManager {
         val shouldUpdateEntries = lastChanges.entry > lastLocalChange().entry
 
         if (serverOnline) {
+            onProgressUpdate("Loading media...")
             // These can be updated every time because its not a lot of data
             val jobs = mutableListOf(launch {
                 saveListEx(getList(Endpoints.SCHEDULES), "schedules.json", schedules)
@@ -46,7 +47,6 @@ object DataManager {
                 saveListEx(getList(Endpoints.FAVOURITES), "favourites.json", favourites)
                 saveListEx(getList(Endpoints.WATCHED), "watched.json", watched)
             })
-
             if (shouldUpdateEntries || shouldUpdateMedia) {
                 // Update Images if entries or media get updated
                 jobs.add(launch {
@@ -80,6 +80,7 @@ object DataManager {
             // Wait for all jobs to finish
             awaitAll(*jobs.toTypedArray())
         } else {
+            onProgressUpdate("Reading local media...")
             // Read from local files
             entries.value = readList("entries.json")
             media.value = readList("media.json")
@@ -115,7 +116,7 @@ object DataManager {
 
         delay(200)
 
-        onProgressUpdate("Updating image cache...")
+        onProgressUpdate("Updating image cache...\n(This may take a minute or two)")
         updateImageCache()
 
         isLoaded.value = true
