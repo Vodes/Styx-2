@@ -1,0 +1,65 @@
+name: "Run Windows Build (msi, jar)"
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Mostly just the version folder it will be uploaded to."
+        required: true
+        type: string
+
+jobs:
+  build:
+    runs-on: windows-latest
+    env:
+      STYX_BASEURL: ${{ secrets.STYX_BASEURL }}
+      STYX_IMAGEURL: ${{ secrets.STYX_IMAGEURL }}
+      STYX_SITEURL: ${{ secrets.STYX_SITEURL }}
+      STYX_APP_GUID: ${{ secrets.STYX_APP_GUID }}
+      STYX_SECRET: ${{ secrets.STYX_SECRET }}
+
+    steps:
+      - name: "Checkout"
+        uses: actions/checkout@v4
+      - name: "Setup JDK"
+        id: java
+        uses: actions/setup-java@v4
+        with:
+          distribution: "temurin"
+          java-version: "17"
+          cache: "gradle"
+      - name: "Build Styx-Types"
+        env:
+          JAVA_HOME: ${{ steps.setup-java.outputs.path }}
+        run: |
+          git clone https://github.com/Vodes/Styx-Types.git
+          cd ./Styx-Types
+          ./gradlew.exe publishToMavenLocal
+          cd ..
+      - name: "Build Msi"
+        env:
+          JAVA_HOME: ${{ steps.setup-java.outputs.path }}
+        run: ./gradlew.exe packageReleaseMsi
+      - name: "Build Uber jar"
+        env:
+          JAVA_HOME: ${{ steps.setup-java.outputs.path }}
+        run: ./gradlew.exe packageReleaseUberJarForCurrentOS
+      - name: "Upload binaries to FTP"
+        uses: "SamKirkland/FTP-Deploy-Action@v4.3.4"
+        with:
+          server: ${{ secrets.FTP_HOST }}
+          username: ${{ secrets.FTP_USER }}
+          password: ${{ secrets.FTP_PASS }}
+          protocol: ftps
+          security: loose
+          local-dir: "./build/compose/binaries/main-release/"
+          server-dir: "/${{ inputs.version }}/"
+      - name: "Upload jars to FTP"
+        uses: "SamKirkland/FTP-Deploy-Action@v4.3.4"
+        with:
+          server: ${{ secrets.FTP_HOST }}
+          username: ${{ secrets.FTP_USER }}
+          password: ${{ secrets.FTP_PASS }}
+          protocol: ftps
+          security: loose
+          local-dir: "./build/compose/jars/"
+          server-dir: "/${{ inputs.version }}/"
