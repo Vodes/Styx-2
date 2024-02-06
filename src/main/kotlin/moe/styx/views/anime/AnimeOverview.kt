@@ -13,6 +13,7 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.tab.*
 import kotlinx.coroutines.delay
+import moe.styx.Styx__.BuildConfig
 import moe.styx.logic.data.DataManager
 import moe.styx.logic.login.login
 import moe.styx.logic.loops.Heartbeats
@@ -42,7 +43,7 @@ class AnimeOverview() : Screen {
         var showUserDropDown by mutableStateOf(false)
         Scaffold(topBar = {
             TopAppBar(
-                title = { Text("Styx 2 — Beta") },
+                title = { Text("${BuildConfig.APP_NAME} — Beta") },
                 actions = {
                     UsersIconWithNum(numUsers) { showUserDropDown = if (numUsers > 0) !showUserDropDown else false }
                     IconButton(onClick = { nav.push(FontSizeView()) }, content = { Icon(Icons.Filled.QuestionMark, null) })

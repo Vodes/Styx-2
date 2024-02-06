@@ -10,12 +10,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import kotlinx.coroutines.delay
+import moe.styx.Styx__.BuildConfig
 import moe.styx.logic.login.checkLogin
 import moe.styx.logic.login.generateCode
 import moe.styx.logic.login.isLoggedIn
 import moe.styx.navigation.LocalGlobalNavigator
-import moe.styx.views.other.LoadingView
 import moe.styx.types.CreationResponse
+import moe.styx.views.other.LoadingView
+import java.awt.Desktop
+import java.net.URI
 
 class LoginView() : Screen {
 
@@ -72,7 +75,8 @@ class LoginView() : Screen {
             }
 
             Button(onClick = {
-                println("Penis")
+                if (Desktop.isDesktopSupported())
+                    Desktop.getDesktop().browse(URI(BuildConfig.SITE_URL))
             }, Modifier.height(38.dp).align(Alignment.BottomCenter)) {
                 Text("Open styx.moe")
             }

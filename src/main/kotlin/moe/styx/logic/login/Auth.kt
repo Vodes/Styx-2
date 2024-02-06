@@ -7,6 +7,7 @@ import io.ktor.http.*
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.encodeToString
 import moe.styx.Main.settings
+import moe.styx.Styx__.BuildConfig
 import moe.styx.logic.Endpoints
 import moe.styx.logic.data.DataManager
 import moe.styx.logic.httpClient
@@ -48,7 +49,8 @@ fun fetchDeviceInfo(): DeviceInfo {
         "$os".trim(),
         null,
         "${System.getProperty("java.vm.name")} (${System.getProperty("java.vm.version")})",
-        System.getProperty("java.version")
+        System.getProperty("java.version"),
+        BuildConfig.APP_SECRET
     )
 }
 
@@ -85,7 +87,7 @@ fun checkLogin(token: String, first: Boolean = false): LoginResponse? = runBlock
             (if (first) Endpoints.DEVICE_FIRST_AUTH else Endpoints.LOGIN).url(),
             formParameters = Parameters.build {
                 append("token", token)
-                append("info", runCatching { json.encodeToString(fetchDeviceInfo()) }.getOrNull() ?: "")
+                append("content", runCatching { json.encodeToString(fetchDeviceInfo()) }.getOrNull() ?: "")
             }
         )
     }.onFailure { it.printStackTrace().also { ServerStatus.lastKnown = ServerStatus.UNKNOWN } }.getOrNull() ?: return@runBlocking null

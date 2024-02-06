@@ -8,6 +8,7 @@ plugins {
     kotlin("jvm") version "1.9.21"
     id("org.jetbrains.compose") version "1.5.11"
     id("org.jetbrains.kotlin.plugin.serialization") version "1.9.21"
+    id("com.github.gmazzo.buildconfig") version "5.3.5"
 }
 
 group = "moe.styx"
@@ -54,7 +55,7 @@ dependencies {
     // implementation("org.jetbrains.compose.material3:material3-desktop:1.4.0")
     //implementation("dev.cbyrne:kdiscordipc:0.2.1")
 
-    implementation("moe.styx:styx-types:0.5")
+    implementation("moe.styx:styx-types:0.6")
 }
 
 tasks.withType<KotlinCompile> {
@@ -65,11 +66,20 @@ compose.desktop {
     application {
         mainClass = "moe.styx.MainKt"
         nativeDistributions {
-            includeAllModules = true
+            modules(
+                "java.base",
+                "java.desktop",
+                "java.instrument",
+                "java.logging",
+                "java.management",
+                "java.net.http",
+                "java.prefs",
+                "jdk.unsupported"
+            )
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb, TargetFormat.Rpm, TargetFormat.AppImage)
             packageName = "Styx 2"
             copyright = "© 2024 Vodes. All rights reserved."
-            vendor = "Styx.moe"
+            vendor = "Styx Team"
             licenseFile.set(project.file("LICENSE"))
             windows {
                 menuGroup = "Styx"
@@ -89,6 +99,16 @@ compose.desktop {
         }
     }
 }
+
+buildConfig {
+    buildConfigField("APP_NAME", project.name)
+    buildConfigField("APP_VERSION", provider { "${project.version}" })
+    buildConfigField("APP_SECRET", System.getenv("STYX_SECRET"))
+    buildConfigField("BASE_URL", System.getenv("STYX_BASEURL"))
+    buildConfigField("SITE_URL", System.getenv("STYX_SITEURL"))
+    buildConfigField("BUILD_TIME", (System.currentTimeMillis() / 1000))
+}
+
 kotlin {
     jvmToolchain(17)
 }

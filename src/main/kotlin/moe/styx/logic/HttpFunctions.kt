@@ -1,6 +1,7 @@
 package moe.styx.logic
 
 import io.ktor.client.*
+import io.ktor.client.plugins.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.request.*
 import io.ktor.client.request.forms.*
@@ -8,6 +9,7 @@ import io.ktor.client.statement.*
 import io.ktor.http.*
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.encodeToString
+import moe.styx.Styx__.BuildConfig
 import moe.styx.logic.login.ServerStatus
 import moe.styx.logic.login.isLoggedIn
 import moe.styx.logic.login.login
@@ -20,10 +22,10 @@ val httpClient = HttpClient() {
     install(ContentNegotiation) {
         json
     }
+    install(UserAgent) {
+        agent = "${BuildConfig.APP_NAME} - ${BuildConfig.APP_VERSION}"
+    }
 }
-
-//private const val baseURL = "http://localhost:8081"
-private const val baseURL = "https://api.styx.moe"
 
 enum class Endpoints(private val path: String) {
     LOGIN("/login"),
@@ -50,11 +52,11 @@ enum class Endpoints(private val path: String) {
 
     CHANGES("/changes"),
     WATCH("/watch"),
-    
+
     MPV("/mpv"),
     MPV_DOWNLOAD("/mpv/download");
 
-    fun url() = baseURL + path
+    fun url() = BuildConfig.BASE_URL + path
 }
 
 /*

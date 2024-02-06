@@ -22,6 +22,7 @@ import com.russhwolf.settings.Settings
 import com.russhwolf.settings.get
 import moe.styx.Main.isUiModeDark
 import moe.styx.Main.settings
+import moe.styx.Styx__.BuildConfig
 import moe.styx.logic.login.ServerStatus
 import moe.styx.logic.login.isLoggedIn
 import moe.styx.logic.login.login
@@ -56,7 +57,7 @@ fun main(args: Array<String>) = application {
 
     Window(
         onCloseRequest = ::exitApplication,
-        title = "Styx 2",
+        title = "${BuildConfig.APP_NAME} - ${BuildConfig.APP_VERSION}",
         state = WindowState(width = 750.dp, height = 750.dp),
         undecorated = preferRounded,
         transparent = preferRounded,
@@ -70,6 +71,7 @@ fun main(args: Array<String>) = application {
     )
     {
         Log.i { "Compose window initialized with: ${this.window.renderApi}" }
+        Log.i { "Starting ${BuildConfig.APP_NAME} v${BuildConfig.APP_VERSION}" }
         Surface(modifier = Modifier.fillMaxSize()) {
             MaterialTheme(
                 colorScheme = (if (darkMode) DarkColorScheme else LightColorScheme).transition(),

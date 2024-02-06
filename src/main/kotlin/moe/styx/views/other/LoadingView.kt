@@ -10,6 +10,7 @@ import cafe.adriel.voyager.core.screen.Screen
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import moe.styx.logic.data.DataManager
+import moe.styx.logic.utils.MpvUtils
 import moe.styx.navigation.LocalGlobalNavigator
 import moe.styx.views.anime.AnimeOverview
 
@@ -26,6 +27,7 @@ class LoadingView : Screen {
             while (!DataManager.isLoaded.value) {
                 delay(500)
             }
+            MpvUtils.checkVersionAndDownload()
             nav.replaceAll(AnimeOverview())
         }
 

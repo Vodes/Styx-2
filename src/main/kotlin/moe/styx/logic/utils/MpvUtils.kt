@@ -11,10 +11,8 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.Serializable
 import moe.styx.Main
-import moe.styx.logic.Endpoints
+import moe.styx.logic.*
 import moe.styx.logic.data.DataManager
-import moe.styx.logic.httpClient
-import moe.styx.logic.launchThreaded
 import moe.styx.types.eqI
 import moe.styx.types.json
 import net.lingala.zip4j.ZipFile
@@ -150,6 +148,8 @@ object MpvUtils {
     }
 
     fun checkVersionAndDownload() {
+        if (!hasInternet())
+            return
         launchThreaded {
             delay(8000)
             val response = httpClient.get(Endpoints.MPV.url())
