@@ -18,6 +18,10 @@ jobs:
       STYX_SECRET: ${{ secrets.STYX_SECRET }}
 
     steps:
+      - name: "Checkout Styx-Types"
+        uses: actions/checkout@v4
+        with:
+          repository: "Vodes/Styx-Types"
       - name: "Setup JDK"
         id: java
         uses: actions/setup-java@v4
@@ -25,10 +29,6 @@ jobs:
           distribution: "temurin"
           java-version: "17"
           cache: "gradle"
-      - name: "Checkout Styx-Types"
-        uses: actions/checkout@v4
-        with:
-          repository: "Vodes/Styx-Types"
       - name: "Build Styx-Types"
         env:
           JAVA_HOME: ${{ steps.setup-java.outputs.path }}
