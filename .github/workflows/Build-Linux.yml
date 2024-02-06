@@ -32,7 +32,8 @@ jobs:
           JAVA_HOME: ${{ steps.setup-java.outputs.path }}
         run: |
           chmod u+x ./gradlew
-          ./gradlew buildExternalDeps packageReleaseDeb packageReleaseRpm
+          ./gradlew buildExternalDeps
+          ./gradlew packageReleaseDeb packageReleaseRpm
       - name: "Build Uber jar"
         env:
           JAVA_HOME: ${{ steps.setup-java.outputs.path }}
