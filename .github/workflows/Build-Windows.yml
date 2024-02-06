@@ -32,17 +32,17 @@ jobs:
       - name: "Build Styx-Types"
         env:
           JAVA_HOME: ${{ steps.setup-java.outputs.path }}
-        run: "./gradlew.exe publishToMavenLocal"
+        run: "./gradlew.bat publishToMavenLocal"
       - name: "Checkout"
         uses: actions/checkout@v4
       - name: "Build Msi"
         env:
           JAVA_HOME: ${{ steps.setup-java.outputs.path }}
-        run: ./gradlew.exe packageReleaseMsi
+        run: ./gradlew.bat packageReleaseMsi
       - name: "Build Uber jar"
         env:
           JAVA_HOME: ${{ steps.setup-java.outputs.path }}
-        run: ./gradlew.exe packageReleaseUberJarForCurrentOS
+        run: ./gradlew.bat packageReleaseUberJarForCurrentOS
       - name: "Upload binaries to FTP"
         uses: "SamKirkland/FTP-Deploy-Action@v4.3.4"
         with:
