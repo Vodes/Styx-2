@@ -187,7 +187,7 @@ class MpvInstance {
                 continue
             if (!output.startsWith("{") || !output.endsWith("}")) {
                 if (!output.startsWith("AV"))
-                    Log.d { "MPV: $output" }
+                    Log.d { "[MPV] - $output" }
                 continue
             }
             runCatching { MpvStatus.updateCurrent(output) }
