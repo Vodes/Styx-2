@@ -1,3 +1,4 @@
+import org.ajoberstar.grgit.Grgit
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
@@ -9,6 +10,7 @@ plugins {
     id("org.jetbrains.compose") version "1.5.11"
     id("org.jetbrains.kotlin.plugin.serialization") version "1.9.21"
     id("com.github.gmazzo.buildconfig") version "5.3.5"
+    id("org.ajoberstar.grgit") version "5.2.1"
 }
 
 group = "moe.styx"
@@ -116,4 +118,28 @@ buildConfig {
 
 kotlin {
     jvmToolchain(17)
+}
+
+tasks.register("buildExternalDeps") {
+    val isWin = System.getProperty("os.name").contains("win", true)
+    val projectDir = layout.projectDirectory.asFile.parentFile
+    val outDir = File(projectDir, ".temp-deps/styx-db")
+    doFirst {
+        outDir.deleteRecursively()
+        Grgit.clone {
+            dir = outDir
+            uri = "https://github.com/Vodes/Styx-DB.git"
+        }
+        val result = kotlin.runCatching {
+            ProcessBuilder(listOf(if (isWin) "./gradlew.bat" else "./gradlew", "buildExternalDeps", "publishToMavenLocal"))
+                .directory(outDir)
+                .inheritIO()
+                .start().waitFor()
+        }.getOrNull() ?: -1
+        if (result != 0) {
+            outDir.deleteRecursively()
+            throw StopExecutionException()
+        }
+    }
+    doLast { outDir.deleteRecursively() }
 }
