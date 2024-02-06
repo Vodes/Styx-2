@@ -88,6 +88,8 @@
 -dontwarn io.netty.**
 -dontwarn com.typesafe.**
 -dontwarn org.slf4j.**
+-keep class org.slf4j.**
+-keep class * implements org.slf4j.Logger
 
 -keep class moe.styx.**
 -keep class oshi.**

@@ -54,7 +54,7 @@ jobs:
           password: ${{ secrets.FTP_PASS }}
           protocol: ftps
           security: loose
-          local-dir: "./build/compose/binaries/main/"
+          local-dir: "./build/compose/binaries/main-release/"
           server-dir: "/${{ inputs.version }}/"
       - name: "Upload jars to FTP"
         uses: "SamKirkland/FTP-Deploy-Action@v4.3.4"
