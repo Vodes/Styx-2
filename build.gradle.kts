@@ -123,15 +123,15 @@ kotlin {
 tasks.register("buildExternalDeps") {
     val isWin = System.getProperty("os.name").contains("win", true)
     val projectDir = layout.projectDirectory.asFile.parentFile
-    val outDir = File(projectDir, ".temp-deps/styx-db")
+    val outDir = File(projectDir, ".temp-deps/styx-types")
     doFirst {
         outDir.deleteRecursively()
         Grgit.clone {
             dir = outDir
-            uri = "https://github.com/Vodes/Styx-DB.git"
+            uri = "https://github.com/Vodes/Styx-Types.git"
         }
         val result = kotlin.runCatching {
-            ProcessBuilder(listOf(if (isWin) "./gradlew.bat" else "./gradlew", "buildExternalDeps", "publishToMavenLocal"))
+            ProcessBuilder(listOf(if (isWin) "./gradlew.bat" else "./gradlew", "publishToMavenLocal"))
                 .directory(outDir)
                 .inheritIO()
                 .start().waitFor()
