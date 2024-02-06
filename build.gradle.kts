@@ -93,6 +93,7 @@ compose.desktop {
             }
             linux {
                 iconFile.set(project.file("src/main/resources/icons/icon.png"))
+                menuGroup = "AudioVideo;Video"
             }
             macOS {
                 packageVersion = "1.0.0"
