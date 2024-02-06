@@ -1,5 +1,7 @@
 package moe.styx.views.anime
 
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.TooltipArea
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
@@ -13,6 +15,7 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.tab.*
 import kotlinx.coroutines.delay
+import moe.styx.Main
 import moe.styx.Styx__.BuildConfig
 import moe.styx.logic.data.DataManager
 import moe.styx.logic.login.login
@@ -22,11 +25,12 @@ import moe.styx.types.ActiveUser
 import moe.styx.types.eqI
 import moe.styx.types.toBoolean
 import moe.styx.views.other.FontSizeView
+import moe.styx.views.other.LoadingView
 import moe.styx.views.settings.SettingsView
 
 class AnimeOverview() : Screen {
 
-    @OptIn(ExperimentalMaterial3Api::class)
+    @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
     @Composable
     override fun Content() {
         val nav = LocalGlobalNavigator.current
@@ -46,7 +50,17 @@ class AnimeOverview() : Screen {
                 title = { Text("${BuildConfig.APP_NAME} — Beta") },
                 actions = {
                     UsersIconWithNum(numUsers) { showUserDropDown = if (numUsers > 0) !showUserDropDown else false }
-                    IconButton(onClick = { nav.push(FontSizeView()) }, content = { Icon(Icons.Filled.QuestionMark, null) })
+                    if (Main.wasLaunchedInDebug)
+                        IconButton(onClick = { nav.push(FontSizeView()) }, content = { Icon(Icons.Filled.QuestionMark, null) })
+                    IconButton(onClick = {
+                        DataManager.updateLocalChange(0L, 0L)
+                        DataManager.isLoaded.value = false
+                        nav.replaceAll(LoadingView())
+                    }) {
+                        TooltipArea({ Text("Reload") }) {
+                            Icon(Icons.Filled.Refresh, "Reload data")
+                        }
+                    }
                     IconButton(onClick = { nav.push(SettingsView()) }, content = { Icon(Icons.Filled.Settings, "Settings") })
                     DropdownMenu(showUserDropDown, { showUserDropDown = false }, Modifier.defaultMinSize(260.dp, 0.dp)) {
                         Text("Online Users", Modifier.padding(7.dp, 10.dp), style = MaterialTheme.typography.titleLarge)

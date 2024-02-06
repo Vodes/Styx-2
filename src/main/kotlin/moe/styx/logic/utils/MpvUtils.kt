@@ -64,6 +64,11 @@ object MpvDesc {
         May be useful if you think that surround audio sounds like crap on your headphones.
         Or if you just don't have a 5.1+ setup.
     """.trimIndent()
+
+    val dither10bit = """
+        Forces dithering to 10bit because MPV's auto detection is broken.
+        Only use if you know that your display is 10bit.
+    """.trimIndent()
 }
 
 @Serializable
@@ -75,6 +80,7 @@ data class MpvPreferences(
     val debandIterations: String = debandIterationsChoices[0],
     val hwDecoding: Boolean = true,
     val oversampleInterpol: Boolean = false,
+    val dither10bit: Boolean = false,
     val customDownmix: Boolean = false,
     val preferGerman: Boolean = false,
     val preferEnDub: Boolean = false,
@@ -108,6 +114,7 @@ deband-iterations=${pref.debandIterations}
 vo=${pref.videoOutputDriver}
 gpu-api=$gpuAPI
 hwdec=${if (pref.hwDecoding) "auto-safe" else "no"}
+dither-depth=${if (pref.dither10bit) "10" else "8"}
         
 $customStr
         

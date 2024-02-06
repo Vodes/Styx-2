@@ -29,7 +29,6 @@ import moe.styx.logic.login.login
 import moe.styx.logic.loops.Heartbeats
 import moe.styx.logic.loops.RequestQueue
 import moe.styx.logic.utils.Log
-import moe.styx.logic.utils.MpvUtils
 import moe.styx.logic.utils.setupLogFile
 import moe.styx.navigation.LocalGlobalNavigator
 import moe.styx.theme.*
@@ -42,11 +41,14 @@ object Main {
     private val delegate = Preferences.userNodeForPackage(this.javaClass)
     val settings: Settings = PreferencesSettings(delegate)
     var isUiModeDark: MutableState<Boolean> = mutableStateOf(true)
+    var wasLaunchedInDebug = false
 }
 
 fun main(args: Array<String>) = application {
     if (!args.contains("-debug"))
         setupLogFile()
+    else
+        Main.wasLaunchedInDebug = true
     RequestQueue.start()
     Heartbeats.start()
     isUiModeDark.value = settings["darkmode", true]
@@ -80,7 +82,6 @@ fun main(args: Array<String>) = application {
             ) {
                 val view = if (isLoggedIn()) {
                     Log.i { "Logged in as: ${login?.name}" }
-                    MpvUtils.checkVersionAndDownload()
                     LoadingView()
                 } else {
                     if (ServerStatus.lastKnown !in listOf(ServerStatus.ONLINE, ServerStatus.UNAUTHORIZED))

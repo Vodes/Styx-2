@@ -100,16 +100,13 @@ object DataManager {
 
     private fun updateLocalChange(media: Boolean, entry: Boolean) {
         val now = currentUnixSeconds()
-        val changesFile = File(getAppDir(), "changes.json")
         val current = lastLocalChange()
-        changesFile.writeText(
-            json.encodeToString(
-                Changes(
-                    if (media) now else current.media,
-                    if (entry) now else current.entry
-                )
-            )
-        )
+        updateLocalChange(if (media) now else current.media, if (entry) now else current.media)
+    }
+
+    fun updateLocalChange(media: Long, entry: Long) {
+        val changesFile = File(getAppDir(), "changes.json")
+        changesFile.writeText(json.encodeToString(Changes(media, entry)))
     }
 
     inline fun <reified T> saveList(list: List<T>, file: String): List<T> {

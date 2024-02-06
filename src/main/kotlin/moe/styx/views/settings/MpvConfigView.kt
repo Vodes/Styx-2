@@ -79,6 +79,11 @@ class MpvConfigView : Screen {
                             preferences.customDownmix,
                             MpvDesc.downmix
                         ) { preferences = preferences.copy(customDownmix = it) }
+                        MpvCheckbox(
+                            "Force 10bit Dithering",
+                            preferences.dither10bit,
+                            MpvDesc.dither10bit
+                        ) { preferences = preferences.copy(dither10bit = it) }
                     }
                     Divider(Modifier.fillMaxWidth().padding(12.dp, 8.dp), thickness = 2.dp)
                     Text("Language Preferences", style = MaterialTheme.typography.titleLarge)
@@ -96,7 +101,6 @@ class MpvConfigView : Screen {
                             preferences.preferDeDub
                         ) { preferences = preferences.copy(preferDeDub = it) }
                     }
-
                 }
                 Divider(Modifier.fillMaxWidth().padding(12.dp, 8.dp), thickness = 2.dp)
                 Button(
