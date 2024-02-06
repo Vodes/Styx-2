@@ -30,7 +30,9 @@ jobs:
       - name: "Build RPM & DEB"
         env:
           JAVA_HOME: ${{ steps.setup-java.outputs.path }}
-        run: "./gradlew packageReleaseDeb packageReleaseRpm"
+        run: |
+          chmod u+x ./gradlew
+          ./gradlew packageReleaseDeb packageReleaseRpm
       - name: "Build Uber jar"
         env:
           JAVA_HOME: ${{ steps.setup-java.outputs.path }}
