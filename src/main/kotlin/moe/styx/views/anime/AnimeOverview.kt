@@ -17,6 +17,7 @@ import cafe.adriel.voyager.navigator.tab.*
 import kotlinx.coroutines.delay
 import moe.styx.Main
 import moe.styx.Styx__.BuildConfig
+import moe.styx.components.MainScaffold
 import moe.styx.logic.data.DataManager
 import moe.styx.logic.login.login
 import moe.styx.logic.loops.Heartbeats
@@ -45,34 +46,29 @@ class AnimeOverview() : Screen {
             }
         }
         var showUserDropDown by mutableStateOf(false)
-        Scaffold(topBar = {
-            TopAppBar(
-                title = { Text("${BuildConfig.APP_NAME} — Beta") },
-                actions = {
-                    UsersIconWithNum(numUsers) { showUserDropDown = if (numUsers > 0) !showUserDropDown else false }
-                    if (Main.wasLaunchedInDebug)
-                        IconButton(onClick = { nav.push(FontSizeView()) }, content = { Icon(Icons.Filled.QuestionMark, null) })
-                    IconButton(onClick = {
-                        DataManager.updateLocalChange(0L, 0L)
-                        DataManager.isLoaded.value = false
-                        nav.replaceAll(LoadingView())
-                    }) {
-                        TooltipArea({ Text("Reload") }) {
-                            Icon(Icons.Filled.Refresh, "Reload data")
-                        }
-                    }
-                    IconButton(onClick = { nav.push(SettingsView()) }, content = { Icon(Icons.Filled.Settings, "Settings") })
-                    DropdownMenu(showUserDropDown, { showUserDropDown = false }, Modifier.defaultMinSize(260.dp, 0.dp)) {
-                        Text("Online Users", Modifier.padding(7.dp, 10.dp), style = MaterialTheme.typography.titleLarge)
-                        Divider(Modifier.fillMaxWidth().padding(10.dp, 0.dp, 10.dp, 8.dp), thickness = 3.dp)
-                        UserListComponent(nav, users)
-                    }
+
+        MainScaffold(title = "${BuildConfig.APP_NAME} — Beta", addPopButton = false, actions = {
+            UsersIconWithNum(numUsers) { showUserDropDown = if (numUsers > 0) !showUserDropDown else false }
+            if (Main.wasLaunchedInDebug)
+                IconButton(onClick = { nav.push(FontSizeView()) }, content = { Icon(Icons.Filled.QuestionMark, null) })
+            IconButton(onClick = {
+                DataManager.updateLocalChange(0L, 0L)
+                DataManager.isLoaded.value = false
+                nav.replaceAll(LoadingView())
+            }) {
+                TooltipArea({ Text("Reload") }) {
+                    Icon(Icons.Filled.Refresh, "Reload data")
                 }
-            )
-        }) { values ->
+            }
+            IconButton(onClick = { nav.push(SettingsView()) }, content = { Icon(Icons.Filled.Settings, "Settings") })
+            DropdownMenu(showUserDropDown, { showUserDropDown = false }, Modifier.defaultMinSize(260.dp, 0.dp)) {
+                Text("Online Users", Modifier.padding(7.dp, 10.dp), style = MaterialTheme.typography.titleLarge)
+                Divider(Modifier.fillMaxWidth().padding(10.dp, 0.dp, 10.dp, 8.dp), thickness = 3.dp)
+                UserListComponent(nav, users)
+            }
+        }) {
             TabNavigator(defaultTab) {
                 Scaffold(
-                    modifier = Modifier.padding(values),
                     bottomBar = {
                         NavigationBar(tonalElevation = 5.dp) {
                             TabNavigationItem(defaultTab)

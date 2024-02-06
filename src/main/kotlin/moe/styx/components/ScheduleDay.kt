@@ -20,7 +20,7 @@ import java.util.*
 
 @Composable
 fun ScheduleDay(day: ScheduleWeekday) {
-    val schedules = DataManager.schedules.value.filter { it.getTargetTime().dayOfWeek == day.dayOfWeek() }
+    val schedules = DataManager.schedules.value.filter { it.getTargetTime().dayOfWeek == day.dayOfWeek() }.sortedBy { it.getTargetTime() }
     if (schedules.isEmpty())
         return
     Column(Modifier.padding(2.dp, 6.dp)) {
