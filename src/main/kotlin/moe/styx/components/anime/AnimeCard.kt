@@ -29,6 +29,10 @@ fun AnimeCard(nav: Navigator, media: Media, showUnseenBadge: Boolean = false) {
     val image = media.thumbID.getImageFromID()
     val showNamesAllTheTime = remember { mutableStateOf(settings["display-names", false]) }
     val showName = remember { mutableStateOf(showNamesAllTheTime.value) }
+    val entries = if (showUnseenBadge) {
+        DataManager.entries.value.filter { it.mediaID == media.GUID }
+            .associateWith { m -> DataManager.watched.value.find { it.entryID == m.GUID } }.filter { (it.value?.maxProgress ?: 0F) < 85F }
+    } else emptyMap()
     val shadowAlpha: Float by animateFloatAsState(if (showName.value) 0.8f else 0f)
     val textAlpha: Float by animateFloatAsState(if (showName.value) 1.0f else 0f)
     Card(modifier = Modifier.padding(2.dp).aspectRatio(0.71F), onClick = {
@@ -53,17 +57,21 @@ fun AnimeCard(nav: Navigator, media: Media, showUnseenBadge: Boolean = false) {
                 )
             }
             if (showUnseenBadge) {
-                val entries = DataManager.entries.value.filter { it.mediaID == media.GUID }
-                ElevatedCard(
-                    Modifier.clip(RoundedCornerShape(40)).size(33.dp).padding(4.dp).align(Alignment.TopEnd).zIndex(3f),
-                    colors = CardDefaults.elevatedCardColors(containerColor = MaterialTheme.colorScheme.primary)
-                ) {
-                    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        Text(
-                            entries.size.toString(), softWrap = false,
-                            overflow = TextOverflow.Ellipsis, style = MaterialTheme.typography.labelSmall,
-                            modifier = Modifier.align(Alignment.Center)
-                        )
+                if (entries.isNotEmpty()) {
+                    ElevatedCard(
+                        Modifier.clip(RoundedCornerShape(40)).size(33.dp).padding(4.dp).align(Alignment.TopEnd).zIndex(3f),
+                        colors = CardDefaults.elevatedCardColors(containerColor = MaterialTheme.colorScheme.secondary)
+                    ) {
+                        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                            val text = entries.size.toString()
+                            Text(
+                                text, softWrap = false,
+                                overflow = TextOverflow.Ellipsis,
+                                style = if (text.length > 2) MaterialTheme.typography.labelMedium else MaterialTheme.typography.labelLarge,
+                                color = MaterialTheme.colorScheme.onSecondary,
+                                modifier = Modifier.align(Alignment.Center)
+                            )
+                        }
                     }
                 }
             }
