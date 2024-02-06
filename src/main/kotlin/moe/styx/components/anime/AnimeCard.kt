@@ -27,14 +27,14 @@ import moe.styx.views.anime.AnimeDetailView
 @Composable
 fun AnimeCard(nav: Navigator, media: Media, showUnseenBadge: Boolean = false) {
     val image = media.thumbID.getImageFromID()
-    val showNamesAllTheTime = remember { mutableStateOf(settings["display-names", false]) }
-    val showName = remember { mutableStateOf(showNamesAllTheTime.value) }
+    val showNamesAllTheTime by remember { mutableStateOf(settings["display-names", false]) }
+    var showName by remember { mutableStateOf(showNamesAllTheTime) }
     val entries = if (showUnseenBadge) {
         DataManager.entries.value.filter { it.mediaID == media.GUID }
             .associateWith { m -> DataManager.watched.value.find { it.entryID == m.GUID } }.filter { (it.value?.maxProgress ?: 0F) < 85F }
     } else emptyMap()
-    val shadowAlpha: Float by animateFloatAsState(if (showName.value) 0.8f else 0f)
-    val textAlpha: Float by animateFloatAsState(if (showName.value) 1.0f else 0f)
+    val shadowAlpha: Float by animateFloatAsState(if (showName) 0.8f else 0f)
+    val textAlpha: Float by animateFloatAsState(if (showName) 1.0f else 0f)
     Card(modifier = Modifier.padding(2.dp).aspectRatio(0.71F), onClick = {
         if (nav.lastItem is AnimeDetailView) {
             nav.replace(AnimeDetailView(media.GUID))
@@ -52,8 +52,8 @@ fun AnimeCard(nav: Navigator, media: Media, showUnseenBadge: Boolean = false) {
                     contentDescription = media.name,
                     contentScale = ContentScale.FillBounds,
                     modifier = Modifier.padding(2.dp).align(Alignment.Center)
-                        .onPointerEvent(PointerEventType.Enter) { showName.value = !showNamesAllTheTime.value }
-                        .onPointerEvent(PointerEventType.Exit) { showName.value = showNamesAllTheTime.value }.clip(AppShapes.medium)
+                        .onPointerEvent(PointerEventType.Enter) { showName = !showNamesAllTheTime }
+                        .onPointerEvent(PointerEventType.Exit) { showName = showNamesAllTheTime }.clip(AppShapes.medium)
                 )
             }
             if (showUnseenBadge) {
@@ -75,14 +75,14 @@ fun AnimeCard(nav: Navigator, media: Media, showUnseenBadge: Boolean = false) {
                     }
                 }
             }
-            if (showName.value || textAlpha > 0) {
+            if (showName || textAlpha > 0) {
                 Surface(
                     modifier = Modifier.zIndex(1f).align(Alignment.BottomCenter).padding(0.dp, 0.dp, 0.dp, 5.dp)
                         .defaultMinSize(0.dp, 25.dp)
                         .fillMaxWidth()
                         .clip(AppShapes.small)
-                        .onPointerEvent(PointerEventType.Enter) { showName.value = !showNamesAllTheTime.value }
-                        .onPointerEvent(PointerEventType.Exit) { showName.value = showNamesAllTheTime.value },
+                        .onPointerEvent(PointerEventType.Enter) { showName = !showNamesAllTheTime }
+                        .onPointerEvent(PointerEventType.Exit) { showName = showNamesAllTheTime },
                     color = MaterialTheme.colorScheme.surface.copy(shadowAlpha * 0.85F)
                 ) {
                     Surface(
