@@ -87,7 +87,7 @@ fun checkLogin(token: String, first: Boolean = false): LoginResponse? = runBlock
             (if (first) Endpoints.DEVICE_FIRST_AUTH else Endpoints.LOGIN).url(),
             formParameters = Parameters.build {
                 append("token", token)
-                append("content", runCatching { json.encodeToString(fetchDeviceInfo()) }.getOrNull() ?: "")
+                append("content", runCatching { json.encodeToString(fetchDeviceInfo()) }.onFailure { it.printStackTrace() }.getOrNull() ?: "")
             }
         )
     }.onFailure { it.printStackTrace().also { ServerStatus.lastKnown = ServerStatus.UNKNOWN } }.getOrNull() ?: return@runBlocking null
@@ -100,6 +100,8 @@ fun checkLogin(token: String, first: Boolean = false): LoginResponse? = runBlock
         if (first && log.refreshToken != null)
             settings.putString("refreshToken", log.refreshToken!!)
         return@runBlocking login
+    } else {
+        println(response.bodyAsText())
     }
     return@runBlocking null
 }

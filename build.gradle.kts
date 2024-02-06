@@ -65,6 +65,9 @@ tasks.withType<KotlinCompile> {
 compose.desktop {
     application {
         mainClass = "moe.styx.MainKt"
+        buildTypes.release.proguard {
+            configurationFiles.from(project.file("proguard.rules"))
+        }
         nativeDistributions {
             modules(
                 "java.base",
@@ -78,8 +81,8 @@ compose.desktop {
             )
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb, TargetFormat.Rpm, TargetFormat.AppImage)
             packageName = "Styx 2"
-            copyright = "© 2024 Vodes. All rights reserved."
-            vendor = "Styx Team"
+            copyright = "© 2024 Vodes & Styx contributors. All rights reserved."
+            vendor = "Vodes & Styx contributors"
             licenseFile.set(project.file("LICENSE"))
             windows {
                 menuGroup = "Styx"
@@ -105,6 +108,7 @@ buildConfig {
     buildConfigField("BASE_URL", System.getenv("STYX_BASEURL"))
     buildConfigField("SITE_URL", System.getenv("STYX_SITEURL"))
     buildConfigField("BUILD_TIME", (System.currentTimeMillis() / 1000))
+    buildConfigField("VERSION_CHECK_URL", "https://raw.githubusercontent.com/Vodes/Styx-2/master/build.gradle.kts")
 }
 
 kotlin {
