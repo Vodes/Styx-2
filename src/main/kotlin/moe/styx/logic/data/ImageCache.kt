@@ -2,8 +2,8 @@ package moe.styx.logic.data
 
 import androidx.compose.runtime.getValue
 import io.ktor.client.request.*
+import io.ktor.client.statement.*
 import io.ktor.http.*
-import io.ktor.util.*
 import io.ktor.util.cio.*
 import io.ktor.utils.io.*
 import kotlinx.coroutines.coroutineScope
@@ -39,11 +39,10 @@ private fun getImageDir(): File {
     return File(DataManager.getAppDir(), "Images").also { it.mkdirs() }
 }
 
-@OptIn(InternalAPI::class)
 suspend fun Image.downloadFile() {
     val response = httpClient.get(getURL())
     if (response.status.isSuccess())
-        response.content.copyAndClose(getFile().writeChannel())
+        response.bodyAsChannel().copyAndClose(getFile().writeChannel())
 }
 
 fun Image.isCached(): Boolean {
