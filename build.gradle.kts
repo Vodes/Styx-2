@@ -87,8 +87,6 @@ compose.desktop {
                 iconFile.set(project.file("src/main/resources/icons/icon.ico"))
             }
             linux {
-                appCategory = "AudioVideo"
-                appRelease = "1"
                 iconFile.set(project.file("src/main/resources/icons/icon.png"))
             }
             macOS {
