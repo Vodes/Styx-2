@@ -27,12 +27,20 @@ jobs:
           distribution: "temurin"
           java-version: "17"
           cache: "gradle"
+      - name: "Build Styx-Types"
+        env:
+          JAVA_HOME: ${{ steps.setup-java.outputs.path }}
+        run: |
+          git clone https://github.com/Vodes/Styx-Types.git
+          cd ./Styx-Types
+          chmod u+x ./gradlew
+          ./gradlew publishToMavenLocal
+          cd ..
       - name: "Build RPM & DEB"
         env:
           JAVA_HOME: ${{ steps.setup-java.outputs.path }}
         run: |
           chmod u+x ./gradlew
-          ./gradlew buildExternalDeps
           ./gradlew packageReleaseDeb packageReleaseRpm
       - name: "Build Uber jar"
         env:
