@@ -64,5 +64,5 @@ jobs:
           password: ${{ secrets.FTP_PASS }}
           protocol: ftps
           security: loose
-          local-dir: "./build/compose/binaries/jars/"
+          local-dir: "./build/compose/jars/"
           server-dir: "/${{ inputs.version }}/"
