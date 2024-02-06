@@ -186,7 +186,7 @@ class MpvInstance {
             if (output.isBlank())
                 continue
             if (!output.startsWith("{") || !output.endsWith("}")) {
-                if (!output.startsWith("AV"))
+                if (!output.startsWith("AV") && !output.startsWith("(Paused)") && !output.startsWith("(...)"))
                     Log.d { "[MPV] - ${output.split("?token")[0]}" }
                 continue
             }

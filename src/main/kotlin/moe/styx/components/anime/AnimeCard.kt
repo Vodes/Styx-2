@@ -21,7 +21,9 @@ import moe.styx.Main.settings
 import moe.styx.logic.data.*
 import moe.styx.theme.AppShapes
 import moe.styx.types.Media
+import moe.styx.types.toBoolean
 import moe.styx.views.anime.AnimeDetailView
+import moe.styx.views.anime.MovieDetailView
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
@@ -36,10 +38,11 @@ fun AnimeCard(nav: Navigator, media: Media, showUnseenBadge: Boolean = false) {
     val shadowAlpha: Float by animateFloatAsState(if (showName) 0.8f else 0f)
     val textAlpha: Float by animateFloatAsState(if (showName) 1.0f else 0f)
     Card(modifier = Modifier.padding(2.dp).aspectRatio(0.71F), onClick = {
+        val view = if (media.isSeries.toBoolean()) AnimeDetailView(media.GUID) else MovieDetailView(media.GUID)
         if (nav.lastItem is AnimeDetailView) {
-            nav.replace(AnimeDetailView(media.GUID))
+            nav.replace(view)
         } else {
-            nav.push(AnimeDetailView(media.GUID))
+            nav.push(view)
         }
     }) {
         Box(contentAlignment = Alignment.Center) {

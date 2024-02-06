@@ -14,19 +14,22 @@ import cafe.adriel.voyager.navigator.Navigator
 import io.kamel.image.KamelImage
 import io.kamel.image.lazyPainterResource
 import moe.styx.logic.data.*
-import moe.styx.views.anime.AnimeDetailView
 import moe.styx.theme.AppShapes
 import moe.styx.types.Media
+import moe.styx.types.toBoolean
+import moe.styx.views.anime.AnimeDetailView
+import moe.styx.views.anime.MovieDetailView
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AnimeListItem(nav: Navigator, media: Media) {
     val image = media.thumbID.getImageFromID()
     ElevatedCard(modifier = Modifier.padding(5.dp, 2.dp).fillMaxWidth(), onClick = {
+        val view = if (media.isSeries.toBoolean()) AnimeDetailView(media.GUID) else MovieDetailView(media.GUID)
         if (nav.lastItem is AnimeDetailView) {
-            nav.replace(AnimeDetailView(media.GUID))
+            nav.replace(view)
         } else {
-            nav.push(AnimeDetailView(media.GUID))
+            nav.push(view)
         }
     }) {
         Row(Modifier.height(80.dp)) {

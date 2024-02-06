@@ -187,6 +187,7 @@ object MpvUtils {
             runBlocking {
                 Log.i("MpvUtils::checkVersionAndDownload") { "Downloading" }
                 channel.copyAndClose(temp.writeChannel())
+                delay(800)
                 ZipFile(temp).extractAll(DataManager.getMpvDir().absolutePath)
                 Main.settings["mpv-version"] = version
                 isMpvDownloading = false

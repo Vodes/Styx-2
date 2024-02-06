@@ -15,6 +15,7 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.rememberScreenModel
@@ -105,7 +106,13 @@ class AnimeDetailView(val ID: String) : Screen {
 }
 
 @Composable
-fun StupidImageNameArea(media: Media) {
+fun StupidImageNameArea(
+    media: Media,
+    dynamicMaxWidth: Dp = 760.dp,
+    requiredWidth: Dp = 385.dp,
+    requiredHeight: Dp = 535.dp,
+    otherContent: @Composable () -> Unit = {}
+) {
     val img = media.thumbID.getImageFromID()!!
     val imageResource = lazyPainterResource(
         if (img.isCached()) img.getFile() else img.getURL(),
@@ -114,15 +121,16 @@ fun StupidImageNameArea(media: Media) {
     BoxWithConstraints {
         val width = this.maxWidth
         Row(Modifier.align(Alignment.TopStart).height(IntrinsicSize.Max).fillMaxWidth()) {
-            if (width <= 760.dp)
+            if (width <= dynamicMaxWidth)
                 BigScalingCardImage(imageResource, Modifier.fillMaxWidth().weight(1f, false))
             else {
                 // Theoretical max size that should be reached at this window width
                 // Just force to not have layout spacing issues lmao
-                BigScalingCardImage(imageResource, Modifier.requiredSize(385.dp, 535.dp))
+                BigScalingCardImage(imageResource, Modifier.requiredSize(requiredWidth, requiredHeight))
             }
             Column(Modifier.fillMaxWidth().weight(1f, true)) {
                 MediaNameListing(media, Modifier.align(Alignment.Start))//, Modifier.weight(0.5F))
+                otherContent()
                 Spacer(Modifier.weight(1f, true))
                 MappingIcons(media)
             }
