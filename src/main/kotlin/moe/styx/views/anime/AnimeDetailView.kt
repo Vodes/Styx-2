@@ -27,6 +27,7 @@ import moe.styx.Main.settings
 import moe.styx.components.MainScaffold
 import moe.styx.components.anime.*
 import moe.styx.components.misc.FavouriteIconButton
+import moe.styx.components.user.OnlineUsersIcon
 import moe.styx.logic.data.*
 import moe.styx.logic.utils.StackType
 import moe.styx.logic.utils.getURLFromMap
@@ -69,6 +70,7 @@ class AnimeDetailView(val ID: String) : Screen {
         val showSelection = remember { mutableStateOf(false) }
 
         MainScaffold(title = vm.anime.name, actions = {
+            OnlineUsersIcon()
             FavouriteIconButton(vm.anime)
         }) {
             ElevatedCard(

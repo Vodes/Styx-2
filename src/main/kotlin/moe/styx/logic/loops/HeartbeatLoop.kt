@@ -14,9 +14,10 @@ object Heartbeats {
     var listeningTo: String? = null
     fun start() {
         launchGlobal {
+            delay(3000)
             while (true) {
                 if (login == null) {
-                    delay(15000)
+                    delay(10000)
                     continue
                 }
                 val mediaActivity = if (currentPlayer != null && MpvStatus.current.file.isNotEmpty() && MpvStatus.current.percentage > -1)

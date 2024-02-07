@@ -19,6 +19,7 @@ import moe.styx.Main
 import moe.styx.components.MainScaffold
 import moe.styx.components.anime.*
 import moe.styx.components.misc.FavouriteIconButton
+import moe.styx.components.user.OnlineUsersIcon
 import moe.styx.logic.data.DataManager
 import moe.styx.logic.login.login
 import moe.styx.logic.loops.RequestQueue
@@ -65,6 +66,7 @@ class MovieDetailView(val ID: String) : Screen {
         val showSelection = remember { mutableStateOf(false) }
 
         MainScaffold(title = vm.anime.name, actions = {
+            OnlineUsersIcon()
             FavouriteIconButton(vm.anime)
         }) {
             ElevatedCard(
