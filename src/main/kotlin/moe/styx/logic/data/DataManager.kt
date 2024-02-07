@@ -174,7 +174,10 @@ object DataManager {
             dir.mkdirs()
             dir
         } else {
-            val configDir = File(System.getProperty("user.dir"), ".config")
+            var configDir = File(System.getProperty("user.home"), ".config")
+            val xdgDirEnv = System.getenv("XDG_CONFIG_HOME")
+            if (!xdgDirEnv.isNullOrBlank() && File(xdgDirEnv).exists())
+                configDir = File(xdgDirEnv)
             val styxDir = File(configDir, "Styx")
             val dir = File(styxDir, "App")
             dir.mkdirs()
