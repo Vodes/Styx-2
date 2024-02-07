@@ -173,6 +173,12 @@ class MpvInstance {
                         runCommand("set pause yes")
                         runCommand("set playback-time ${watched.progress - 5}")
                     }
+            } else {
+                launchThreaded {
+                    while (MpvStatus.current.pos.contains("unavailable") || !MpvStatus.current.file.equals(mediaEntry.GUID, true))
+                        delay(300)
+                    runCommand("set playback-time 0")
+                }
             }
         }
 
