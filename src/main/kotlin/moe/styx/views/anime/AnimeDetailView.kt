@@ -63,7 +63,6 @@ class AnimeDetailView(val ID: String) : Screen {
             nav.pop();
             return
         }
-        val episodes = vm.getEpisodes()
 
         val preferGerman = settings["prefer-german-metadata", false]
         val scrollState = rememberScrollState()
@@ -100,7 +99,7 @@ class AnimeDetailView(val ID: String) : Screen {
                         Divider(Modifier.fillMaxHeight(), thickness = 3.dp)
                     }
 
-                    EpisodeList(episodes, showSelection)
+                    EpisodeList(vm.episodes, showSelection)
                 }
             }
         }
@@ -142,15 +141,18 @@ fun StupidImageNameArea(
 
 class AnimeDetailViewModel(val ID: String) : ScreenModel {
     val anime = DataManager.media.value.find { a -> a.GUID == ID }
-    private var episodes = listOf<MediaEntry>()
-
-    fun getEpisodes(): List<MediaEntry> {
-        if (episodes.isNotEmpty())
-            return episodes
-
-        episodes = DataManager.entries.value.filter { it.mediaID == anime!!.GUID }.sortedByDescending { it.entryNumber.toDoubleOrNull() ?: 0.0 }
-        return episodes
-    }
+    private var _episodes = listOf<MediaEntry>()
+    val episodes: List<MediaEntry>
+        get() {
+            if (_episodes.isNotEmpty())
+                return _episodes
+            _episodes = DataManager.entries.value.filter { it.mediaID == anime!!.GUID }
+            _episodes = if (settings["episode-asc", false])
+                _episodes.sortedBy { it.entryNumber.toDoubleOrNull() ?: 0.0 }
+            else
+                _episodes.sortedByDescending { it.entryNumber.toDoubleOrNull() ?: 0.0 }
+            return _episodes
+        }
 }
 
 @Composable

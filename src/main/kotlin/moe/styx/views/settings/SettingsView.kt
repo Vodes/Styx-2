@@ -47,6 +47,7 @@ class SettingsView : Screen {
                     Divider(Modifier.padding(5.dp), thickness = 2.dp)
                     SettingsCheckbox("Use list for shows", "shows-list", false)
                     SettingsCheckbox("Use list for movies", "movies-list", false)
+                    SettingsCheckbox("Sort episodes ascendingly", "episode-asc", false)
                     Divider(Modifier.padding(5.dp), thickness = 2.dp)
 
                     Text("MPV Options", style = MaterialTheme.typography.titleLarge, modifier = Modifier.padding(5.dp))

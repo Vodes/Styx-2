@@ -57,7 +57,7 @@ class MovieDetailView(val ID: String) : Screen {
             nav.pop();
             return
         }
-        val entry = vm.getEpisodes().firstOrNull()
+        val entry = vm.episodes.firstOrNull()
         var needsRepaint by remember { mutableStateOf(0) }
         val watched = entry?.let { DataManager.watched.value.find { it.entryID eqI entry.GUID } }
 
