@@ -35,11 +35,8 @@ fun OnlineUsersIcon() {
         }
     }
     UsersIconWithNum(numUsers) {
-        println("What $showUserDropDown, $numUsers")
-        if (showUserDropDown)
-            showUserDropDown = false
-
-        showUserDropDown = numUsers > 0
+        showUserDropDown = if (showUserDropDown) false
+        else numUsers > 0
     }
     DropdownMenu(showUserDropDown, { showUserDropDown = false }, Modifier.defaultMinSize(260.dp, 0.dp)) {
         Text("Online Users", Modifier.padding(7.dp, 10.dp), style = MaterialTheme.typography.titleLarge)

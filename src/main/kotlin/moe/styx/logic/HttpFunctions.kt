@@ -29,6 +29,7 @@ val httpClient = HttpClient() {
 
 enum class Endpoints(private val path: String) {
     LOGIN("/login"),
+    LOGOUT("/logout"),
     DEVICE_CREATE("/device/create"),
     DEVICE_FIRST_AUTH("/device/firstAuth"),
     HEARTBEAT("/heartbeat"),

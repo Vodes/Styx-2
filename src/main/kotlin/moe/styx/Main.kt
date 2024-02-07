@@ -11,9 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Window
-import androidx.compose.ui.window.WindowState
-import androidx.compose.ui.window.application
+import androidx.compose.ui.window.*
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.transitions.SlideTransition
@@ -23,11 +21,13 @@ import com.russhwolf.settings.get
 import moe.styx.Main.isUiModeDark
 import moe.styx.Main.settings
 import moe.styx.Styx__.BuildConfig
+import moe.styx.logic.Endpoints
 import moe.styx.logic.login.ServerStatus
 import moe.styx.logic.login.isLoggedIn
 import moe.styx.logic.login.login
 import moe.styx.logic.loops.Heartbeats
 import moe.styx.logic.loops.RequestQueue
+import moe.styx.logic.sendObject
 import moe.styx.logic.utils.Log
 import moe.styx.logic.utils.setupLogFile
 import moe.styx.navigation.LocalGlobalNavigator
@@ -58,7 +58,7 @@ fun main(args: Array<String>) = application {
     val preferRounded = settings["rounded-corners", false]
 
     Window(
-        onCloseRequest = ::exitApplication,
+        onCloseRequest = { onClose() },
         title = "${BuildConfig.APP_NAME} - ${BuildConfig.APP_VERSION}",
         state = WindowState(width = 750.dp, height = 750.dp),
         undecorated = preferRounded,
@@ -102,4 +102,9 @@ fun main(args: Array<String>) = application {
             }
         }
     }
+}
+
+private fun ApplicationScope.onClose() {
+    sendObject(Endpoints.LOGOUT, "")
+    exitApplication()
 }
