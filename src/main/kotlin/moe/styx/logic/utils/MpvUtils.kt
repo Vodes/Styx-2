@@ -90,6 +90,9 @@ data class MpvPreferences(
 fun generateNewConfig() {
     val pref = MpvUtils.getPreferences()
     val baseConfig = File(DataManager.getMpvConfDir(), "base.conf")
+    if (!baseConfig.exists())
+        return
+    
     val dynamics = File(DataManager.getMpvConfDir(), "dynamic-profiles")
     val profiles = File(dynamics, "quality.conf")
     val downmix = File(dynamics, "downmix.conf")
