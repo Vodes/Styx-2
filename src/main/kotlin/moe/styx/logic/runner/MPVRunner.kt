@@ -54,6 +54,7 @@ class MpvInstance {
     private val isWindows = isWin()
     private val tryFlatpak = settings["mpv-flatpak", false]
     private val instanceJob = Job()
+    private var firstPrint = true
     val execUpdate: () -> Unit = {}
 
     private fun openSocket(): RandomAccessFile {
@@ -131,9 +132,17 @@ class MpvInstance {
                 onFinish(process.waitFor())
                 instanceJob.complete()
             }
+            launch {
+                while (firstPrint || !MpvStatus.current.isAvailable())
+                    delay(200)
+                delay(4000)
+                runCommand("set start 0")
+            }
 
             launch {
-                delay(2000L)
+                while (firstPrint)
+                    delay(200)
+                delay(1000L)
                 while (currentPlayer != null) {
                     val json = JsonObject(
                         mapOf(
@@ -168,17 +177,12 @@ class MpvInstance {
                 val watched = DataManager.watched.value.find { it.entryID eqI mediaEntry.GUID }
                 if (watched != null)
                     launchThreaded {
-                        while (MpvStatus.current.pos.contains("unavailable") || !MpvStatus.current.file.equals(mediaEntry.GUID, true))
-                            delay(400)
+                        delay(100)
+                        while (!MpvStatus.current.isAvailable() || !MpvStatus.current.file.equals(mediaEntry.GUID, true))
+                            delay(350)
                         runCommand("set pause yes")
                         runCommand("set playback-time ${watched.progress - 5}")
                     }
-            } else {
-                launchThreaded {
-                    while (MpvStatus.current.pos.contains("unavailable") || !MpvStatus.current.file.equals(mediaEntry.GUID, true))
-                        delay(300)
-                    runCommand("set playback-time 0")
-                }
             }
         }
 
@@ -191,6 +195,7 @@ class MpvInstance {
         while (inputStream.readLine()?.also { output = it.trim() } != null) {
             if (output.isBlank())
                 continue
+            firstPrint = false
             if (!output.startsWith("{") || !output.endsWith("}")) {
                 if (!output.startsWith("AV") && !output.startsWith("(Paused)") && !output.startsWith("(...)"))
                     Log.d { "[MPV] - ${output.split("?token")[0]}" }
@@ -275,6 +280,10 @@ data class MpvStatus(
                 return time.hour * 3600 + time.minute * 60 + time.second
             }.getOrNull() ?: 0
         }
+
+    fun isAvailable(): Boolean {
+        return !(pos.contains("unavailable", true) || file.contains("unavailable", true))
+    }
 }
 
 fun attemptPlayNext() {
