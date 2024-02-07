@@ -14,7 +14,7 @@ plugins {
 }
 
 group = "moe.styx"
-version = "0.0.1"
+version = "0.0.2"
 
 repositories {
     google()
@@ -97,7 +97,7 @@ compose.desktop {
                 shortcut = true
             }
             macOS {
-                packageVersion = "1.0.0"
+                packageVersion = "1.0.2"
                 appStore = false
                 iconFile.set(project.file("src/main/resources/icons/icon.icns"))
             }
