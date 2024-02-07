@@ -8,7 +8,7 @@ import io.ktor.http.*
 import io.ktor.util.cio.*
 import io.ktor.utils.io.*
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import moe.styx.Main
 import moe.styx.logic.*
@@ -92,7 +92,7 @@ fun generateNewConfig() {
     val baseConfig = File(DataManager.getMpvConfDir(), "base.conf")
     if (!baseConfig.exists())
         return
-    
+
     val dynamics = File(DataManager.getMpvConfDir(), "dynamic-profiles")
     val profiles = File(dynamics, "quality.conf")
     val downmix = File(dynamics, "downmix.conf")
@@ -160,44 +160,44 @@ object MpvUtils {
     fun checkVersionAndDownload() {
         if (!hasInternet())
             return
-        launchThreaded {
+        launchGlobal {
             delay(8000)
             val response = httpClient.get(Endpoints.MPV.url())
 
             if (!response.status.isSuccess()) {
                 Log.w("MpvUtils::checkVersionAndDownload") { "Failed to check for mpv version." }
-                return@launchThreaded
+                return@launchGlobal
             }
             isMpvDownloading = true
             val version = response.bodyAsText().trim()
-            if (Main.settings["mpv-version", "None"].trim() eqI version && DataManager.getMpvDir().exists()) {
+            if (Main.settings["mpv-version", "None"].trim() eqI version && DataManager.getMpvDir().exists() && DataManager.getMpvConfDir().exists()) {
                 Log.i { "mpv version is up-to-date." }
                 isMpvDownloading = false
-                return@launchThreaded
+                return@launchGlobal
             }
-
-            val downloadResp = httpClient.get(Endpoints.MPV_DOWNLOAD.url())
-            if (!downloadResp.status.isSuccess()) {
-                Log.w("MpvUtils::checkVersionAndDownload") { "Failed to establish download connection" }
-                isMpvDownloading = false
-                return@launchThreaded
-            }
-            if (DataManager.getMpvDir().exists())
-                DataManager.getMpvDir().deleteRecursively()
 
             val temp = File(DataManager.getAppDir(), "temp.zip")
-            val channel = downloadResp.bodyAsChannel()
-            runBlocking {
-                Log.i("MpvUtils::checkVersionAndDownload") { "Downloading" }
-                channel.copyAndClose(temp.writeChannel())
-                delay(800)
-                ZipFile(temp).extractAll(DataManager.getMpvDir().absolutePath)
-                Main.settings["mpv-version"] = version
-                isMpvDownloading = false
+            if (temp.exists())
                 temp.delete()
-                generateNewConfig()
+
+            launch {
+                Log.i { "Downloading latest mpv bundle" }
+
+                val downloadResp = httpClient.get(Endpoints.MPV_DOWNLOAD.url())
+                if (DataManager.getMpvDir().exists() && downloadResp.status.isSuccess())
+                    DataManager.getMpvDir().deleteRecursively()
+                val openChannel = downloadResp.bodyAsChannel()
+                openChannel.copyAndClose(temp.writeChannel())
+                delay(500)
+
+                runCatching {
+                    ZipFile(temp).extractAll(DataManager.getMpvDir().absolutePath)
+                    Main.settings["mpv-version"] = version
+                    temp.delete()
+                    generateNewConfig()
+                    isMpvDownloading = false
+                }.onFailure { Log.e("MpvUtils Downloader", it) { "Failed to extract downloaded file!" } }
             }
-            isMpvDownloading = false
         }
     }
 }
