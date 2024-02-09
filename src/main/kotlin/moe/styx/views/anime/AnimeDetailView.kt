@@ -24,6 +24,8 @@ import cafe.adriel.voyager.core.screen.ScreenKey
 import com.russhwolf.settings.get
 import io.kamel.image.lazyPainterResource
 import moe.styx.Main.settings
+import moe.styx.common.data.Media
+import moe.styx.common.data.MediaEntry
 import moe.styx.components.MainScaffold
 import moe.styx.components.anime.*
 import moe.styx.components.misc.FavouriteIconButton
@@ -34,8 +36,6 @@ import moe.styx.logic.utils.getURLFromMap
 import moe.styx.logic.utils.removeSomeHTMLTags
 import moe.styx.navigation.LocalGlobalNavigator
 import moe.styx.theme.AppShapes
-import moe.styx.types.Media
-import moe.styx.types.MediaEntry
 import java.awt.Desktop
 import java.net.URI
 import java.util.*

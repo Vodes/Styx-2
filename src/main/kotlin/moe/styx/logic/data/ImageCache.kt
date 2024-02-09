@@ -9,10 +9,10 @@ import io.ktor.utils.io.*
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import moe.styx.Styx__.BuildConfig
-import moe.styx.logic.httpClient
-import moe.styx.types.Image
-import moe.styx.types.eqI
-import moe.styx.types.toBoolean
+import moe.styx.common.data.Image
+import moe.styx.common.extension.eqI
+import moe.styx.common.extension.toBoolean
+import moe.styx.common.http.httpClient
 import java.io.File
 
 suspend fun updateImageCache() = coroutineScope {

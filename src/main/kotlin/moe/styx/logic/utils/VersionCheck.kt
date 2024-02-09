@@ -5,8 +5,8 @@ import io.ktor.client.statement.*
 import io.ktor.http.*
 import kotlinx.coroutines.runBlocking
 import moe.styx.Styx__.BuildConfig
-import moe.styx.logic.httpClient
-import moe.styx.types.eqI
+import moe.styx.common.extension.eqI
+import moe.styx.common.http.httpClient
 
 // TODO: Actually check at some point lol.
 private val versionRegex = "^version = \\\"(?<version>(?<major>\\d)\\.(?<minor>\\d)(?:\\.(?<patch>\\d))?)\\\"\$".toRegex(RegexOption.IGNORE_CASE)

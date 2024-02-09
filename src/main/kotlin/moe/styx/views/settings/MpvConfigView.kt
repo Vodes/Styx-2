@@ -12,11 +12,12 @@ import cafe.adriel.voyager.core.screen.Screen
 import com.russhwolf.settings.set
 import kotlinx.serialization.encodeToString
 import moe.styx.Main.settings
+import moe.styx.common.extension.eqI
+import moe.styx.common.isWindows
+import moe.styx.common.json
 import moe.styx.components.MainScaffold
 import moe.styx.components.SettingsCheckbox
 import moe.styx.logic.utils.*
-import moe.styx.types.eqI
-import moe.styx.types.json
 
 class MpvConfigView : Screen {
     @Composable
@@ -26,7 +27,7 @@ class MpvConfigView : Screen {
             Column {
                 Column(Modifier.padding(8.dp).fillMaxWidth().weight(1f).verticalScroll(rememberScrollState())) {
                     Text("General", Modifier.padding(6.dp, 3.dp), style = MaterialTheme.typography.titleLarge)
-                    SettingsCheckbox("Use system MPV", "mpv-system", !isWin(), paddingValues = PaddingValues(13.dp, 10.dp))
+                    SettingsCheckbox("Use system MPV", "mpv-system", !isWindows(), paddingValues = PaddingValues(13.dp, 10.dp))
                     SettingsCheckbox("Use styx config with system mpv", "mpv-system-styx-conf", false, paddingValues = PaddingValues(13.dp, 10.dp))
                     SettingsCheckbox("Try to use flatpak (Linux only)", "mpv-flatpak", false, paddingValues = PaddingValues(13.dp, 10.dp))
                     SettingsCheckbox(

@@ -7,13 +7,13 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import moe.styx.common.data.ScheduleWeekday
+import moe.styx.common.extension.capitalize
 import moe.styx.components.anime.AnimeListItem
 import moe.styx.logic.data.DataManager
 import moe.styx.logic.utils.dayOfWeek
 import moe.styx.logic.utils.getTargetTime
-import moe.styx.logic.utils.makeFirstLetterBig
 import moe.styx.navigation.LocalGlobalNavigator
-import moe.styx.types.ScheduleWeekday
 import java.time.format.DateTimeFormatter
 import java.util.*
 
@@ -25,7 +25,7 @@ fun ScheduleDay(day: ScheduleWeekday) {
         return
     Column(Modifier.padding(2.dp, 6.dp)) {
         Text(
-            day.name.lowercase().makeFirstLetterBig(),
+            day.name.capitalize(),
             modifier = Modifier.padding(2.dp),
             style = MaterialTheme.typography.titleLarge
         )

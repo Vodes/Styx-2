@@ -18,10 +18,10 @@ import com.russhwolf.settings.get
 import io.kamel.image.KamelImage
 import io.kamel.image.lazyPainterResource
 import moe.styx.Main.settings
+import moe.styx.common.data.Media
+import moe.styx.common.extension.toBoolean
 import moe.styx.logic.data.*
 import moe.styx.theme.AppShapes
-import moe.styx.types.Media
-import moe.styx.types.toBoolean
 import moe.styx.views.anime.AnimeDetailView
 import moe.styx.views.anime.MovieDetailView
 

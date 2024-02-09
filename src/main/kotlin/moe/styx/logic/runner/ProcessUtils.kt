@@ -1,6 +1,6 @@
 package moe.styx.logic.runner
 
-import moe.styx.types.eqI
+import moe.styx.common.extension.eqI
 import java.io.File
 
 fun getExecutableFromPath(name: String): File? {

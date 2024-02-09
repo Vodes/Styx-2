@@ -1,8 +1,5 @@
 package moe.styx.logic
 
-import io.ktor.client.*
-import io.ktor.client.plugins.*
-import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.request.*
 import io.ktor.client.request.forms.*
 import io.ktor.client.statement.*
@@ -10,22 +7,14 @@ import io.ktor.http.*
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.encodeToString
 import moe.styx.Styx__.BuildConfig
+import moe.styx.common.data.ApiResponse
+import moe.styx.common.extension.currentUnixSeconds
+import moe.styx.common.http.httpClient
+import moe.styx.common.json
 import moe.styx.logic.login.ServerStatus
 import moe.styx.logic.login.isLoggedIn
 import moe.styx.logic.login.login
 import moe.styx.logic.utils.Log
-import moe.styx.logic.utils.currentUnixSeconds
-import moe.styx.types.ApiResponse
-import moe.styx.types.json
-
-val httpClient = HttpClient() {
-    install(ContentNegotiation) {
-        json
-    }
-    install(UserAgent) {
-        agent = "${BuildConfig.APP_NAME} - ${BuildConfig.APP_VERSION}"
-    }
-}
 
 enum class Endpoints(private val path: String) {
     LOGIN("/login"),

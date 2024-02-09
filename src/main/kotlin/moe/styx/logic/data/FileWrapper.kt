@@ -3,8 +3,8 @@ package moe.styx.logic.data
 import androidx.compose.runtime.getValue
 import com.russhwolf.settings.get
 import moe.styx.Main.settings
-import moe.styx.types.Category
-import moe.styx.types.eqI
+import moe.styx.common.data.Category
+import moe.styx.common.extension.eqI
 
 fun getSelectedCategories(shows: Boolean = true): List<Category> {
     val saved = settings[if (shows) "selected-categories-shows" else "selected-categories-movies", ""]

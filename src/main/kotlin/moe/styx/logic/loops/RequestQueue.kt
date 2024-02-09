@@ -4,13 +4,19 @@ import com.russhwolf.settings.get
 import kotlinx.coroutines.delay
 import kotlinx.serialization.encodeToString
 import moe.styx.Main.settings
-import moe.styx.logic.*
+import moe.styx.common.data.*
+import moe.styx.common.extension.currentUnixSeconds
+import moe.styx.common.extension.eqI
+import moe.styx.common.extension.replaceIfNotNull
+import moe.styx.common.json
+import moe.styx.common.util.launchGlobal
+import moe.styx.common.util.launchThreaded
+import moe.styx.logic.Endpoints
 import moe.styx.logic.data.DataManager
+import moe.styx.logic.hasInternet
 import moe.styx.logic.login.isLoggedIn
 import moe.styx.logic.login.login
-import moe.styx.logic.utils.currentUnixSeconds
-import moe.styx.logic.utils.replaceIfNotNull
-import moe.styx.types.*
+import moe.styx.logic.sendObject
 
 object RequestQueue {
     private var queuedFavChanges = QueuedFavChanges()

@@ -20,19 +20,19 @@ import com.russhwolf.settings.get
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import moe.styx.Main.settings
+import moe.styx.common.data.MediaEntry
+import moe.styx.common.data.MediaWatched
+import moe.styx.common.extension.currentUnixSeconds
+import moe.styx.common.extension.eqI
+import moe.styx.common.extension.toDateString
 import moe.styx.components.misc.ExpandableText
 import moe.styx.logic.data.DataManager
 import moe.styx.logic.login.login
 import moe.styx.logic.loops.RequestQueue
 import moe.styx.logic.runner.currentPlayer
 import moe.styx.logic.runner.launchMPV
-import moe.styx.logic.utils.currentUnixSeconds
 import moe.styx.logic.utils.readableSize
-import moe.styx.logic.utils.toDateString
 import moe.styx.navigation.LocalGlobalNavigator
-import moe.styx.types.MediaEntry
-import moe.styx.types.MediaWatched
-import moe.styx.types.eqI
 import moe.styx.views.settings.SettingsView
 
 @OptIn(ExperimentalFoundationApi::class)

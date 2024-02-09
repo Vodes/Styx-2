@@ -8,14 +8,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import moe.styx.common.data.MediaEntry
+import moe.styx.common.extension.eqI
+import moe.styx.common.extension.toBoolean
 import moe.styx.components.TextWithCheckBox
 import moe.styx.components.misc.OutlinedText
 import moe.styx.logic.data.DataManager
 import moe.styx.logic.runner.launchMPV
 import moe.styx.theme.AppShapes
-import moe.styx.types.MediaEntry
-import moe.styx.types.eqI
-import moe.styx.types.toBoolean
 
 @Composable
 fun FailedDialog(message: String, modifier: Modifier = Modifier, buttonModifier: Modifier = Modifier, onDismiss: (Boolean) -> Unit = {}) {

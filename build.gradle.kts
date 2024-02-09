@@ -29,7 +29,6 @@ dependencies {
     implementation(compose.desktop.currentOs)
     implementation("org.jetbrains.compose.material3:material3:1.5.11")
     implementation("media.kamel:kamel-image:0.9.0")
-    implementation("com.aallam.similarity:string-similarity-kotlin:0.1.0")
     implementation("cafe.adriel.voyager:voyager-navigator:$voyagerVer")
     implementation("cafe.adriel.voyager:voyager-screenmodel:$voyagerVer")
     implementation("cafe.adriel.voyager:voyager-tab-navigator:$voyagerVer")
@@ -37,12 +36,6 @@ dependencies {
     implementation("cafe.adriel.voyager:voyager-transitions:$voyagerVer")
     implementation("com.russhwolf:multiplatform-settings-no-arg:1.1.1")
     implementation("org.jetbrains.compose.material:material-icons-extended:1.5.11")
-    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.5.0")
-
-    implementation("io.ktor:ktor-client-core-jvm:$ktorVersion")
-    implementation("io.ktor:ktor-client-java:$ktorVersion")
-    implementation("io.ktor:ktor-serialization-kotlinx-json-jvm:$ktorVersion")
-    implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
 
     implementation("com.github.oshi:oshi-core:6.4.11")
     implementation("com.github.ajalt.mordant:mordant:2.2.0")
@@ -57,7 +50,7 @@ dependencies {
     // implementation("org.jetbrains.compose.material3:material3-desktop:1.4.0")
     //implementation("dev.cbyrne:kdiscordipc:0.2.1")
 
-    implementation("moe.styx:styx-types:0.6")
+    implementation("moe.styx:styx-common:0.0.1")
 }
 
 tasks.withType<KotlinCompile> {

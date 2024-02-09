@@ -16,6 +16,9 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
 import com.russhwolf.settings.get
 import moe.styx.Main
+import moe.styx.common.data.MediaWatched
+import moe.styx.common.extension.currentUnixSeconds
+import moe.styx.common.extension.eqI
 import moe.styx.components.MainScaffold
 import moe.styx.components.anime.*
 import moe.styx.components.misc.FavouriteIconButton
@@ -25,12 +28,9 @@ import moe.styx.logic.login.login
 import moe.styx.logic.loops.RequestQueue
 import moe.styx.logic.runner.currentPlayer
 import moe.styx.logic.runner.launchMPV
-import moe.styx.logic.utils.currentUnixSeconds
 import moe.styx.logic.utils.readableSize
 import moe.styx.logic.utils.removeSomeHTMLTags
 import moe.styx.navigation.LocalGlobalNavigator
-import moe.styx.types.MediaWatched
-import moe.styx.types.eqI
 import moe.styx.views.settings.SettingsView
 import java.util.*
 

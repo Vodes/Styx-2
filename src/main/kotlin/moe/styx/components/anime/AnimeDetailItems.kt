@@ -18,11 +18,11 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import io.kamel.core.Resource
 import io.kamel.image.KamelImage
-import moe.styx.logic.data.DataManager
+import moe.styx.common.data.Media
 import moe.styx.components.misc.ExpandIconButton
+import moe.styx.logic.data.DataManager
 import moe.styx.navigation.LocalGlobalNavigator
 import moe.styx.theme.AppShapes
-import moe.styx.types.Media
 
 @Composable
 fun MediaNameListing(media: Media, modifier: Modifier = Modifier) {

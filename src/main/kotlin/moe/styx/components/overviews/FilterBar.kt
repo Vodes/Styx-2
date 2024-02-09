@@ -14,12 +14,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import moe.styx.common.data.Category
+import moe.styx.common.data.Media
+import moe.styx.common.extension.addIfNotExisting
 import moe.styx.logic.data.*
-import moe.styx.logic.utils.addIfNotExisting
 import moe.styx.logic.utils.getCategory
 import moe.styx.theme.AppShapes
-import moe.styx.types.Category
-import moe.styx.types.Media
 
 @Composable
 fun PrimarySelectableObject(name: String, isSelected: MutableState<Boolean>, onSelection: (Boolean) -> Unit) =

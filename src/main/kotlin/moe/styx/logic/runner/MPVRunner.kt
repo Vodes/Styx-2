@@ -6,14 +6,19 @@ import kotlinx.coroutines.*
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 import moe.styx.Main.settings
+import moe.styx.common.data.MediaEntry
+import moe.styx.common.data.MediaWatched
+import moe.styx.common.extension.currentUnixSeconds
+import moe.styx.common.extension.eqI
+import moe.styx.common.isWindows
+import moe.styx.common.json
+import moe.styx.common.util.launchThreaded
 import moe.styx.logic.Endpoints
 import moe.styx.logic.data.DataManager
-import moe.styx.logic.launchThreaded
 import moe.styx.logic.login.login
 import moe.styx.logic.loops.RequestQueue
-import moe.styx.logic.utils.*
 import moe.styx.logic.utils.Log
-import moe.styx.types.*
+import moe.styx.logic.utils.MpvUtils
 import java.io.*
 
 var currentPlayer: MpvInstance? = null
@@ -51,7 +56,7 @@ fun launchMPV(entry: MediaEntry, append: Boolean, onFail: (String) -> Unit = {},
 
 class MpvInstance {
     private lateinit var process: Process
-    private val isWindows = isWin()
+    private val isWindows = isWindows()
     private val tryFlatpak = settings["mpv-flatpak", false]
     private val instanceJob = Job()
     private var firstPrint = true

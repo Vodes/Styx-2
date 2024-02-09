@@ -11,11 +11,11 @@ import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import kotlinx.coroutines.delay
 import moe.styx.Styx__.BuildConfig
+import moe.styx.common.data.CreationResponse
 import moe.styx.logic.login.checkLogin
 import moe.styx.logic.login.generateCode
 import moe.styx.logic.login.isLoggedIn
 import moe.styx.navigation.LocalGlobalNavigator
-import moe.styx.types.CreationResponse
 import moe.styx.views.other.LoadingView
 import java.awt.Desktop
 import java.net.URI

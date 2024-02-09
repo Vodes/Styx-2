@@ -11,10 +11,14 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import moe.styx.Main
-import moe.styx.logic.*
+import moe.styx.common.extension.capitalize
+import moe.styx.common.extension.eqI
+import moe.styx.common.http.httpClient
+import moe.styx.common.json
+import moe.styx.common.util.launchGlobal
+import moe.styx.logic.Endpoints
 import moe.styx.logic.data.DataManager
-import moe.styx.types.eqI
-import moe.styx.types.json
+import moe.styx.logic.hasInternet
 import net.lingala.zip4j.ZipFile
 import java.io.File
 
@@ -154,7 +158,7 @@ object MpvUtils {
 
     fun getProfile(): String {
         val pref = getPreferences()
-        return "styx${pref.profile.makeFirstLetterBig()}"
+        return "styx${pref.profile.capitalize()}"
     }
 
     fun checkVersionAndDownload() {

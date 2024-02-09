@@ -11,13 +11,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.navigator.Navigator
 import kotlinx.coroutines.delay
+import moe.styx.common.data.ActiveUser
+import moe.styx.common.extension.eqI
+import moe.styx.common.extension.toBoolean
 import moe.styx.logic.data.DataManager
 import moe.styx.logic.login.login
 import moe.styx.logic.loops.Heartbeats
 import moe.styx.navigation.LocalGlobalNavigator
-import moe.styx.types.ActiveUser
-import moe.styx.types.eqI
-import moe.styx.types.toBoolean
 import moe.styx.views.anime.AnimeDetailView
 
 @Composable

@@ -21,6 +21,7 @@ import com.russhwolf.settings.get
 import moe.styx.Main.isUiModeDark
 import moe.styx.Main.settings
 import moe.styx.Styx__.BuildConfig
+import moe.styx.common.http.getHttpClient
 import moe.styx.logic.Endpoints
 import moe.styx.logic.login.ServerStatus
 import moe.styx.logic.login.isLoggedIn
@@ -49,6 +50,7 @@ fun main(args: Array<String>) = application {
         setupLogFile()
     else
         Main.wasLaunchedInDebug = true
+    getHttpClient("${BuildConfig.APP_NAME} - ${BuildConfig.APP_VERSION}")
     RequestQueue.start()
     Heartbeats.start()
     isUiModeDark.value = settings["darkmode", true]

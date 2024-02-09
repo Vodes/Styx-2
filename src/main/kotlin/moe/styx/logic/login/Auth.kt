@@ -8,11 +8,14 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.encodeToString
 import moe.styx.Main.settings
 import moe.styx.Styx__.BuildConfig
+import moe.styx.common.data.CreationResponse
+import moe.styx.common.data.DeviceInfo
+import moe.styx.common.data.LoginResponse
+import moe.styx.common.http.httpClient
+import moe.styx.common.json
 import moe.styx.logic.Endpoints
 import moe.styx.logic.data.DataManager
-import moe.styx.logic.httpClient
 import moe.styx.logic.login.ServerStatus.Companion.setLastKnown
-import moe.styx.types.*
 import oshi.SystemInfo
 import java.io.File
 import kotlin.system.exitProcess

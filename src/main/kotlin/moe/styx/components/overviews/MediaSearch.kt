@@ -11,15 +11,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.russhwolf.settings.get
 import moe.styx.Main.settings
+import moe.styx.common.data.Category
+import moe.styx.common.data.Media
+import moe.styx.common.extension.equalsAny
 import moe.styx.components.misc.TwoStateIconButton
 import moe.styx.logic.data.getSelectedCategories
 import moe.styx.logic.data.getSelectedGenres
-import moe.styx.logic.utils.equalsAny
 import moe.styx.logic.utils.favAdded
 import moe.styx.logic.utils.find
 import moe.styx.theme.AppShapes
-import moe.styx.types.Category
-import moe.styx.types.Media
 
 class MediaSearch(listIn: List<Media>, private val favs: Boolean = false) {
 

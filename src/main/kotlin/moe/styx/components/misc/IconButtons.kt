@@ -10,12 +10,12 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import cafe.adriel.voyager.navigator.Navigator
 import kotlinx.datetime.Clock
+import moe.styx.common.data.Media
 import moe.styx.logic.data.DataManager
 import moe.styx.logic.loops.RequestQueue
 import moe.styx.logic.utils.isFav
 import moe.styx.navigation.LocalGlobalNavigator
 import moe.styx.navigation.favsTab
-import moe.styx.types.Media
 
 var lastPop = 0L
 
