@@ -18,10 +18,8 @@ jobs:
       STYX_SECRET: ${{ secrets.STYX_SECRET }}
 
     steps:
-      - name: "Checkout Styx-Common"
+      - name: "Checkout"
         uses: actions/checkout@v4
-        with:
-          repository: "Vodes/Styx-Common"
       - name: "Setup JDK"
         id: java
         uses: actions/setup-java@v4
@@ -31,15 +29,9 @@ jobs:
             11
             17
           cache: "gradle"
-      - name: "Build Styx-Common"
-        env:
-          JAVA_HOME: ${{ steps.setup-java.outputs.path }}
-        run: "./gradlew.bat publishToMavenLocal"
-      - name: "Checkout"
-        uses: actions/checkout@v4
       - name: "Build Msi"
         env:
-          JAVA_HOME: ${{ steps.setup-java.outputs.path }}
+          JAVA_HOME: ${{ steps.java.outputs.path }}
         run: ./gradlew.bat packageReleaseMsi
       - name: "Build Uber jar"
         env:
