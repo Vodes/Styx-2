@@ -6,9 +6,9 @@ val voyagerVer = "1.0.0"
 val ktorVersion = "2.3.8"
 
 plugins {
-    kotlin("jvm") version "1.9.21"
-    id("org.jetbrains.compose") version "1.5.11"
-    id("org.jetbrains.kotlin.plugin.serialization") version "1.9.21"
+    kotlin("jvm") version "1.9.22"
+    id("org.jetbrains.compose") version "1.5.12"
+    id("org.jetbrains.kotlin.plugin.serialization") version "1.9.22"
     id("com.github.gmazzo.buildconfig") version "5.3.5"
     id("org.ajoberstar.grgit") version "5.2.1"
 }
@@ -19,15 +19,15 @@ version = "0.0.2"
 repositories {
     google()
     mavenCentral()
-    mavenLocal()
     maven("https://jitpack.io")
     maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
+    maven { url = uri("https://repo.styx.moe/releases") }
 }
 
 dependencies {
     implementation(kotlin("stdlib-jdk8"))
     implementation(compose.desktop.currentOs)
-    implementation("org.jetbrains.compose.material3:material3:1.5.11")
+    implementation("org.jetbrains.compose.material3:material3:1.5.12")
     implementation("media.kamel:kamel-image:0.9.0")
     implementation("cafe.adriel.voyager:voyager-navigator:$voyagerVer")
     implementation("cafe.adriel.voyager:voyager-screenmodel:$voyagerVer")
@@ -35,20 +35,12 @@ dependencies {
     implementation("cafe.adriel.voyager:voyager-bottom-sheet-navigator:$voyagerVer")
     implementation("cafe.adriel.voyager:voyager-transitions:$voyagerVer")
     implementation("com.russhwolf:multiplatform-settings-no-arg:1.1.1")
-    implementation("org.jetbrains.compose.material:material-icons-extended:1.5.11")
+    implementation("org.jetbrains.compose.material:material-icons-extended:1.5.12")
 
     implementation("com.github.oshi:oshi-core:6.4.11")
     implementation("com.github.ajalt.mordant:mordant:2.2.0")
-    // https://mvnrepository.com/artifact/org.slf4j/slf4j-simple
     implementation("org.slf4j:slf4j-simple:2.0.9")
-    // https://mvnrepository.com/artifact/net.lingala.zip4j/zip4j
     implementation("net.lingala.zip4j:zip4j:2.11.5")
-
-    // Still gotta think about some cross-platform IO stuff
-    //implementation("com.soywiz.korlibs.korio:korio:2.2.0")
-    // https://mvnrepository.com/artifact/org.jetbrains.compose.material3/material3-desktop
-    // implementation("org.jetbrains.compose.material3:material3-desktop:1.4.0")
-    //implementation("dev.cbyrne:kdiscordipc:0.2.1")
 
     implementation("moe.styx:styx-common:0.0.1")
 }
