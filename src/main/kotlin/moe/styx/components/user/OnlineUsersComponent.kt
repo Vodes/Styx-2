@@ -62,7 +62,8 @@ fun UserListComponent(nav: Navigator, userList: List<ActiveUser>) {
     userList.forEachIndexed { index, user ->
         if (index != 0)
             Divider(Modifier.fillMaxWidth().padding(10.dp, 10.dp), thickness = 1.dp)
-        Row(Modifier.padding(10.dp, 0.dp, 0.dp, 5.dp), verticalAlignment = Alignment.CenterVertically) {
+
+        Row(Modifier.padding(10.dp, if (index != 0) 0.dp else 5.dp, 0.dp, 5.dp), verticalAlignment = Alignment.CenterVertically) {
             when (user.deviceType) {
                 "PC" -> Icon(Icons.Filled.Computer, "PC")
                 "Laptop" -> Icon(Icons.Filled.LaptopWindows, "Laptop")

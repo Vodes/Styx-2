@@ -17,6 +17,7 @@ import moe.styx.logic.sendObjectWithResponse
 object Heartbeats {
     var currentUsers: List<ActiveUser> = emptyList()
     var listeningTo: String? = null
+
     fun start() {
         launchGlobal {
             delay(3000)
@@ -32,9 +33,8 @@ object Heartbeats {
                 val response = sendObjectWithResponse(Endpoints.HEARTBEAT, ClientHeartbeat(login!!.accessToken, mediaActivity, null))
                 if (response != null && response.code == 200 && !response.message.isNullOrBlank()) {
                     currentUsers = json.decodeFromString(response.message!!)
+                    currentUsers = currentUsers.sortedBy { it.user.name.lowercase() }
                 }
-//                if (currentUsers.isNotEmpty())
-//                    println("Online Users:\n${currentUsers.map { "${it.user.name} (${it.deviceType})" }}")
 
                 if (listeningTo != null && currentUsers.find { it.user.GUID eqI listeningTo } == null)
                     listeningTo = null
