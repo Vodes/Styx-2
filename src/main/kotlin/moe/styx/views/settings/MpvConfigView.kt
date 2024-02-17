@@ -89,6 +89,11 @@ class MpvConfigView : Screen {
                     Divider(Modifier.fillMaxWidth().padding(12.dp, 8.dp), thickness = 2.dp)
                     Text("Language Preferences", style = MaterialTheme.typography.titleLarge)
                     Column(Modifier.padding(6.dp)) {
+                        Text(
+                            "If nothing here is checked, it will default to English sub",
+                            Modifier.padding(10.dp, 4.dp),
+                            style = MaterialTheme.typography.bodyMedium
+                        )
                         MpvCheckbox(
                             "Prefer German subtitles",
                             preferences.preferGerman
