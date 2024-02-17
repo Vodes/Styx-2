@@ -19,6 +19,7 @@ import moe.styx.Main.isUiModeDark
 import moe.styx.components.MainScaffold
 import moe.styx.components.SettingsCheckbox
 import moe.styx.components.misc.MpvVersionAndDownload
+import moe.styx.logic.DiscordRPC
 import moe.styx.logic.login.ServerStatus
 import moe.styx.logic.login.isLoggedIn
 import moe.styx.logic.login.login
@@ -48,6 +49,18 @@ class SettingsView : Screen {
                     SettingsCheckbox("Use list for shows", "shows-list", false)
                     SettingsCheckbox("Use list for movies", "movies-list", false)
                     SettingsCheckbox("Sort episodes ascendingly", "episode-asc", false)
+                    Divider(Modifier.padding(5.dp), thickness = 2.dp)
+                    SettingsCheckbox(
+                        "Discord RPC", "discord-rpc", true
+                    ) {
+                        if (it && !DiscordRPC.isStarted())
+                            DiscordRPC.start()
+                    }
+                    Text(
+                        "Show Styx (& what you're watching) on your discord activity.\nDisabling requires a restart.",
+                        Modifier.padding(12.dp, 2.dp, 0.dp, 6.dp),
+                        style = MaterialTheme.typography.bodySmall
+                    )
                     Divider(Modifier.padding(5.dp), thickness = 2.dp)
 
                     Text("MPV Options", style = MaterialTheme.typography.titleLarge, modifier = Modifier.padding(5.dp))

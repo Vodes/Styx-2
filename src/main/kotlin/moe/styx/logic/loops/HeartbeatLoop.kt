@@ -7,6 +7,7 @@ import moe.styx.common.data.MediaActivity
 import moe.styx.common.extension.eqI
 import moe.styx.common.json
 import moe.styx.common.util.launchGlobal
+import moe.styx.logic.DiscordRPC.updateActivity
 import moe.styx.logic.Endpoints
 import moe.styx.logic.login.login
 import moe.styx.logic.runner.MpvStatus
@@ -20,6 +21,7 @@ object Heartbeats {
         launchGlobal {
             delay(3000)
             while (true) {
+                updateActivity()
                 if (login == null) {
                     delay(10000)
                     continue

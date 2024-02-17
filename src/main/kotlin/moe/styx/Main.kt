@@ -22,6 +22,7 @@ import moe.styx.Main.isUiModeDark
 import moe.styx.Main.settings
 import moe.styx.Styx__.BuildConfig
 import moe.styx.common.http.getHttpClient
+import moe.styx.logic.DiscordRPC
 import moe.styx.logic.Endpoints
 import moe.styx.logic.login.ServerStatus
 import moe.styx.logic.login.isLoggedIn
@@ -51,8 +52,12 @@ fun main(args: Array<String>) = application {
     else
         Main.wasLaunchedInDebug = true
     getHttpClient("${BuildConfig.APP_NAME} - ${BuildConfig.APP_VERSION}")
+    if (settings["discord-rpc", true]) {
+        DiscordRPC.start()
+    }
     RequestQueue.start()
     Heartbeats.start()
+
     isUiModeDark.value = settings["darkmode", true]
     val darkMode by remember { isUiModeDark }
     val nav = LocalNavigator.current

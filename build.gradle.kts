@@ -1,4 +1,3 @@
-import org.ajoberstar.grgit.Grgit
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
@@ -21,11 +20,13 @@ repositories {
     mavenCentral()
     maven("https://jitpack.io")
     maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
-    maven { url = uri("https://repo.styx.moe/releases") }
+    maven("https://repo.styx.moe/releases")
 }
 
 dependencies {
     implementation(kotlin("stdlib-jdk8"))
+
+    // Compose Stuff
     implementation(compose.desktop.currentOs)
     implementation("org.jetbrains.compose.material3:material3:1.5.12")
     implementation("media.kamel:kamel-image:0.9.0")
@@ -37,11 +38,14 @@ dependencies {
     implementation("com.russhwolf:multiplatform-settings-no-arg:1.1.1")
     implementation("org.jetbrains.compose.material:material-icons-extended:1.5.12")
 
+    // Misc
     implementation("com.github.oshi:oshi-core:6.4.11")
     implementation("com.github.ajalt.mordant:mordant:2.2.0")
     implementation("org.slf4j:slf4j-simple:2.0.9")
     implementation("net.lingala.zip4j:zip4j:2.11.5")
+    implementation("com.github.caoimhebyrne:KDiscordIPC:0.2.2")
 
+    // Styx
     implementation("moe.styx:styx-common:0.0.1")
 }
 
@@ -101,32 +105,9 @@ buildConfig {
     buildConfigField("SITE", siteURL.split("https://").getOrElse(1) { siteURL })
     buildConfigField("BUILD_TIME", (System.currentTimeMillis() / 1000))
     buildConfigField("VERSION_CHECK_URL", "https://raw.githubusercontent.com/Vodes/Styx-2/master/build.gradle.kts")
+    buildConfigField("DISCORD_CLIENT_ID", System.getenv("STYX_DISCORDCLIENT"))
 }
 
 kotlin {
     jvmToolchain(17)
-}
-
-tasks.register("buildExternalDeps") {
-    val isWin = System.getProperty("os.name").contains("win", true)
-    val projectDir = layout.projectDirectory.asFile.parentFile
-    val outDir = File(projectDir, ".temp-deps/styx-types")
-    doFirst {
-        outDir.deleteRecursively()
-        Grgit.clone {
-            dir = outDir
-            uri = "https://github.com/Vodes/Styx-Types.git"
-        }
-        val result = kotlin.runCatching {
-            ProcessBuilder(listOf(if (isWin) "./gradlew.bat" else "./gradlew", "publishToMavenLocal"))
-                .directory(outDir)
-                .inheritIO()
-                .start().waitFor()
-        }.getOrNull() ?: -1
-        if (result != 0) {
-            outDir.deleteRecursively()
-            throw StopExecutionException()
-        }
-    }
-    doLast { outDir.deleteRecursively() }
 }

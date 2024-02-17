@@ -157,7 +157,8 @@ class MpvInstance {
                             "path" to JsonPrimitive("\${filename}"),
                             "playlist-count" to JsonPrimitive("\${playlist-count}"),
                             "playlist-current-pos" to JsonPrimitive("\${playlist-current-pos}"),
-                            "eof" to JsonPrimitive("\${eof-reached}")
+                            "eof" to JsonPrimitive("\${eof-reached}"),
+                            "time-remaining" to JsonPrimitive("\${time-remaining}")
                         )
                     )
                     runCommand("print-text ${json.toString()}")
@@ -219,10 +220,11 @@ data class MpvStatus(
     val paused: Boolean,
     val playlistCurrent: Int,
     val playlistSize: Int,
-    val eof: Boolean
+    val eof: Boolean,
+    val timeRemaining: Long
 ) {
     companion object {
-        var current = MpvStatus("00:00:00", 0, "", true, 0, 0, false)
+        var current = MpvStatus("00:00:00", 0, "", true, 0, 0, false, 0)
         private var was100 = false
 
         fun updateCurrent(output: String) {
@@ -254,7 +256,11 @@ data class MpvStatus(
                 obj["paused"]?.equals("yes") ?: true,
                 playlistCurrent,
                 playlistSize,
-                eof
+                eof,
+                runCatching {
+                    val time = java.time.LocalTime.parse(obj["time-remaining"]!!)
+                    return@runCatching (time.hour * 3600 + time.minute * 60 + time.second).toLong()
+                }.getOrNull() ?: 0
             )
 
             if (current.file.isNotBlank() && new.file.isNotBlank() && !current.file.trim().equals(new.file.trim(), true)) {
