@@ -86,7 +86,9 @@ compose.desktop {
                 shortcut = true
             }
             macOS {
-                packageVersion = "1.0.2"
+                packageVersion = project.version.toString().let {
+                    if (it.startsWith("0.")) it.replaceFirst("0.", "1.") else it
+                }
                 appStore = false
                 iconFile.set(project.file("src/main/resources/icons/icon.icns"))
             }
