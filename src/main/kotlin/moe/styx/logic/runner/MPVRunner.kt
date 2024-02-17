@@ -5,6 +5,7 @@ import com.russhwolf.settings.get
 import kotlinx.coroutines.*
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
+import moe.styx.Main
 import moe.styx.Main.settings
 import moe.styx.common.data.MediaEntry
 import moe.styx.common.data.MediaWatched
@@ -262,23 +263,26 @@ data class MpvStatus(
                     return@runCatching (time.hour * 3600 + time.minute * 60 + time.second).toLong()
                 }.getOrNull() ?: 0
             )
-
-            if (current.file.isNotBlank() && new.file.isNotBlank() && !current.file.trim().equals(new.file.trim(), true)) {
-                val previousEntry = DataManager.entries.value.find { current.file eqI it.GUID }
-                if (previousEntry != null && current.seconds > 5) {
-                    val watched = MediaWatched(
-                        previousEntry.GUID,
-                        login?.userID ?: "",
-                        currentUnixSeconds(),
-                        current.seconds.toLong(),
-                        current.percentage.toFloat(),
-                        current.percentage.toFloat()
-                    )
-                    RequestQueue.updateWatched(watched)
-                    currentPlayer?.let { it.execUpdate() }
+            if (new.isAvailable()) {
+                if (current.isAvailable() && !current.file.trim().equals(new.file.trim(), true)) {
+                    val previousEntry = DataManager.entries.value.find { current.file eqI it.GUID }
+                    if (previousEntry != null && current.seconds > 5) {
+                        val watched = MediaWatched(
+                            previousEntry.GUID,
+                            login?.userID ?: "",
+                            currentUnixSeconds(),
+                            current.seconds.toLong(),
+                            current.percentage.toFloat(),
+                            current.percentage.toFloat()
+                        )
+                        RequestQueue.updateWatched(watched)
+                        currentPlayer?.let { it.execUpdate() }
+                    }
                 }
+                current = new
             }
-            current = new
+            if (Main.wasLaunchedInDebug)
+                println(current)
             if (shouldAutoplay)
                 attemptPlayNext()
         }
@@ -293,7 +297,7 @@ data class MpvStatus(
         }
 
     fun isAvailable(): Boolean {
-        return !(pos.contains("unavailable", true) || file.contains("unavailable", true))
+        return file.isNotBlank() && !(pos.contains("unavailable", true) || file.contains("unavailable", true))
     }
 }
 
