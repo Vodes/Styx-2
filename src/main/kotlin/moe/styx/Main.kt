@@ -12,7 +12,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.*
-import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.transitions.SlideTransition
 import com.russhwolf.settings.PreferencesSettings
@@ -60,23 +59,12 @@ fun main(args: Array<String>) = application {
 
     isUiModeDark.value = settings["darkmode", true]
     val darkMode by remember { isUiModeDark }
-    val nav = LocalNavigator.current
-
-    val preferRounded = settings["rounded-corners", false]
 
     Window(
         onCloseRequest = { onClose() },
         title = "${BuildConfig.APP_NAME} - ${BuildConfig.APP_VERSION}",
         state = WindowState(width = 750.dp, height = 750.dp),
-        undecorated = preferRounded,
-        transparent = preferRounded,
-        icon = painterResource("icons/icon.ico"),
-        onKeyEvent = {
-            if (nav != null && nav.canPop)
-                nav.pop()
-
-            true
-        }
+        icon = painterResource("icons/icon.ico")
     )
     {
         Log.i { "Compose window initialized with: ${this.window.renderApi}" }
@@ -112,6 +100,6 @@ fun main(args: Array<String>) = application {
 }
 
 private fun ApplicationScope.onClose() {
-    sendObject(Endpoints.LOGOUT, "")
+    runCatching { sendObject(Endpoints.LOGOUT, "") }
     exitApplication()
 }
