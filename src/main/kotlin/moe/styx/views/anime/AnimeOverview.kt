@@ -1,7 +1,6 @@
 package moe.styx.views.anime
 
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.TooltipArea
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.padding
@@ -18,6 +17,7 @@ import cafe.adriel.voyager.navigator.tab.*
 import moe.styx.Main
 import moe.styx.Styx__.BuildConfig
 import moe.styx.components.MainScaffold
+import moe.styx.components.misc.IconButtonWithTooltip
 import moe.styx.components.user.OnlineUsersIcon
 import moe.styx.logic.data.DataManager
 import moe.styx.navigation.*
@@ -36,22 +36,17 @@ class AnimeOverview() : Screen {
             OnlineUsersIcon()
             if (Main.wasLaunchedInDebug)
                 IconButton(onClick = { nav.push(FontSizeView()) }, content = { Icon(Icons.Filled.QuestionMark, null) })
-            IconButton(onClick = {
+            IconButtonWithTooltip(Icons.Filled.Refresh, "Reload") {
                 DataManager.updateLocalChange(0L, 0L)
                 DataManager.isLoaded.value = false
                 nav.replaceAll(LoadingView())
-            }) {
-                TooltipArea({ Text("Reload") }) {
-                    Icon(Icons.Filled.Refresh, "Reload data")
-                }
             }
-            IconButton(onClick = { nav.push(SettingsView()) }, content = { Icon(Icons.Filled.Settings, "Settings") })
-
+            IconButtonWithTooltip(Icons.Filled.Settings, "Settings") { nav.push(SettingsView()) }
         }) {
             TabNavigator(defaultTab) {
                 Scaffold(
                     bottomBar = {
-                        NavigationBar(tonalElevation = 5.dp) {
+                        NavigationBar(tonalElevation = 10.dp) {
                             TabNavigationItem(defaultTab)
                             TabNavigationItem(movieTab)
                             TabNavigationItem(favsTab)

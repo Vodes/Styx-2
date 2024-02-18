@@ -52,9 +52,9 @@ fun ExpandIconButton(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ToolTipWrapper(text: String, modifier: Modifier = Modifier, content: @Composable () -> Unit) {
-    TooltipArea(delayMillis = 325, tooltip = {
+    TooltipArea(delayMillis = 425, tooltip = {
         ElevatedCard {
-            Text(text, modifier = modifier.padding(6.dp))
+            Text(text, modifier = modifier.padding(5.dp))
         }
     }, content = content)
 }

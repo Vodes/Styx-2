@@ -4,10 +4,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.StarOutline
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import cafe.adriel.voyager.navigator.Navigator
 import kotlinx.datetime.Clock
 import moe.styx.common.data.Media
@@ -49,5 +49,21 @@ fun FavouriteIconButton(media: Media, modifier: Modifier = Modifier) {
             Icon(Icons.Filled.Star, "Fav")
         else
             Icon(Icons.Outlined.StarOutline, "Not fav")
+    }
+}
+
+@Composable
+fun IconButtonWithTooltip(
+    icon: ImageVector,
+    tooltip: String,
+    modifier: Modifier = Modifier,
+    colors: IconButtonColors = IconButtonDefaults.iconButtonColors(),
+    enabled: Boolean = true,
+    onClick: () -> Unit
+) {
+    ToolTipWrapper(tooltip) {
+        IconButton(onClick, modifier = modifier, enabled = enabled, colors = colors) {
+            Icon(icon, tooltip)
+        }
     }
 }
