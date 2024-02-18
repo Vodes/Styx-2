@@ -1,9 +1,7 @@
 package moe.styx.views.settings
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
@@ -50,14 +48,20 @@ class SettingsView : Screen {
                     SettingsCheckbox("Use list for movies", "movies-list", false)
                     SettingsCheckbox("Sort episodes ascendingly", "episode-asc", false)
                     Divider(Modifier.padding(5.dp), thickness = 2.dp)
-                    SettingsCheckbox(
-                        "Discord RPC", "discord-rpc", true
-                    ) {
-                        if (it && !DiscordRPC.isStarted())
-                            DiscordRPC.start()
+                    Row {
+                        SettingsCheckbox(
+                            "Discord RPC", "discord-rpc", true
+                        ) {
+                            if (it && !DiscordRPC.isStarted())
+                                DiscordRPC.start()
+                            else if (!it && DiscordRPC.isStarted()) {
+                                DiscordRPC.clearActivity()
+                            }
+                        }
+                        SettingsCheckbox("Show RPC when idle", "discord-rpc-idle", true)
                     }
                     Text(
-                        "Show Styx (& what you're watching) on your discord activity.\nDisabling requires a restart.",
+                        "Show Styx (& what you're watching) on your discord activity.",
                         Modifier.padding(12.dp, 2.dp, 0.dp, 6.dp),
                         style = MaterialTheme.typography.bodySmall
                     )

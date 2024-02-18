@@ -1,11 +1,13 @@
 package moe.styx.logic
 
+import com.russhwolf.settings.get
 import dev.cbyrne.kdiscordipc.KDiscordIPC
 import dev.cbyrne.kdiscordipc.core.event.impl.DisconnectedEvent
 import dev.cbyrne.kdiscordipc.core.event.impl.ErrorEvent
 import dev.cbyrne.kdiscordipc.core.event.impl.ReadyEvent
 import dev.cbyrne.kdiscordipc.data.activity.*
 import kotlinx.coroutines.launch
+import moe.styx.Main.settings
 import moe.styx.Styx__.BuildConfig
 import moe.styx.common.data.MediaActivity
 import moe.styx.common.extension.currentUnixSeconds
@@ -45,6 +47,17 @@ object DiscordRPC {
         }
     }
 
+    fun clearActivity() {
+        if (!isStarted())
+            return
+        ipc?.scope?.launch {
+            runCatching {
+                ipc!!.activityManager.clearActivity()
+            }
+            ipc = null
+        }
+    }
+
     fun updateActivity() {
         if (!isStarted())
             return
@@ -59,9 +72,13 @@ object DiscordRPC {
             runCatching {
                 ipc?.let {
                     if (mediaActivity == null || media == null) {
-                        it.activityManager.setActivity("Not watching anything") {
-                            button("View on GitHub", "https://github.com/Vodes?tab=repositories&q=Styx&language=kotlin")
-                            largeImage("styx", "v${BuildConfig.APP_VERSION}")
+                        if (settings["discord-rpc-idle", true]) {
+                            it.activityManager.setActivity("Not watching anything") {
+                                button("View on GitHub", "https://github.com/Vodes?tab=repositories&q=Styx&language=kotlin")
+                                largeImage("styx", "v${BuildConfig.APP_VERSION}")
+                            }
+                        } else {
+                            it.activityManager.clearActivity()
                         }
                         return@let
                     }
