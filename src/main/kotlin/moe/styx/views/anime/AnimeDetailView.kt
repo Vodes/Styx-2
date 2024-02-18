@@ -74,7 +74,8 @@ class AnimeDetailView(val ID: String) : Screen {
         }) {
             ElevatedCard(
                 Modifier.padding(8.dp).fillMaxSize(),
-                colors = CardDefaults.elevatedCardColors(containerColor = MaterialTheme.colorScheme.surface)
+                colors = CardDefaults.elevatedCardColors(containerColor = MaterialTheme.colorScheme.surface),
+                elevation = CardDefaults.elevatedCardElevation(8.dp)
             ) {
                 Row(Modifier.padding(5.dp).fillMaxSize()) {
                     Column(Modifier.fillMaxHeight().fillMaxWidth(.52F).verticalScroll(scrollState)) {

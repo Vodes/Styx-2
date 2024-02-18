@@ -24,14 +24,17 @@ import moe.styx.views.anime.MovieDetailView
 @Composable
 fun AnimeListItem(nav: Navigator, media: Media) {
     val image = media.thumbID.getImageFromID()
-    ElevatedCard(modifier = Modifier.padding(5.dp, 2.dp).fillMaxWidth(), onClick = {
-        val view = if (media.isSeries.toBoolean()) AnimeDetailView(media.GUID) else MovieDetailView(media.GUID)
-        if (nav.lastItem is AnimeDetailView) {
-            nav.replace(view)
-        } else {
-            nav.push(view)
-        }
-    }) {
+    ElevatedCard(
+        modifier = Modifier.padding(5.dp, 2.dp).fillMaxWidth(),
+        elevation = CardDefaults.elevatedCardElevation(3.dp),
+        onClick = {
+            val view = if (media.isSeries.toBoolean()) AnimeDetailView(media.GUID) else MovieDetailView(media.GUID)
+            if (nav.lastItem is AnimeDetailView) {
+                nav.replace(view)
+            } else {
+                nav.push(view)
+            }
+        }) {
         Row(Modifier.height(80.dp)) {
             ElevatedCard(
                 Modifier.clip(AppShapes.large).width(67.dp).padding(3.dp),
