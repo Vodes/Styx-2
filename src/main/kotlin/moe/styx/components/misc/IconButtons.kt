@@ -7,6 +7,7 @@ import androidx.compose.material.icons.outlined.StarOutline
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import cafe.adriel.voyager.navigator.Navigator
 import kotlinx.datetime.Clock
@@ -59,11 +60,12 @@ fun IconButtonWithTooltip(
     modifier: Modifier = Modifier,
     colors: IconButtonColors = IconButtonDefaults.iconButtonColors(),
     enabled: Boolean = true,
+    tint: Color = MaterialTheme.colorScheme.onSurface,
     onClick: () -> Unit
 ) {
     ToolTipWrapper(tooltip) {
         IconButton(onClick, modifier = modifier, enabled = enabled, colors = colors) {
-            Icon(icon, tooltip)
+            Icon(icon, tooltip, tint = tint)
         }
     }
 }

@@ -6,9 +6,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -68,7 +66,7 @@ fun BigScalingCardImage(image: Resource<Painter>, modifier: Modifier = Modifier)
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun MediaGenreListing(media: Media) {
-    val isExpanded = remember { mutableStateOf(false) }
+    var isExpanded by remember { mutableStateOf(false) }
     val shape = AppShapes.medium
     if (!media.genres.isNullOrBlank()) {
         FlowRow(Modifier.padding(5.dp), horizontalArrangement = Arrangement.Start, verticalArrangement = Arrangement.Center) {
@@ -90,11 +88,11 @@ fun MediaGenreListing(media: Media) {
                 }
             }
             if (!media.tags.isNullOrBlank()) {
-                ExpandIconButton(tooltip = "Show tags", tooltipExpanded = "Hide tags") { isExpanded.value = it }
+                ExpandIconButton(tooltip = "Show tags", tooltipExpanded = "Hide tags", isExpanded = isExpanded) { isExpanded = !isExpanded }
             }
         }
         if (!media.tags.isNullOrBlank()) {
-            AnimatedVisibility(isExpanded.value) {
+            AnimatedVisibility(isExpanded) {
                 FlowRow(Modifier.padding(5.dp)) {
                     media.tags!!.split(",").forEach { tag ->
                         Surface(
