@@ -56,13 +56,16 @@
 -keepclasseswithmembers class moe.styx.** {
     kotlinx.serialization.KSerializer serializer(...);
 }
+-keepclasseswithmembers class dev.cbyrne.** {
+    kotlinx.serialization.KSerializer serializer(...);
+}
 
 # When kotlinx.serialization.json.JsonObjectSerializer occurs
 
 -keepclassmembers class kotlinx.serialization.json.** {
     *** Companion;
 }
--keepclasseswithmembers class kotlinx.serialization.json.** {
+-keepclasseswithmembers class kotlinx.serialization.** {
     kotlinx.serialization.KSerializer serializer(...);
 }
 
@@ -84,6 +87,7 @@
 -keep class io.ktor.** { *; }
 -keep class kotlinx.coroutines.** { *; }
 -keep class kotlinx.serialization.**
+-keep class dev.cbyrne.**
 -dontwarn kotlinx.atomicfu.**
 -dontwarn io.netty.**
 -dontwarn com.typesafe.**
