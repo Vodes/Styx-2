@@ -16,6 +16,7 @@ jobs:
       STYX_SITEURL: ${{ secrets.STYX_SITEURL }}
       STYX_APP_GUID: ${{ secrets.STYX_APP_GUID }}
       STYX_SECRET: ${{ secrets.STYX_SECRET }}
+      STYX_DISCORDCLIENT: ${{ secrets.STYX_DISCORDCLIENT }}
 
     steps:
       - name: "Checkout"
