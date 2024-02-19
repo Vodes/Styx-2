@@ -2,6 +2,8 @@ package moe.styx.components.anime
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.*
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsHoveredAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
@@ -106,14 +108,21 @@ fun EpisodeList(episodes: List<MediaEntry>, showSelection: MutableState<Boolean>
                         })
                 ) {
                     Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                        val title = if (!ep.nameDE.isNullOrBlank() && preferGerman) ep.nameDE else ep.nameEN
                         val watchProgress = watched[ep]
                         SelectionCheckboxes(showSelection, selected, episodes, i)
+
                         Column(Modifier.fillMaxWidth()) {
-                            Column {
-                                val title = if (!ep.nameDE.isNullOrBlank() && preferGerman) ep.nameDE else ep.nameEN
+                            val interactionSource = remember { MutableInteractionSource() }
+                            val isHover by interactionSource.collectIsHoveredAsState()
+
+                            Column(modifier = Modifier.hoverable(interactionSource = interactionSource)) {
+                                var modifier = Modifier.padding(5.dp)
+                                if (isHover)
+                                    modifier = modifier.basicMarquee(delayMillis = 300)
                                 Text(
                                     "${ep.entryNumber}${if (!title.isNullOrBlank()) " - $title" else ""}",
-                                    Modifier.padding(5.dp).basicMarquee(animationMode = MarqueeAnimationMode.WhileFocused),
+                                    modifier,
                                     softWrap = false,
                                     style = MaterialTheme.typography.labelLarge
                                 )
