@@ -14,10 +14,10 @@ import moe.styx.common.compose.files.Storage
 import moe.styx.common.compose.files.getCurrentAndCollectFlow
 import moe.styx.common.compose.utils.SearchState
 import moe.styx.common.extension.toBoolean
-import moe.styx.navigation.barWithListComp
+import moe.styx.views.barWithListComp
 
 class MovieListView : SimpleTab("Movies", Icons.Default.Movie) {
-    
+
     @Composable
     override fun Content() {
         val media by Storage.stores.mediaStore.getCurrentAndCollectFlow()

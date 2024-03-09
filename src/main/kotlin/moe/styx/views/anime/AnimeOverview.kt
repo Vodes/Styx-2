@@ -20,7 +20,7 @@ import moe.styx.common.compose.components.misc.OnlineUsersIcon
 import moe.styx.common.compose.utils.LocalGlobalNavigator
 import moe.styx.components.MainScaffold
 import moe.styx.logic.utils.pushMediaView
-import moe.styx.navigation.*
+import moe.styx.views.*
 import moe.styx.views.other.FontSizeView
 import moe.styx.views.other.LoadingView
 import moe.styx.views.settings.SettingsView

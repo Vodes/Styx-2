@@ -21,7 +21,7 @@ import moe.styx.common.extension.eqI
 import moe.styx.common.isWindows
 import moe.styx.common.json
 import moe.styx.common.util.launchThreaded
-import moe.styx.logic.data.DataManager
+import moe.styx.logic.Files
 import java.io.*
 
 var currentPlayer: MpvInstance? = null
@@ -92,7 +92,7 @@ class MpvInstance {
             else
                 getExecutableFromPath("mpv")
         } else
-            File(DataManager.getMpvDir(), "mpv.exe")
+            File(Files.getMpvDir(), "mpv.exe")
 
         if (mpvExecutable == null || !mpvExecutable.exists()) {
             onFail("MPV could not be found.")
@@ -118,7 +118,7 @@ class MpvInstance {
         commands.add("-slang=${pref.getSlangArg()}")
         commands.add("-alang=${pref.getAlangArg()}")
         if (useConfigRegardless || !systemMpv) {
-            commands.add("--config-dir=${DataManager.getMpvConfDir().absolutePath}")
+            commands.add("--config-dir=${Files.getMpvConfDir().absolutePath}")
             commands.add("--profile=${pref.getPlatformProfile()}")
         }
 

@@ -37,7 +37,7 @@ import moe.styx.common.extension.formattedStrFile
 import moe.styx.common.http.getHttpClient
 import moe.styx.common.util.launchGlobal
 import moe.styx.logic.DiscordRPC
-import moe.styx.logic.data.DataManager
+import moe.styx.logic.Files
 import moe.styx.logic.runner.currentPlayer
 import moe.styx.theme.*
 import moe.styx.views.login.LoginView
@@ -52,7 +52,7 @@ object Main {
 
     fun setupLogFile() {
         val time = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).formattedStrFile()
-        val dir = File(DataManager.getAppDir(), "Logs")
+        val dir = File(Files.getAppDir(), "Logs")
         dir.mkdirs()
         val file = File(dir, "Log - $time.txt")
         val stream = PrintStream(file.outputStream())
@@ -74,8 +74,8 @@ fun main(args: Array<String>) = application {
             BuildConfig.BASE_URL,
             BuildConfig.IMAGE_URL,
             null,
-            DataManager.getCacheDir().absolutePath,
-            DataManager.getDataDir().absolutePath
+            Files.getCacheDir().absolutePath,
+            Files.getDataDir().absolutePath
         )
     }
     if (settings["discord-rpc", true]) {

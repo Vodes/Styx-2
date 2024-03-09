@@ -17,21 +17,21 @@ import moe.styx.common.compose.utils.ServerStatus
 import moe.styx.common.extension.eqI
 import moe.styx.common.http.httpClient
 import moe.styx.common.util.launchGlobal
-import moe.styx.logic.data.DataManager
+import moe.styx.logic.Files
 import net.lingala.zip4j.ZipFile
 import java.io.File
 
 fun generateNewConfig() {
     val pref = MpvPreferences.getOrDefault()
-    val baseConfig = File(DataManager.getMpvConfDir(), "base.conf")
+    val baseConfig = File(Files.getMpvConfDir(), "base.conf")
     if (!baseConfig.exists())
         return
 
-    val dynamics = File(DataManager.getMpvConfDir(), "dynamic-profiles")
+    val dynamics = File(Files.getMpvConfDir(), "dynamic-profiles")
     val profiles = File(dynamics, "quality.conf")
     val downmix = File(dynamics, "downmix.conf")
     val oversample = File(dynamics, "oversample-interpolate.conf")
-    val customConf = File(DataManager.getAppDir(), "custom-mpv.conf")
+    val customConf = File(Files.getAppDir(), "custom-mpv.conf")
     val customStr = if (customConf.exists()) "## Custom conf file\n\n${customConf.readText().trim()}\n\n## End" else "\n\n##End"
     val gpuAPI = if (pref.gpuAPI eqI "auto") {
         if (System.getProperty("os.name").contains("win", true))
@@ -60,7 +60,7 @@ ${if (pref.customDownmix) "${downmix.readText()}\n" else ""}
 ${profiles.readText()}
     """.trimIndent()
 
-    File(DataManager.getMpvConfDir(), "mpv.conf").writeText(newConfig)
+    File(Files.getMpvConfDir(), "mpv.conf").writeText(newConfig)
 }
 
 object MpvUtils {
@@ -79,13 +79,13 @@ object MpvUtils {
             }
             isMpvDownloading = true
             val version = response.bodyAsText().trim()
-            if (settings["mpv-version", "None"].trim() eqI version && DataManager.getMpvDir().exists() && DataManager.getMpvConfDir().exists()) {
+            if (settings["mpv-version", "None"].trim() eqI version && Files.getMpvDir().exists() && Files.getMpvConfDir().exists()) {
                 Log.i { "mpv version is up-to-date." }
                 isMpvDownloading = false
                 return@launchGlobal
             }
 
-            val temp = File(DataManager.getAppDir(), "temp.zip")
+            val temp = File(Files.getAppDir(), "temp.zip")
             if (temp.exists())
                 temp.delete()
 
@@ -93,14 +93,14 @@ object MpvUtils {
                 Log.i { "Downloading latest mpv bundle" }
 
                 val downloadResp = httpClient.get(Endpoints.MPV_DOWNLOAD.url)
-                if (DataManager.getMpvDir().exists() && downloadResp.status.isSuccess())
-                    DataManager.getMpvDir().deleteRecursively()
+                if (Files.getMpvDir().exists() && downloadResp.status.isSuccess())
+                    Files.getMpvDir().deleteRecursively()
                 val openChannel = downloadResp.bodyAsChannel()
                 openChannel.copyAndClose(temp.writeChannel())
                 delay(500)
 
                 runCatching {
-                    ZipFile(temp).extractAll(DataManager.getMpvDir().absolutePath)
+                    ZipFile(temp).extractAll(Files.getMpvDir().absolutePath)
                     settings["mpv-version"] = version
                     temp.delete()
                     generateNewConfig()

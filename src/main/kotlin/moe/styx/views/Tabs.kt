@@ -1,4 +1,4 @@
-package moe.styx.navigation
+package moe.styx.views
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.Composable

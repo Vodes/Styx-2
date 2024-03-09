@@ -14,7 +14,7 @@ import moe.styx.common.compose.files.getCurrentAndCollectFlow
 import moe.styx.common.compose.utils.SearchState
 import moe.styx.common.extension.eqI
 import moe.styx.components.misc.createTabOptions
-import moe.styx.navigation.barWithListComp
+import moe.styx.views.barWithListComp
 
 class FavouritesListView : Tab {
     override val options: TabOptions

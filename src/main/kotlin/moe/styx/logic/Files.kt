@@ -1,8 +1,8 @@
-package moe.styx.logic.data
+package moe.styx.logic
 
 import java.io.File
 
-object DataManager {
+object Files {
 
     fun getDataDir(): File {
         return File(getAppDir(), "Data").also { it.mkdirs() }
