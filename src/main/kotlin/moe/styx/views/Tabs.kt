@@ -15,11 +15,13 @@ import moe.styx.common.data.Media
 import moe.styx.components.overviews.MediaGrid
 import moe.styx.components.overviews.MediaList
 import moe.styx.views.anime.tabs.*
+import moe.styx.views.settings.SettingsView
 
 val defaultTab = AnimeListView()
 val movieTab = MovieListView()
 var favsTab = FavouritesListView()
 val scheduleTab = ScheduleView()
+val settingsTab = SettingsView()
 
 @OptIn(FlowPreview::class)
 @Composable

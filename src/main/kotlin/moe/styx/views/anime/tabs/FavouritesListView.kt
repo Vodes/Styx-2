@@ -5,23 +5,16 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import cafe.adriel.voyager.navigator.tab.Tab
-import cafe.adriel.voyager.navigator.tab.TabOptions
 import kotlinx.coroutines.runBlocking
 import moe.styx.common.compose.components.search.MediaSearch
+import moe.styx.common.compose.extensions.SimpleTab
 import moe.styx.common.compose.files.Storage
 import moe.styx.common.compose.files.getCurrentAndCollectFlow
 import moe.styx.common.compose.utils.SearchState
 import moe.styx.common.extension.eqI
-import moe.styx.components.misc.createTabOptions
 import moe.styx.views.barWithListComp
 
-class FavouritesListView : Tab {
-    override val options: TabOptions
-        @Composable
-        get() {
-            return createTabOptions("Favourites", Icons.Default.Star)
-        }
+class FavouritesListView : SimpleTab("Favourites", Icons.Default.Star) {
 
     @Composable
     override fun Content() {

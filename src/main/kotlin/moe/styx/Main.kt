@@ -99,7 +99,7 @@ fun main(args: Array<String>) = application {
     Window(
         onCloseRequest = { onClose() },
         title = "${BuildConfig.APP_NAME} - ${BuildConfig.APP_VERSION}",
-        state = WindowState(width = 750.dp, height = 750.dp),
+        state = WindowState(width = 800.dp, height = 750.dp),
         icon = painterResource("icons/icon.ico")
     )
     {
