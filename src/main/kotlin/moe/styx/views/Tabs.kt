@@ -11,6 +11,7 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.debounce
 import moe.styx.common.compose.components.search.MediaSearch
 import moe.styx.common.compose.utils.SearchState
+import moe.styx.common.data.Favourite
 import moe.styx.common.data.Media
 import moe.styx.components.overviews.MediaGrid
 import moe.styx.components.overviews.MediaList
@@ -30,13 +31,14 @@ internal fun Tab.barWithListComp(
     initialState: SearchState,
     filtered: List<Media>,
     useList: Boolean = false,
-    showUnseen: Boolean = false
+    showUnseen: Boolean = false,
+    favourites: List<Favourite> = emptyList()
 ) {
     Column(Modifier.fillMaxSize()) {
         mediaSearch.Component(Modifier.fillMaxWidth().padding(10.dp))
         Column(Modifier.fillMaxSize()) {
             val flow by mediaSearch.stateEmitter.debounce(150L).collectAsState(initialState)
-            val processedMedia = flow.filterMedia(filtered)
+            val processedMedia = flow.filterMedia(filtered, favourites)
             if (!useList)
                 MediaGrid(processedMedia, showUnseen)
             else

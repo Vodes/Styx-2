@@ -25,7 +25,7 @@ class FavouritesListView : SimpleTab("Favourites", Icons.Default.Star) {
             val filtered = media.filter { m -> favourites.find { m.GUID eqI it.mediaID } != null }
             val initialState = runBlocking { searchStore.get() ?: SearchState() }
             val mediaSearch = MediaSearch(searchStore, initialState, emptyList(), emptyList(), true)
-            barWithListComp(mediaSearch, initialState, filtered, false, true)
+            barWithListComp(mediaSearch, initialState, filtered, false, true, favourites)
         }
     }
 }
