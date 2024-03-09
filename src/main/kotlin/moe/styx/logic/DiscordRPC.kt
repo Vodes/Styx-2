@@ -7,18 +7,18 @@ import dev.cbyrne.kdiscordipc.core.event.impl.ErrorEvent
 import dev.cbyrne.kdiscordipc.core.event.impl.ReadyEvent
 import dev.cbyrne.kdiscordipc.data.activity.*
 import kotlinx.coroutines.launch
-import moe.styx.Main.settings
 import moe.styx.Styx__.BuildConfig
+import moe.styx.common.compose.extensions.getThumb
+import moe.styx.common.compose.extensions.getURL
+import moe.styx.common.compose.files.Storage
+import moe.styx.common.compose.settings
+import moe.styx.common.compose.utils.Log
 import moe.styx.common.data.MediaActivity
 import moe.styx.common.extension.currentUnixSeconds
 import moe.styx.common.extension.eqI
 import moe.styx.common.util.launchGlobal
-import moe.styx.logic.data.DataManager
-import moe.styx.logic.data.getImageFromID
-import moe.styx.logic.data.getURL
 import moe.styx.logic.runner.MpvStatus
 import moe.styx.logic.runner.currentPlayer
-import moe.styx.logic.utils.Log
 
 object DiscordRPC {
     private var ipc: KDiscordIPC? = null
@@ -64,8 +64,8 @@ object DiscordRPC {
         val mediaActivity = if (currentPlayer != null && MpvStatus.current.file.isNotEmpty() && MpvStatus.current.percentage > -1)
             MediaActivity(MpvStatus.current.file, MpvStatus.current.seconds.toLong(), !MpvStatus.current.paused)
         else null
-        val entry = mediaActivity?.let { act -> DataManager.entries.value.find { it.GUID eqI act.mediaEntry } }
-        val media = entry?.let { ent -> DataManager.media.value.find { it.GUID eqI ent.mediaID } }
+        val entry = mediaActivity?.let { act -> Storage.entryList.find { it.GUID eqI act.mediaEntry } }
+        val media = entry?.let { ent -> Storage.mediaList.find { it.GUID eqI ent.mediaID } }
         ipc!!.scope.launch {
             if (errored)
                 return@launch
@@ -84,7 +84,7 @@ object DiscordRPC {
                     }
                     it.activityManager.setActivity(if (mediaActivity.playing) "Watching" else "Paused", "${media.name} - ${entry.entryNumber}") {
                         button("View on GitHub", "https://github.com/Vodes?tab=repositories&q=Styx&language=kotlin")
-                        val image = media.thumbID.getImageFromID()
+                        val image = media.getThumb()
                         if (mediaActivity.playing)
                             timestamps(currentUnixSeconds(), currentUnixSeconds() + MpvStatus.current.timeRemaining)
                         if (image == null) {

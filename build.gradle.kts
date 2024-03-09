@@ -1,12 +1,9 @@
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-val voyagerVer = "1.0.0"
-val ktorVersion = "2.3.8"
-
 plugins {
     kotlin("jvm") version "1.9.22"
-    id("org.jetbrains.compose") version "1.5.12"
+    id("org.jetbrains.compose") version "1.6.0"
     id("org.jetbrains.kotlin.plugin.serialization") version "1.9.22"
     id("com.github.gmazzo.buildconfig") version "5.3.5"
     id("org.ajoberstar.grgit") version "5.2.1"
@@ -21,6 +18,7 @@ repositories {
     maven("https://jitpack.io")
     maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
     maven("https://repo.styx.moe/releases")
+    maven("https://repo.styx.moe/snapshots")
 }
 
 dependencies {
@@ -28,25 +26,16 @@ dependencies {
 
     // Compose Stuff
     implementation(compose.desktop.currentOs)
-    implementation("org.jetbrains.compose.material3:material3:1.5.12")
-    implementation("media.kamel:kamel-image:0.9.0")
-    implementation("cafe.adriel.voyager:voyager-navigator:$voyagerVer")
-    implementation("cafe.adriel.voyager:voyager-screenmodel:$voyagerVer")
-    implementation("cafe.adriel.voyager:voyager-tab-navigator:$voyagerVer")
-    implementation("cafe.adriel.voyager:voyager-bottom-sheet-navigator:$voyagerVer")
-    implementation("cafe.adriel.voyager:voyager-transitions:$voyagerVer")
-    implementation("com.russhwolf:multiplatform-settings-no-arg:1.1.1")
-    implementation("org.jetbrains.compose.material:material-icons-extended:1.5.12")
+    implementation(compose.material3)
+    implementation(compose.materialIconsExtended)
 
     // Misc
-    implementation("com.github.oshi:oshi-core:6.4.11")
-    implementation("com.github.ajalt.mordant:mordant:2.2.0")
     implementation("org.slf4j:slf4j-simple:2.0.9")
     implementation("net.lingala.zip4j:zip4j:2.11.5")
     implementation("com.github.caoimhebyrne:KDiscordIPC:0.2.2")
 
     // Styx
-    implementation("moe.styx:styx-common:0.0.1")
+    implementation("moe.styx:styx-common-compose-jvm:6ed2e523")
 }
 
 tasks.withType<KotlinCompile> {

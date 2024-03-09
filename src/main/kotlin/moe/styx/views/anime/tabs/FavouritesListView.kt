@@ -1,58 +1,38 @@
 package moe.styx.views.anime.tabs
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Star
-import androidx.compose.runtime.*
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
-import moe.styx.components.anime.AnimeCard
+import kotlinx.coroutines.runBlocking
+import moe.styx.common.compose.components.search.MediaSearch
+import moe.styx.common.compose.files.Storage
+import moe.styx.common.compose.files.getCurrentAndCollectFlow
+import moe.styx.common.compose.utils.SearchState
+import moe.styx.common.extension.eqI
 import moe.styx.components.misc.createTabOptions
-import moe.styx.components.overviews.MediaSearch
-import moe.styx.logic.data.DataManager
-import moe.styx.logic.utils.isFav
-import moe.styx.navigation.LocalGlobalNavigator
+import moe.styx.navigation.barWithListComp
 
-class FavouritesListView() : Tab {
+class FavouritesListView : Tab {
     override val options: TabOptions
         @Composable
         get() {
             return createTabOptions("Favourites", Icons.Default.Star)
         }
 
-    val mediaSearch = MediaSearch(DataManager.media.value.filter { it.isFav() }, true)
-    val searchState = mutableStateOf(mediaSearch.getDefault())
-
-    @OptIn(ExperimentalFoundationApi::class)
     @Composable
     override fun Content() {
-        var list by remember { searchState }
-
+        val media by Storage.stores.mediaStore.getCurrentAndCollectFlow()
         Column {
-            mediaSearch.component({ list = it })
-            LazyVerticalGrid(
-                columns = GridCells.Adaptive(minSize = 160.dp),
-                contentPadding = PaddingValues(10.dp, 7.dp),
-            ) {
-                itemsIndexed(
-                    items = list, key = { _, item -> item.GUID },
-                ) { _, item ->
-                    Row(modifier = Modifier.animateItemPlacement()) {
-                        AnimeCard(
-                            LocalGlobalNavigator.current,
-                            item, true
-                        )
-                    }
-                }
-            }
+            val favourites by Storage.stores.favouriteStore.getCurrentAndCollectFlow()
+            val searchStore = Storage.stores.favSearchState
+            val filtered = media.filter { m -> favourites.find { m.GUID eqI it.mediaID } != null }
+            val initialState = runBlocking { searchStore.get() ?: SearchState() }
+            val mediaSearch = MediaSearch(searchStore, initialState, emptyList(), emptyList(), true)
+            barWithListComp(mediaSearch, initialState, filtered, false, true)
         }
     }
 }

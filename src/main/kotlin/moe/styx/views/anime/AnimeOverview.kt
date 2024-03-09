@@ -1,6 +1,5 @@
 package moe.styx.views.anime
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.padding
@@ -16,10 +15,11 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.tab.*
 import moe.styx.Main
 import moe.styx.Styx__.BuildConfig
+import moe.styx.common.compose.components.buttons.IconButtonWithTooltip
+import moe.styx.common.compose.components.misc.OnlineUsersIcon
+import moe.styx.common.compose.utils.LocalGlobalNavigator
 import moe.styx.components.MainScaffold
-import moe.styx.components.misc.IconButtonWithTooltip
-import moe.styx.components.user.OnlineUsersIcon
-import moe.styx.logic.data.DataManager
+import moe.styx.logic.utils.pushMediaView
 import moe.styx.navigation.*
 import moe.styx.views.other.FontSizeView
 import moe.styx.views.other.LoadingView
@@ -27,18 +27,15 @@ import moe.styx.views.settings.SettingsView
 
 class AnimeOverview() : Screen {
 
-    @OptIn(ExperimentalFoundationApi::class)
     @Composable
     override fun Content() {
         val nav = LocalGlobalNavigator.current
 
         MainScaffold(title = "${BuildConfig.APP_NAME} — Beta", addPopButton = false, actions = {
-            OnlineUsersIcon()
+            OnlineUsersIcon { nav.pushMediaView(it, false) }
             if (Main.wasLaunchedInDebug)
                 IconButton(onClick = { nav.push(FontSizeView()) }, content = { Icon(Icons.Filled.QuestionMark, null) })
             IconButtonWithTooltip(Icons.Filled.Refresh, "Reload") {
-                DataManager.updateLocalChange(0L, 0L)
-                DataManager.isLoaded.value = false
                 nav.replaceAll(LoadingView())
             }
             IconButtonWithTooltip(Icons.Filled.Settings, "Settings") { nav.push(SettingsView()) }

@@ -1,47 +1,19 @@
 package moe.styx.logic.utils
 
-import moe.styx.common.data.*
-import moe.styx.common.extension.eqI
+import cafe.adriel.voyager.navigator.Navigator
+import moe.styx.common.data.MappingCollection
+import moe.styx.common.data.Media
 import moe.styx.common.extension.toBoolean
 import moe.styx.common.json
-import moe.styx.common.util.isClose
-import moe.styx.logic.data.DataManager
-import java.time.*
-import java.time.temporal.TemporalAdjusters
+import moe.styx.views.anime.AnimeDetailView
+import moe.styx.views.anime.MovieDetailView
 
-fun ScheduleWeekday.dayOfWeek(): DayOfWeek {
-    return when (this) {
-        ScheduleWeekday.MONDAY -> DayOfWeek.MONDAY
-        ScheduleWeekday.TUESDAY -> DayOfWeek.TUESDAY
-        ScheduleWeekday.WEDNESDAY -> DayOfWeek.WEDNESDAY
-        ScheduleWeekday.THURSDAY -> DayOfWeek.THURSDAY
-        ScheduleWeekday.FRIDAY -> DayOfWeek.FRIDAY
-        ScheduleWeekday.SATURDAY -> DayOfWeek.SATURDAY
-        else -> DayOfWeek.SUNDAY
-    }
-}
-
-fun MediaSchedule.getTargetTime(): LocalDateTime {
-    val now = LocalDate.now(ZoneId.of("Europe/Berlin"))
-    val adjusted = now.atTime(this.hour, this.minute)
-    val target = adjusted.with(TemporalAdjusters.next(this.day.dayOfWeek()))
-    return target.atZone(ZoneId.of("Europe/Berlin")).withZoneSameInstant(ZoneId.systemDefault()).toLocalDateTime()
-}
-
-fun Media.find(search: String): Boolean {
-    return name.isClose(search.trim()) || nameEN.isClose(search.trim()) || nameJP.isClose(search.trim())
-}
-
-fun Media.isFav() = DataManager.favourites.value.find { it.mediaID.equals(GUID, true) } != null
-
-fun Media.getCategory(): Category {
-    val categories = DataManager.categories.value.sortedByDescending { it.sort }
-    return categories.find { it.GUID eqI categoryID } ?: categories.last()
-}
-
-fun Media.favAdded(): Long {
-    val fav = DataManager.favourites.value.find { it.mediaID.equals(GUID, true) }
-    return fav?.added ?: 0L
+fun Navigator.pushMediaView(media: Media, replace: Boolean = false) {
+    val view = if (media.isSeries.toBoolean()) AnimeDetailView(media.GUID) else MovieDetailView(media.GUID)
+    if (replace)
+        this.replace(view)
+    else
+        this.push(view)
 }
 
 enum class StackType {

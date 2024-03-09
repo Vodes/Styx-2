@@ -9,90 +9,20 @@ import io.ktor.util.cio.*
 import io.ktor.utils.io.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.serialization.Serializable
-import moe.styx.Main
-import moe.styx.common.extension.capitalize
+import moe.styx.common.compose.http.Endpoints
+import moe.styx.common.compose.settings
+import moe.styx.common.compose.utils.Log
+import moe.styx.common.compose.utils.MpvPreferences
+import moe.styx.common.compose.utils.ServerStatus
 import moe.styx.common.extension.eqI
 import moe.styx.common.http.httpClient
-import moe.styx.common.json
 import moe.styx.common.util.launchGlobal
-import moe.styx.logic.Endpoints
 import moe.styx.logic.data.DataManager
-import moe.styx.logic.hasInternet
 import net.lingala.zip4j.ZipFile
 import java.io.File
 
-val videoOutputDriverChoices = listOf("gpu-next", "gpu")
-val gpuApiChoices = listOf("auto", "vulkan", "d3d11", "opengl")
-val profileChoices = listOf("high", "normal", "light", "fast")
-val debandIterationsChoices = listOf("4", "3", "2")
-
-
-object MpvDesc {
-    val profileDescription = """
-        Sorted from best to worst (and slowest to fastest).
-        This mostly affects scaling and if you have a relatively modern machine, it should have no issues with "high".
-    """.trimIndent()
-
-    val hwDecoding = """
-        Use your GPU to decode the video.
-        This is both faster and more efficient.
-        Leave on if at all possible and not causing issues.
-    """.trimIndent()
-
-    val deband = """
-        Removes colorbanding from the video.
-        Keep this on if you don't have any performance issues.
-        Can also be toggled with h in the player.
-    """.trimIndent()
-
-    val oversample = """
-        Interpolates by showing every frame 2.5 times (on 60hz).
-        This can make the video feel way smoother but cause issues with advanced subtitles.
-        G-Sync makes this redundant.
-    """.trimIndent()
-
-    val gpuAPI = """
-        The rendering backend used.
-        Keep at auto if you don't know what you're doing.
-        Auto is basically d3d11 on windows and vulkan everywhere else.
-    """.trimIndent()
-
-    val outputDriver = """
-        Keep at gpu-next if you don't know what you're doing and if not causing issues.
-        This is in theory faster and has higher quality.
-    """.trimIndent()
-
-    val downmix = """
-        This forces a custom downmix for surround sound audio.
-        May be useful if you think that surround audio sounds like crap on your headphones.
-        Or if you just don't have a 5.1+ setup.
-    """.trimIndent()
-
-    val dither10bit = """
-        Forces dithering to 10bit because MPV's auto detection is broken.
-        Only use if you know that your display is 10bit.
-    """.trimIndent()
-}
-
-@Serializable
-data class MpvPreferences(
-    val gpuAPI: String = gpuApiChoices[0],
-    val videoOutputDriver: String = videoOutputDriverChoices[0],
-    val profile: String = profileChoices[0],
-    val deband: Boolean = true,
-    val debandIterations: String = debandIterationsChoices[0],
-    val hwDecoding: Boolean = true,
-    val oversampleInterpol: Boolean = false,
-    val dither10bit: Boolean = false,
-    val customDownmix: Boolean = false,
-    val preferGerman: Boolean = false,
-    val preferEnDub: Boolean = false,
-    val preferDeDub: Boolean = false,
-)
-
 fun generateNewConfig() {
-    val pref = MpvUtils.getPreferences()
+    val pref = MpvPreferences.getOrDefault()
     val baseConfig = File(DataManager.getMpvConfDir(), "base.conf")
     if (!baseConfig.exists())
         return
@@ -136,37 +66,12 @@ ${profiles.readText()}
 object MpvUtils {
     var isMpvDownloading = false
 
-    fun getPreferences() = runCatching { json.decodeFromString<MpvPreferences>(Main.settings["mpv-preferences", ""]) }.getOrNull() ?: MpvPreferences()
-
-    fun getSlangArg(): String {
-        val pref = getPreferences()
-        return if (pref.preferGerman)
-            "de,ger,en,eng"
-        else
-            "en,eng,de,ger"
-    }
-
-    fun getAlangArg(): String {
-        val pref = getPreferences()
-        return if (pref.preferEnDub)
-            "en,eng,jp,jpn,de,ger"
-        else if (pref.preferDeDub)
-            "de,ger,jp,jpn,en,eng"
-        else
-            "jp,jpn,en,eng,de,ger"
-    }
-
-    fun getProfile(): String {
-        val pref = getPreferences()
-        return "styx${pref.profile.capitalize()}"
-    }
-
     fun checkVersionAndDownload() {
-        if (!hasInternet())
+        if (ServerStatus.lastKnown == ServerStatus.UNKNOWN)
             return
         launchGlobal {
             delay(8000)
-            val response = httpClient.get(Endpoints.MPV.url())
+            val response = httpClient.get(Endpoints.MPV.url)
 
             if (!response.status.isSuccess()) {
                 Log.w("MpvUtils::checkVersionAndDownload") { "Failed to check for mpv version." }
@@ -174,7 +79,7 @@ object MpvUtils {
             }
             isMpvDownloading = true
             val version = response.bodyAsText().trim()
-            if (Main.settings["mpv-version", "None"].trim() eqI version && DataManager.getMpvDir().exists() && DataManager.getMpvConfDir().exists()) {
+            if (settings["mpv-version", "None"].trim() eqI version && DataManager.getMpvDir().exists() && DataManager.getMpvConfDir().exists()) {
                 Log.i { "mpv version is up-to-date." }
                 isMpvDownloading = false
                 return@launchGlobal
@@ -187,7 +92,7 @@ object MpvUtils {
             launch {
                 Log.i { "Downloading latest mpv bundle" }
 
-                val downloadResp = httpClient.get(Endpoints.MPV_DOWNLOAD.url())
+                val downloadResp = httpClient.get(Endpoints.MPV_DOWNLOAD.url)
                 if (DataManager.getMpvDir().exists() && downloadResp.status.isSuccess())
                     DataManager.getMpvDir().deleteRecursively()
                 val openChannel = downloadResp.bodyAsChannel()
@@ -196,7 +101,7 @@ object MpvUtils {
 
                 runCatching {
                     ZipFile(temp).extractAll(DataManager.getMpvDir().absolutePath)
-                    Main.settings["mpv-version"] = version
+                    settings["mpv-version"] = version
                     temp.delete()
                     generateNewConfig()
                     isMpvDownloading = false

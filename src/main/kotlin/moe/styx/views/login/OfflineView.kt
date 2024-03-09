@@ -9,8 +9,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
-import moe.styx.logic.login.ServerStatus
-import moe.styx.navigation.LocalGlobalNavigator
+import moe.styx.common.compose.utils.LocalGlobalNavigator
+import moe.styx.common.compose.utils.ServerStatus
 import moe.styx.views.other.LoadingView
 
 class OfflineView : Screen {
@@ -36,5 +36,4 @@ class OfflineView : Screen {
             }
         }
     }
-
 }

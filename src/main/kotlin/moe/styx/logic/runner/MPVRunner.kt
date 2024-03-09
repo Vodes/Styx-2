@@ -1,12 +1,17 @@
 package moe.styx.logic.runner
 
-import androidx.compose.runtime.getValue
 import com.russhwolf.settings.get
 import kotlinx.coroutines.*
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 import moe.styx.Main
-import moe.styx.Main.settings
+import moe.styx.common.compose.files.Storage
+import moe.styx.common.compose.http.Endpoints
+import moe.styx.common.compose.http.login
+import moe.styx.common.compose.settings
+import moe.styx.common.compose.threads.RequestQueue
+import moe.styx.common.compose.utils.Log
+import moe.styx.common.compose.utils.MpvPreferences
 import moe.styx.common.data.MediaEntry
 import moe.styx.common.data.MediaWatched
 import moe.styx.common.extension.currentUnixSeconds
@@ -14,12 +19,7 @@ import moe.styx.common.extension.eqI
 import moe.styx.common.isWindows
 import moe.styx.common.json
 import moe.styx.common.util.launchThreaded
-import moe.styx.logic.Endpoints
 import moe.styx.logic.data.DataManager
-import moe.styx.logic.login.login
-import moe.styx.logic.loops.RequestQueue
-import moe.styx.logic.utils.Log
-import moe.styx.logic.utils.MpvUtils
 import java.io.*
 
 var currentPlayer: MpvInstance? = null
@@ -32,7 +32,7 @@ fun launchMPV(entry: MediaEntry, append: Boolean, onFail: (String) -> Unit = {},
             if (processCode > 0) {
                 onFail("Playback ended with a bad status code:\n$processCode")
             } else {
-                val currentEntry = DataManager.entries.value.find { MpvStatus.current.file eqI it.GUID }
+                val currentEntry = Storage.entryList.find { MpvStatus.current.file eqI it.GUID }
                 if (MpvStatus.current.file.isNotBlank() && currentEntry != null && MpvStatus.current.seconds > 5) {
                     val watched = MediaWatched(
                         currentEntry.GUID,
@@ -102,7 +102,7 @@ class MpvInstance {
             currentPlayer = null
             return false
         }
-        val url = "${Endpoints.WATCH.url()}/${mediaEntry.GUID}?token=${login!!.watchToken}"
+        val url = "${Endpoints.WATCH.url}/${mediaEntry.GUID}?token=${login!!.watchToken}"
         val pipe = if (isWindows) """--input-ipc-server=\\.\pipe\styx-mpvsocket""" else "--input-ipc-server=/tmp/styx-mpvsocket"
         val commands = if (!isWindows && tryFlatpak) mutableListOf(
             mpvExecutable.absolutePath,
@@ -112,14 +112,15 @@ class MpvInstance {
             pipe,
             "--keep-open=yes"
         ) else mutableListOf(mpvExecutable.absolutePath, url, pipe, "--keep-open=yes")
-        commands.add("-slang=${MpvUtils.getSlangArg()}")
-        commands.add("-alang=${MpvUtils.getAlangArg()}")
+        val pref = MpvPreferences.getOrDefault()
+        commands.add("-slang=${pref.getSlangArg()}")
+        commands.add("-alang=${pref.getAlangArg()}")
         if (useConfigRegardless || !systemMpv) {
             commands.add("--config-dir=${DataManager.getMpvConfDir().absolutePath}")
-            commands.add("--profile=${MpvUtils.getProfile()}")
+            commands.add("--profile=${pref.getPlatformProfile()}")
         }
 
-        val watched = DataManager.watched.value.find { it.entryID eqI mediaEntry.GUID }
+        val watched = Storage.watchedList.find { it.entryID eqI mediaEntry.GUID }
         if (watched != null && watched.progress > 5)
             commands.add("--start=${watched.progress - 5}")
 
@@ -172,7 +173,7 @@ class MpvInstance {
 
     fun play(mediaEntry: MediaEntry, append: Boolean = true): Boolean {
         val current = MpvStatus.current.copy()
-        val url = "${Endpoints.WATCH.url()}/${mediaEntry.GUID}?token=${login!!.watchToken}"
+        val url = "${Endpoints.WATCH.url}/${mediaEntry.GUID}?token=${login!!.watchToken}"
         val appendType = if (current.percentage == 100 && current.eof) "append-play" else "append"
         val options = if (append) " $appendType" else ""
         val loaded = runCommand("loadfile \"$url\"$options")
@@ -181,7 +182,7 @@ class MpvInstance {
                 runCommand("set pause no").also { return it }
 
             if (!append) {
-                val watched = DataManager.watched.value.find { it.entryID eqI mediaEntry.GUID }
+                val watched = Storage.watchedList.find { it.entryID eqI mediaEntry.GUID }
                 if (watched != null)
                     launchThreaded {
                         delay(100)
@@ -265,7 +266,7 @@ data class MpvStatus(
             )
             if (new.isAvailable()) {
                 if (current.isAvailable() && !current.file.trim().equals(new.file.trim(), true)) {
-                    val previousEntry = DataManager.entries.value.find { current.file eqI it.GUID }
+                    val previousEntry = Storage.entryList.find { current.file eqI it.GUID }
                     if (previousEntry != null && current.seconds > 5) {
                         val watched = MediaWatched(
                             previousEntry.GUID,
@@ -302,8 +303,8 @@ data class MpvStatus(
 }
 
 fun attemptPlayNext() {
-    val entryList by DataManager.entries
-    val mediaList by DataManager.media
+    val entryList = Storage.entryList
+    val mediaList = Storage.mediaList
 
     val entry = entryList.find { it.GUID == MpvStatus.current.file } ?: return
     val parentMedia = mediaList.find { it.GUID == entry.mediaID } ?: return

@@ -7,9 +7,11 @@ import androidx.compose.material.icons.filled.CalendarViewWeek
 import androidx.compose.runtime.Composable
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
+import moe.styx.common.compose.components.schedule.ScheduleDay
+import moe.styx.common.compose.utils.LocalGlobalNavigator
 import moe.styx.common.data.ScheduleWeekday
-import moe.styx.components.ScheduleDay
 import moe.styx.components.misc.createTabOptions
+import moe.styx.views.anime.AnimeDetailView
 
 class ScheduleView : Tab {
     override val options: TabOptions
@@ -20,10 +22,11 @@ class ScheduleView : Tab {
 
     @Composable
     override fun Content() {
+        val nav = LocalGlobalNavigator.current
         val days = ScheduleWeekday.entries.toTypedArray()
         LazyColumn {
             items(items = days, itemContent = { day ->
-                ScheduleDay(day)
+                ScheduleDay(day) { nav.push(AnimeDetailView(it.GUID)) }
             })
         }
     }

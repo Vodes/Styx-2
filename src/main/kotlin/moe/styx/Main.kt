@@ -14,35 +14,48 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.*
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.transitions.SlideTransition
-import com.russhwolf.settings.PreferencesSettings
-import com.russhwolf.settings.Settings
 import com.russhwolf.settings.get
+import io.kamel.image.config.LocalKamelConfig
+import kotlinx.datetime.Clock
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import moe.styx.Main.isUiModeDark
-import moe.styx.Main.settings
+import moe.styx.Main.setupLogFile
 import moe.styx.Styx__.BuildConfig
+import moe.styx.common.compose.AppConfig
+import moe.styx.common.compose.appConfig
+import moe.styx.common.compose.extensions.kamelConfig
+import moe.styx.common.compose.http.*
+import moe.styx.common.compose.settings
+import moe.styx.common.compose.threads.Heartbeats
+import moe.styx.common.compose.threads.RequestQueue
+import moe.styx.common.compose.utils.LocalGlobalNavigator
+import moe.styx.common.compose.utils.Log
+import moe.styx.common.compose.utils.ServerStatus
+import moe.styx.common.extension.formattedStrFile
 import moe.styx.common.http.getHttpClient
 import moe.styx.logic.DiscordRPC
-import moe.styx.logic.Endpoints
-import moe.styx.logic.login.ServerStatus
-import moe.styx.logic.login.isLoggedIn
-import moe.styx.logic.login.login
-import moe.styx.logic.loops.Heartbeats
-import moe.styx.logic.loops.RequestQueue
-import moe.styx.logic.sendObject
-import moe.styx.logic.utils.Log
-import moe.styx.logic.utils.setupLogFile
-import moe.styx.navigation.LocalGlobalNavigator
+import moe.styx.logic.data.DataManager
 import moe.styx.theme.*
 import moe.styx.views.login.LoginView
 import moe.styx.views.login.OfflineView
 import moe.styx.views.other.LoadingView
-import java.util.prefs.Preferences
+import java.io.File
+import java.io.PrintStream
 
 object Main {
-    private val delegate = Preferences.userNodeForPackage(this.javaClass)
-    val settings: Settings = PreferencesSettings(delegate)
     var isUiModeDark: MutableState<Boolean> = mutableStateOf(true)
     var wasLaunchedInDebug = false
+
+    fun setupLogFile() {
+        val time = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).formattedStrFile()
+        val dir = File(DataManager.getAppDir(), "Logs")
+        dir.mkdirs()
+        val file = File(dir, "Log - $time.txt")
+        val stream = PrintStream(file.outputStream())
+        System.setOut(stream)
+        System.setErr(stream)
+    }
 }
 
 fun main(args: Array<String>) = application {
@@ -51,6 +64,17 @@ fun main(args: Array<String>) = application {
     else
         Main.wasLaunchedInDebug = true
     getHttpClient("${BuildConfig.APP_NAME} - ${BuildConfig.APP_VERSION}")
+    appConfig = {
+        AppConfig(
+            BuildConfig.APP_SECRET,
+            BuildConfig.APP_VERSION,
+            BuildConfig.BASE_URL,
+            BuildConfig.IMAGE_URL,
+            null,
+            DataManager.getCacheDir().absolutePath,
+            DataManager.getDataDir().absolutePath
+        )
+    }
     if (settings["discord-rpc", true]) {
         DiscordRPC.start()
     }
@@ -85,7 +109,7 @@ fun main(args: Array<String>) = application {
                         LoginView()
                 }
                 Navigator(view) { navigator ->
-                    CompositionLocalProvider(LocalGlobalNavigator provides navigator) {
+                    CompositionLocalProvider(LocalGlobalNavigator provides navigator, LocalKamelConfig provides kamelConfig) {
                         SlideTransition(
                             navigator, animationSpec = spring(
                                 stiffness = Spring.StiffnessMedium,

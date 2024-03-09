@@ -9,16 +9,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.russhwolf.settings.get
 import kotlinx.coroutines.delay
-import moe.styx.Main
+import moe.styx.common.compose.settings
 import moe.styx.logic.utils.MpvUtils.isMpvDownloading
 
 @Composable
 fun MpvVersionAndDownload() {
-    var currentVersion by remember { mutableStateOf(Main.settings["mpv-version", "None"]) }
+    var currentVersion by remember { mutableStateOf(settings["mpv-version", "None"]) }
     var downloading by remember { mutableStateOf(isMpvDownloading) }
     LaunchedEffect(Unit) {
         while (true) {
-            currentVersion = Main.settings["mpv-version", "None"]
+            currentVersion = settings["mpv-version", "None"]
             downloading = isMpvDownloading
             delay(400)
         }

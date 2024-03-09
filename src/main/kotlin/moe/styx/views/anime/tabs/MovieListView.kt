@@ -1,50 +1,33 @@
 package moe.styx.views.anime.tabs
 
-import androidx.compose.foundation.layout.Column
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Movie
-import androidx.compose.runtime.*
-import cafe.adriel.voyager.core.model.ScreenModel
-import cafe.adriel.voyager.core.model.rememberScreenModel
-import cafe.adriel.voyager.navigator.tab.Tab
-import cafe.adriel.voyager.navigator.tab.TabOptions
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import com.russhwolf.settings.get
-import moe.styx.Main.settings
+import kotlinx.coroutines.runBlocking
+import moe.styx.common.compose.components.search.MediaSearch
+import moe.styx.common.compose.extensions.SimpleTab
+import moe.styx.common.compose.extensions.getDistinctCategories
+import moe.styx.common.compose.extensions.getDistinctGenres
+import moe.styx.common.compose.files.Storage
+import moe.styx.common.compose.files.getCurrentAndCollectFlow
+import moe.styx.common.compose.utils.SearchState
 import moe.styx.common.extension.toBoolean
-import moe.styx.components.misc.createTabOptions
-import moe.styx.components.overviews.MediaGrid
-import moe.styx.components.overviews.MediaList
-import moe.styx.components.overviews.MediaSearch
-import moe.styx.logic.data.DataManager
+import moe.styx.navigation.barWithListComp
 
-class MovieListView() : Tab {
-    override val options: TabOptions
-        @Composable
-        get() {
-            return createTabOptions("Movies", Icons.Default.Movie)
-        }
-
-    val mediaSearch = MediaSearch(DataManager.media.value.filter { !it.isSeries.toBoolean() })
-
+class MovieListView : SimpleTab("Movies", Icons.Default.Movie) {
+    
     @Composable
     override fun Content() {
-        val vm = rememberScreenModel { MovieListViewModel(mediaSearch) }
-        var list by remember { vm.listState }
-        val useListView by remember { vm.useListViewState }
-
-        Column {
-            mediaSearch.component({ list = it }, false)
-
-            if (useListView) {
-                MediaList(list)
-            } else {
-                MediaGrid(list)
-            }
-        }
+        val media by Storage.stores.mediaStore.getCurrentAndCollectFlow()
+        val categories by Storage.stores.categoryStore.getCurrentAndCollectFlow()
+        val searchStore = Storage.stores.movieSearchState
+        val filtered = media.filter { !it.isSeries.toBoolean() }
+        val availableGenres = filtered.getDistinctGenres()
+        val availableCategories = filtered.getDistinctCategories(categories)
+        val initialState = runBlocking { searchStore.get() ?: SearchState() }
+        val mediaSearch = MediaSearch(searchStore, initialState, availableGenres, availableCategories)
+        barWithListComp(mediaSearch, initialState, filtered, moe.styx.common.compose.settings["movies-list", false])
     }
-}
-
-class MovieListViewModel(search: MediaSearch) : ScreenModel {
-    val listState = mutableStateOf(search.getDefault())
-    val useListViewState = mutableStateOf(settings["movies-list", false])
 }

@@ -5,73 +5,85 @@ import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import cafe.adriel.voyager.core.model.ScreenModel
-import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
 import com.russhwolf.settings.get
-import io.kamel.image.lazyPainterResource
-import moe.styx.Main.settings
+import moe.styx.common.compose.components.anime.*
+import moe.styx.common.compose.components.buttons.FavouriteIconButton
+import moe.styx.common.compose.components.misc.OnlineUsersIcon
+import moe.styx.common.compose.extensions.getPainter
+import moe.styx.common.compose.extensions.getThumb
+import moe.styx.common.compose.files.Storage
+import moe.styx.common.compose.files.getCurrentAndCollectFlow
+import moe.styx.common.compose.settings
+import moe.styx.common.compose.threads.Heartbeats
+import moe.styx.common.compose.utils.LocalGlobalNavigator
 import moe.styx.common.data.Media
 import moe.styx.common.data.MediaEntry
+import moe.styx.common.extension.eqI
 import moe.styx.components.MainScaffold
-import moe.styx.components.anime.*
-import moe.styx.components.misc.FavouriteIconButton
-import moe.styx.components.user.OnlineUsersIcon
-import moe.styx.logic.data.*
-import moe.styx.logic.utils.StackType
-import moe.styx.logic.utils.getURLFromMap
-import moe.styx.logic.utils.removeSomeHTMLTags
-import moe.styx.navigation.LocalGlobalNavigator
+import moe.styx.components.anime.AppendDialog
+import moe.styx.components.anime.BigScalingCardImage
+import moe.styx.components.anime.FailedDialog
+import moe.styx.logic.runner.currentPlayer
+import moe.styx.logic.runner.launchMPV
+import moe.styx.logic.utils.*
 import moe.styx.theme.AppShapes
+import moe.styx.views.settings.SettingsView
 import java.awt.Desktop
 import java.net.URI
-import java.util.*
 
-class AnimeDetailView(val ID: String) : Screen {
-
-    private var sKey: String? = null
-
-    private fun generateKey(): String {
-        if (sKey == null)
-            sKey = UUID.randomUUID().toString()
-        return sKey as String
-    }
+class AnimeDetailView(private val mediaID: String) : Screen {
 
     override val key: ScreenKey
-        get() = generateKey()
+        get() = mediaID
 
     @Preview
     @Composable
     override fun Content() {
         val nav = LocalGlobalNavigator.current
-        val vm = rememberScreenModel { AnimeDetailViewModel(ID) }
 
-        if (vm.anime == null) {
-            nav.pop();
+        val mediaList by Storage.stores.mediaStore.getCurrentAndCollectFlow()
+        val media = remember { mediaList.find { it.GUID eqI mediaID } }
+        if (media == null) {
+            nav.pop()
             return
         }
+        val entries = fetchEntries(mediaID)
 
         val preferGerman = settings["prefer-german-metadata", false]
         val scrollState = rememberScrollState()
         val showSelection = remember { mutableStateOf(false) }
 
-        MainScaffold(title = vm.anime.name, actions = {
-            OnlineUsersIcon()
-            FavouriteIconButton(vm.anime)
+        MainScaffold(title = media.name, actions = {
+            OnlineUsersIcon { nav.pushMediaView(it, true) }
+            FavouriteIconButton(media)
         }) {
+            var failedToPlayMessage by remember { mutableStateOf("") }
+            if (failedToPlayMessage.isNotBlank()) {
+                FailedDialog(failedToPlayMessage, Modifier.fillMaxWidth(0.6F)) {
+                    failedToPlayMessage = ""
+                    if (it) nav.push(SettingsView())
+                }
+            }
+            var appendEntry by remember { mutableStateOf<MediaEntry?>(null) }
+            if (appendEntry != null) {
+                AppendDialog(appendEntry!!, Modifier.fillMaxWidth(0.6F), onDismiss = {
+                    appendEntry = null
+                }) {
+                    failedToPlayMessage = it
+                    appendEntry = null
+                }
+            }
             ElevatedCard(
                 Modifier.padding(8.dp).fillMaxSize(),
                 colors = CardDefaults.elevatedCardColors(containerColor = MaterialTheme.colorScheme.surface),
@@ -79,28 +91,35 @@ class AnimeDetailView(val ID: String) : Screen {
             ) {
                 Row(Modifier.padding(5.dp).fillMaxSize()) {
                     Column(Modifier.fillMaxHeight().fillMaxWidth(.52F).verticalScroll(scrollState)) {
-                        StupidImageNameArea(vm.anime)
+                        StupidImageNameArea(media)
 
                         Spacer(Modifier.height(6.dp))
 
                         Text("About", Modifier.padding(6.dp, 2.dp), style = MaterialTheme.typography.titleLarge)
-                        MediaGenreListing(vm.anime)
-                        val synopsis = if (!vm.anime.synopsisDE.isNullOrBlank() && preferGerman) vm.anime.synopsisDE else vm.anime.synopsisEN
+                        MediaGenreListing(media)
+                        val synopsis = if (!media.synopsisDE.isNullOrBlank() && preferGerman) media.synopsisDE else media.synopsisEN
                         if (!synopsis.isNullOrBlank())
                             SelectionContainer {
                                 Text(synopsis.removeSomeHTMLTags(), Modifier.padding(6.dp), style = MaterialTheme.typography.bodyMedium)
                             }
 
-                        if (vm.anime.sequel != null || vm.anime.prequel != null) {
-                            Divider(Modifier.fillMaxWidth().padding(0.dp, 4.dp, 0.dp, 2.dp), thickness = 2.dp)
-                            MediaRelations(vm.anime)
+                        if (media.sequel != null || media.prequel != null) {
+                            HorizontalDivider(Modifier.fillMaxWidth().padding(0.dp, 4.dp, 0.dp, 2.dp), thickness = 2.dp)
+                            MediaRelations(media, mediaList) { nav.pushMediaView(it, true) }
                         }
                     }
-                    Column(Modifier.padding(6.dp).width(2.dp).fillMaxHeight()) {
-                        Divider(Modifier.fillMaxHeight(), thickness = 3.dp)
-                    }
+                    VerticalDivider(Modifier.fillMaxHeight().padding(6.dp), thickness = 3.dp)
 
-                    EpisodeList(vm.episodes, showSelection)
+                    EpisodeList(entries, showSelection, SettingsView(), onPlay = { entry ->
+                        if (currentPlayer == null) {
+                            launchMPV(entry, false, {
+                                failedToPlayMessage = it
+                            })
+                        } else {
+                            appendEntry = entry
+                        }
+                        ""
+                    })
                 }
             }
         }
@@ -115,20 +134,17 @@ fun StupidImageNameArea(
     requiredHeight: Dp = 535.dp,
     otherContent: @Composable () -> Unit = {}
 ) {
-    val img = media.thumbID.getImageFromID()!!
-    val imageResource = lazyPainterResource(
-        if (img.isCached()) img.getFile() else img.getURL(),
-        filterQuality = FilterQuality.High
-    )
+    val img = media.getThumb()!!
+    val painter = img.getPainter()
     BoxWithConstraints {
         val width = this.maxWidth
         Row(Modifier.align(Alignment.TopStart).height(IntrinsicSize.Max).fillMaxWidth()) {
             if (width <= dynamicMaxWidth)
-                BigScalingCardImage(imageResource, Modifier.fillMaxWidth().weight(1f, false))
+                BigScalingCardImage(painter, Modifier.fillMaxWidth().weight(1f, false))
             else {
                 // Theoretical max size that should be reached at this window width
                 // Just force to not have layout spacing issues lmao
-                BigScalingCardImage(imageResource, Modifier.requiredSize(requiredWidth, requiredHeight))
+                BigScalingCardImage(painter, Modifier.requiredSize(requiredWidth, requiredHeight))
             }
             Column(Modifier.fillMaxWidth().weight(1f, true)) {
                 MediaNameListing(media, Modifier.align(Alignment.Start))//, Modifier.weight(0.5F))
@@ -140,20 +156,14 @@ fun StupidImageNameArea(
     }
 }
 
-class AnimeDetailViewModel(val ID: String) : ScreenModel {
-    val anime = DataManager.media.value.find { a -> a.GUID == ID }
-    private var _episodes = listOf<MediaEntry>()
-    val episodes: List<MediaEntry>
-        get() {
-            if (_episodes.isNotEmpty())
-                return _episodes
-            _episodes = DataManager.entries.value.filter { it.mediaID == anime!!.GUID }
-            _episodes = if (settings["episode-asc", false])
-                _episodes.sortedBy { it.entryNumber.toDoubleOrNull() ?: 0.0 }
-            else
-                _episodes.sortedByDescending { it.entryNumber.toDoubleOrNull() ?: 0.0 }
-            return _episodes
-        }
+@Composable
+fun fetchEntries(mediaID: String): List<MediaEntry> {
+    Heartbeats.mediaActivity = null
+    val flow by Storage.stores.entryStore.getCurrentAndCollectFlow()
+    val filtered = flow.filter { it.mediaID eqI mediaID }
+    return if (settings["episode-asc", false]) filtered.sortedBy {
+        it.entryNumber.toDoubleOrNull() ?: 0.0
+    } else filtered.sortedByDescending { it.entryNumber.toDoubleOrNull() ?: 0.0 }
 }
 
 @Composable
