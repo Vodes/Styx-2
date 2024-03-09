@@ -31,7 +31,7 @@ class AnimeOverview() : Screen {
         val nav = LocalGlobalNavigator.current
 
 
-        MainScaffold(title = "${BuildConfig.APP_NAME} — Beta", addPopButton = false, actions = {
+        MainScaffold(title = BuildConfig.APP_NAME, addPopButton = false, actions = {
             OnlineUsersIcon { nav.pushMediaView(it, false) }
             if (Main.wasLaunchedInDebug)
                 IconButton(onClick = { nav.push(FontSizeView()) }, content = { Icon(Icons.Filled.QuestionMark, null) })
