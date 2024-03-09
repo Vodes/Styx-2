@@ -39,7 +39,7 @@ object Files {
         return File(getMpvDir(), "portable_config")
     }
 
-    fun cleanUpLegacyData() {
+    private fun cleanUpLegacyData() {
         val imageDir = File(getAppDir(), "Images")
         if (imageDir.exists() && imageDir.isDirectory) {
             runCatching { imageDir.deleteRecursively() }
@@ -49,6 +49,15 @@ object Files {
             runCatching {
                 oldChangesJson.delete()
                 File(getAppDir(), "Data").deleteRecursively()
+            }
+        }
+        val logsDir = File(getAppDir(), "Logs")
+        if (logsDir.exists()) {
+            val files = logsDir.walkTopDown().sorted().filter { it.isFile }.toList()
+            if (files.size > 25) {
+                files.take(files.size - 10).forEach {
+                    runCatching { it.delete() }
+                }
             }
         }
     }
