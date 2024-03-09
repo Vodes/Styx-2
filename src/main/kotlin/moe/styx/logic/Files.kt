@@ -5,6 +5,7 @@ import java.io.File
 object Files {
 
     fun getDataDir(): File {
+        cleanUpLegacyData()
         return File(getAppDir(), "Data").also { it.mkdirs() }
     }
 
@@ -36,5 +37,19 @@ object Files {
 
     fun getMpvConfDir(): File {
         return File(getMpvDir(), "portable_config")
+    }
+
+    fun cleanUpLegacyData() {
+        val imageDir = File(getAppDir(), "Images")
+        if (imageDir.exists() && imageDir.isDirectory) {
+            runCatching { imageDir.deleteRecursively() }
+        }
+        val oldChangesJson = File(getAppDir(), "changes.json")
+        if (oldChangesJson.exists()) {
+            runCatching {
+                oldChangesJson.delete()
+                File(getAppDir(), "Data").deleteRecursively()
+            }
+        }
     }
 }
