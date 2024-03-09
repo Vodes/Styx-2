@@ -14,8 +14,10 @@ import moe.styx.Styx__.BuildConfig
 import moe.styx.common.compose.files.Storage
 import moe.styx.common.compose.utils.LocalGlobalNavigator
 import moe.styx.common.compose.utils.ServerStatus
+import moe.styx.common.isWindows
 import moe.styx.components.MainScaffold
 import moe.styx.logic.utils.MpvUtils
+import moe.styx.logic.utils.downloadNewInstaller
 import moe.styx.logic.utils.isUpToDate
 import moe.styx.views.anime.AnimeOverview
 import java.awt.Desktop
@@ -29,6 +31,8 @@ class LoadingView : Screen {
         val progress = Storage.loadingProgress.collectAsState()
 
         if (ServerStatus.lastKnown != ServerStatus.UNKNOWN && !isUpToDate()) {
+            if (isWindows())
+                downloadNewInstaller()
             OutdatedVersion()
             return
         }
@@ -60,11 +64,19 @@ class LoadingView : Screen {
 fun OutdatedVersion() {
     MainScaffold(title = "Outdated", addPopButton = false) {
         Column(Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
+            var modifier = Modifier.padding(10.dp)
+            if (!isWindows())
+                modifier = modifier.weight(1f)
             Text(
-                "This version of Styx is outdated.\nPlease update.",
-                Modifier.padding(10.dp).weight(1f),
+                "This version of Styx is outdated.",
+                modifier,
                 style = MaterialTheme.typography.headlineMedium
             )
+            if (isWindows())
+                Text(
+                    "Attempting to download the new version automatically. Please wait a bit. If nothing happens, feel free to do it manually below.",
+                    Modifier.weight(1f).padding(16.dp)
+                )
             Button({
                 if (Desktop.isDesktopSupported())
                     Desktop.getDesktop().browse(URI(BuildConfig.SITE_URL))

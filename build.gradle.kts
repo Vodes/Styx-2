@@ -10,7 +10,7 @@ plugins {
 }
 
 group = "moe.styx"
-version = "0.0.4"
+version = "0.0.5"
 
 repositories {
     google()
@@ -35,7 +35,7 @@ dependencies {
     implementation("com.github.caoimhebyrne:KDiscordIPC:0.2.2")
 
     // Styx
-    implementation("moe.styx:styx-common-compose-jvm:04080dbd")
+    implementation("moe.styx:styx-common-compose-jvm:0.0.3")
 }
 
 tasks.withType<KotlinCompile> {

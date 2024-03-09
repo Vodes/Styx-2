@@ -60,5 +60,9 @@ object Files {
                 }
             }
         }
+        val installerFiles = getAppDir().listFiles()?.toList() ?: emptyList()
+        installerFiles.filter { it.name.contains(".msi", true) }.forEach {
+            runCatching { it.delete() }
+        }
     }
 }
