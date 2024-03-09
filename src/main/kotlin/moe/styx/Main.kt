@@ -16,6 +16,7 @@ import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.transitions.SlideTransition
 import com.russhwolf.settings.get
 import io.kamel.image.config.LocalKamelConfig
+import kotlinx.coroutines.delay
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
@@ -34,8 +35,10 @@ import moe.styx.common.compose.utils.Log
 import moe.styx.common.compose.utils.ServerStatus
 import moe.styx.common.extension.formattedStrFile
 import moe.styx.common.http.getHttpClient
+import moe.styx.common.util.launchGlobal
 import moe.styx.logic.DiscordRPC
 import moe.styx.logic.data.DataManager
+import moe.styx.logic.runner.currentPlayer
 import moe.styx.theme.*
 import moe.styx.views.login.LoginView
 import moe.styx.views.login.OfflineView
@@ -80,6 +83,15 @@ fun main(args: Array<String>) = application {
     }
     RequestQueue.start()
     Heartbeats.start()
+
+    launchGlobal {
+        while (true) {
+            delay(3000)
+            DiscordRPC.updateActivity()
+            if (currentPlayer == null)
+                Heartbeats.mediaActivity = null
+        }
+    }
 
     isUiModeDark.value = settings["darkmode", true]
     val darkMode by remember { isUiModeDark }

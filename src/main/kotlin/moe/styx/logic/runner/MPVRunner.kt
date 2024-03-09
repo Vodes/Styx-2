@@ -9,9 +9,11 @@ import moe.styx.common.compose.files.Storage
 import moe.styx.common.compose.http.Endpoints
 import moe.styx.common.compose.http.login
 import moe.styx.common.compose.settings
+import moe.styx.common.compose.threads.Heartbeats
 import moe.styx.common.compose.threads.RequestQueue
 import moe.styx.common.compose.utils.Log
 import moe.styx.common.compose.utils.MpvPreferences
+import moe.styx.common.data.MediaActivity
 import moe.styx.common.data.MediaEntry
 import moe.styx.common.data.MediaWatched
 import moe.styx.common.extension.currentUnixSeconds
@@ -282,6 +284,10 @@ data class MpvStatus(
                 }
                 current = new
             }
+            Heartbeats.mediaActivity = if (currentPlayer != null && current.file.isNotEmpty() && current.percentage > -1)
+                MediaActivity(current.file, current.seconds.toLong(), !current.paused)
+            else null
+
             if (Main.wasLaunchedInDebug)
                 println(current)
             if (shouldAutoplay)
