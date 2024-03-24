@@ -2,9 +2,9 @@ import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    kotlin("jvm") version "1.9.22"
-    id("org.jetbrains.compose") version "1.6.0"
-    id("org.jetbrains.kotlin.plugin.serialization") version "1.9.22"
+    kotlin("jvm") version "1.9.23"
+    id("org.jetbrains.compose") version "1.6.1"
+    id("org.jetbrains.kotlin.plugin.serialization") version "1.9.23"
     id("com.github.gmazzo.buildconfig") version "5.3.5"
     id("org.ajoberstar.grgit") version "5.2.1"
 }
@@ -35,7 +35,7 @@ dependencies {
     implementation("com.github.caoimhebyrne:KDiscordIPC:0.2.2")
 
     // Styx
-    implementation("moe.styx:styx-common-compose-jvm:0.0.3")
+    implementation("moe.styx:styx-common-compose-jvm:41e2ce86")
 }
 
 tasks.withType<KotlinCompile> {

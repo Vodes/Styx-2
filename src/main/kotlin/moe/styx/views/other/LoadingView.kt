@@ -31,7 +31,7 @@ class LoadingView : Screen {
         val progress = Storage.loadingProgress.collectAsState()
 
         if (ServerStatus.lastKnown != ServerStatus.UNKNOWN && !isUpToDate()) {
-            if (isWindows())
+            if (isWindows)
                 downloadNewInstaller()
             OutdatedVersion()
             return
@@ -65,14 +65,14 @@ fun OutdatedVersion() {
     MainScaffold(title = "Outdated", addPopButton = false) {
         Column(Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
             var modifier = Modifier.padding(10.dp)
-            if (!isWindows())
+            if (!isWindows)
                 modifier = modifier.weight(1f)
             Text(
                 "This version of Styx is outdated.",
                 modifier,
                 style = MaterialTheme.typography.headlineMedium
             )
-            if (isWindows())
+            if (isWindows)
                 Text(
                     "Attempting to download the new version automatically. Please wait a bit. If nothing happens, feel free to do it manually below.",
                     Modifier.weight(1f).padding(16.dp)

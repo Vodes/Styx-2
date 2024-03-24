@@ -1,6 +1,7 @@
 package moe.styx.logic.runner
 
 import com.russhwolf.settings.get
+import io.github.xxfast.kstore.extensions.getOrEmpty
 import kotlinx.coroutines.*
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
@@ -34,7 +35,8 @@ fun launchMPV(entry: MediaEntry, append: Boolean, onFail: (String) -> Unit = {},
             if (processCode > 0) {
                 onFail("Playback ended with a bad status code:\n$processCode")
             } else {
-                val currentEntry = Storage.entryList.find { MpvStatus.current.file eqI it.GUID }
+                val currentEntry =
+                    runBlocking { Storage.stores.entryStore.getOrEmpty() }.find { MpvStatus.current.file eqI it.GUID }
                 if (MpvStatus.current.file.isNotBlank() && currentEntry != null && MpvStatus.current.seconds > 5) {
                     val watched = MediaWatched(
                         currentEntry.GUID,
@@ -59,7 +61,6 @@ fun launchMPV(entry: MediaEntry, append: Boolean, onFail: (String) -> Unit = {},
 
 class MpvInstance {
     private lateinit var process: Process
-    private val isWindows = isWindows()
     private val tryFlatpak = settings["mpv-flatpak", false]
     private val instanceJob = Job()
     private var firstPrint = true
@@ -122,7 +123,7 @@ class MpvInstance {
             commands.add("--profile=${pref.getPlatformProfile()}")
         }
 
-        val watched = Storage.watchedList.find { it.entryID eqI mediaEntry.GUID }
+        val watched = runBlocking { Storage.stores.watchedStore.getOrEmpty() }.find { it.entryID eqI mediaEntry.GUID }
         if (watched != null && watched.progress > 5)
             commands.add("--start=${watched.progress - 5}")
 
@@ -268,7 +269,7 @@ data class MpvStatus(
             )
             if (new.isAvailable()) {
                 if (current.isAvailable() && !current.file.trim().equals(new.file.trim(), true)) {
-                    val previousEntry = Storage.entryList.find { current.file eqI it.GUID }
+                    val previousEntry = runBlocking { Storage.stores.entryStore.getOrEmpty() }.find { current.file eqI it.GUID }
                     if (previousEntry != null && current.seconds > 5) {
                         val watched = MediaWatched(
                             previousEntry.GUID,
@@ -309,8 +310,8 @@ data class MpvStatus(
 }
 
 fun attemptPlayNext() {
-    val entryList = Storage.entryList
-    val mediaList = Storage.mediaList
+    val entryList = runBlocking { Storage.stores.entryStore.getOrEmpty() }
+    val mediaList = runBlocking { Storage.stores.mediaStore.getOrEmpty() }
 
     val entry = entryList.find { it.GUID == MpvStatus.current.file } ?: return
     val parentMedia = mediaList.find { it.GUID == entry.mediaID } ?: return

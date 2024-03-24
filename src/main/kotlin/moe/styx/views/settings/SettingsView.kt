@@ -14,11 +14,15 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.navigator.Navigator
+import com.russhwolf.settings.get
+import com.russhwolf.settings.set
 import moe.styx.Main.isUiModeDark
-import moe.styx.common.compose.components.misc.SettingsCheckbox
+import moe.styx.common.compose.components.misc.Toggles
+import moe.styx.common.compose.components.misc.Toggles.settingsContainer
 import moe.styx.common.compose.extensions.SimpleTab
 import moe.styx.common.compose.http.isLoggedIn
 import moe.styx.common.compose.http.login
+import moe.styx.common.compose.settings
 import moe.styx.common.compose.utils.LocalGlobalNavigator
 import moe.styx.common.compose.utils.ServerStatus
 import moe.styx.components.misc.MpvVersionAndDownload
@@ -36,48 +40,78 @@ class SettingsView : SimpleTab("Settings", Icons.Default.Settings) {
         val scrollState = rememberScrollState(0)
         Column(Modifier.fillMaxSize().padding(5.dp)) {
             Column(Modifier.padding(5.dp).weight(1F).verticalScroll(scrollState, true)) {
-                Text("Layout Options", modifier = Modifier.padding(5.dp), style = MaterialTheme.typography.titleLarge)
-                SettingsCheckbox("Darkmode", "darkmode", darkMode, onUpdate = { darkMode = it })
-                SettingsCheckbox("Show Names by default", "display-names", false)
-
-                SettingsCheckbox("Show episode summaries", "display-ep-synopsis", false)
-                SettingsCheckbox("Prefer german titles and summaries", "prefer-german-metadata", false)
-
-                Divider(Modifier.padding(5.dp), thickness = 2.dp)
-                SettingsCheckbox("Use list for shows", "shows-list", false)
-                SettingsCheckbox("Use list for movies", "movies-list", false)
-                SettingsCheckbox("Sort episodes ascendingly", "episode-asc", false)
-                HorizontalDivider(Modifier.padding(5.dp), thickness = 2.dp)
-                Row {
-                    SettingsCheckbox(
-                        "Discord RPC", "discord-rpc", true
-                    ) {
-                        if (it && !DiscordRPC.isStarted())
-                            DiscordRPC.start()
-                        else if (!it && DiscordRPC.isStarted()) {
-                            DiscordRPC.clearActivity()
-                        }
+                Column(Modifier.settingsContainer()) {
+                    Text("Layout Options", modifier = Modifier.padding(10.dp, 7.dp), style = MaterialTheme.typography.titleLarge)
+                    Toggles.ContainerSwitch("Darkmode", value = darkMode) { darkMode = it }
+                    Toggles.ContainerSwitch("Show Names by default", value = settings["display-names", false]) { settings["display-names"] = it }
+                    Toggles.ContainerSwitch(
+                        "Show episode summaries",
+                        value = settings["display-ep-synopsis", false]
+                    ) { settings["display-ep-synopsis"] = it }
+                    Toggles.ContainerSwitch(
+                        "Prefer german titles and summaries",
+                        value = settings["prefer-german-metadata", false]
+                    ) { settings["prefer-german-metadata"] = it }
+                    Row(Modifier.fillMaxWidth()) {
+                        Toggles.ContainerSwitch(
+                            "Use list for shows",
+                            modifier = Modifier.weight(1f),
+                            value = settings["shows-list", false],
+                            paddingValues = Toggles.rowStartPadding
+                        ) { settings["shows-list"] = it }
+                        Toggles.ContainerSwitch(
+                            "Use list for movies",
+                            modifier = Modifier.weight(1f),
+                            value = settings["movies-list", false],
+                            paddingValues = Toggles.rowEndPadding
+                        ) { settings["movies-list"] = it }
                     }
-                    SettingsCheckbox("Show RPC when idle", "discord-rpc-idle", true)
+                    Toggles.ContainerSwitch(
+                        "Sort episodes ascendingly",
+                        value = settings["episode-asc", false],
+                        paddingValues = Toggles.colEndPadding
+                    ) { settings["episode-asc"] = it }
                 }
-                Text(
-                    "Show Styx (& what you're watching) on your discord activity.",
-                    Modifier.padding(12.dp, 2.dp, 0.dp, 6.dp),
-                    style = MaterialTheme.typography.bodySmall
-                )
-                Divider(Modifier.padding(5.dp), thickness = 2.dp)
+                Column(Modifier.settingsContainer()) {
+                    Text("Discord", modifier = Modifier.padding(10.dp, 7.dp), style = MaterialTheme.typography.titleLarge)
 
-                Text("MPV Options", style = MaterialTheme.typography.titleLarge, modifier = Modifier.padding(5.dp))
-                Button({ nav.push(MpvConfigView()) }, Modifier.padding(5.dp, 4.dp)) {
-                    Text("Open Mpv Configuration")
+                    Row(Modifier.fillMaxWidth().height(IntrinsicSize.Max)) {
+                        Toggles.ContainerSwitch(
+                            "Enable RPC",
+                            modifier = Modifier.weight(1f).fillMaxHeight(),
+                            value = settings["discord-rpc", true],
+                            paddingValues = Toggles.rowStartPadding
+                        ) {
+                            settings["discord-rpc"] = it
+                            if (it && !DiscordRPC.isStarted())
+                                DiscordRPC.start()
+                            else if (!it && DiscordRPC.isStarted()) {
+                                DiscordRPC.clearActivity()
+                            }
+                        }
+
+                        Toggles.ContainerSwitch(
+                            "Show RPC when Idle",
+                            "Disabling this means the discord status will only show while you're watching something.",
+                            value = settings["discord-rpc-idle", true], modifier = Modifier.weight(1f), paddingValues = Toggles.rowEndPadding
+                        ) { settings["discord-rpc-idle"] = it }
+                    }
+                    Spacer(Modifier.height(5.dp))
                 }
-                MpvVersionAndDownload()
+                Column(Modifier.settingsContainer()) {
+                    Text("MPV Options", style = MaterialTheme.typography.titleLarge, modifier = Modifier.padding(10.dp, 7.dp))
+                    Button({ nav.push(MpvConfigView()) }, Modifier.padding(8.dp, 4.dp)) {
+                        Text("Open Mpv Configuration")
+                    }
+                    MpvVersionAndDownload()
+                }
             }
             HorizontalDivider(Modifier.padding(5.dp), thickness = 2.dp)
             LoggedInComponent(nav)
         }
     }
 }
+
 
 @Composable
 fun LoggedInComponent(nav: Navigator) {

@@ -23,7 +23,7 @@ fun MpvVersionAndDownload() {
             delay(400)
         }
     }
-    Column(Modifier.padding(7.dp)) {
+    Column(Modifier.padding(9.dp, 7.dp)) {
         Text("Local version: ${currentVersion.split("mpv-").getOrNull(1)?.removeSuffix(".zip") ?: currentVersion}")
         if (downloading) {
             Text("Is downloading", color = MaterialTheme.colorScheme.secondary)
