@@ -6,7 +6,9 @@ import dev.cbyrne.kdiscordipc.core.event.impl.DisconnectedEvent
 import dev.cbyrne.kdiscordipc.core.event.impl.ErrorEvent
 import dev.cbyrne.kdiscordipc.core.event.impl.ReadyEvent
 import dev.cbyrne.kdiscordipc.data.activity.*
+import io.github.xxfast.kstore.extensions.getOrEmpty
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import moe.styx.Styx__.BuildConfig
 import moe.styx.common.compose.extensions.getThumb
 import moe.styx.common.compose.extensions.getURL
@@ -64,8 +66,9 @@ object DiscordRPC {
         val mediaActivity = if (currentPlayer != null && MpvStatus.current.file.isNotEmpty() && MpvStatus.current.percentage > -1)
             MediaActivity(MpvStatus.current.file, MpvStatus.current.seconds.toLong(), !MpvStatus.current.paused)
         else null
-        val entry = mediaActivity?.let { act -> Storage.entryList.find { it.GUID eqI act.mediaEntry } }
-        val media = entry?.let { ent -> Storage.mediaList.find { it.GUID eqI ent.mediaID } }
+        val entry = mediaActivity?.let { act -> runBlocking { Storage.stores.entryStore.getOrEmpty() }.find { it.GUID eqI act.mediaEntry } }
+        val media = entry?.let { ent -> runBlocking { Storage.stores.mediaStore.getOrEmpty() }.find { it.GUID eqI ent.mediaID } }
+//        val media = entry?.let { ent -> Storage.mediaList.find { it.GUID eqI ent.mediaID } }
         ipc!!.scope.launch {
             if (errored)
                 return@launch
