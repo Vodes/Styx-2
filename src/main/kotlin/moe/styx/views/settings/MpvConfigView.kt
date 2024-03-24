@@ -11,13 +11,13 @@ import cafe.adriel.voyager.core.screen.Screen
 import com.russhwolf.settings.get
 import com.russhwolf.settings.set
 import kotlinx.serialization.encodeToString
+import moe.styx.common.compose.components.layout.MainScaffold
 import moe.styx.common.compose.components.misc.Toggles
 import moe.styx.common.compose.components.misc.Toggles.settingsContainer
 import moe.styx.common.compose.settings
 import moe.styx.common.compose.utils.*
 import moe.styx.common.isWindows
 import moe.styx.common.json
-import moe.styx.components.MainScaffold
 import moe.styx.logic.utils.generateNewConfig
 
 class MpvConfigView : Screen {

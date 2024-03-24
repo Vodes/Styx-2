@@ -14,11 +14,11 @@ import kotlinx.coroutines.runBlocking
 import moe.styx.Main
 import moe.styx.Styx__.BuildConfig
 import moe.styx.common.compose.components.buttons.IconButtonWithTooltip
+import moe.styx.common.compose.components.layout.MainScaffold
 import moe.styx.common.compose.components.misc.OnlineUsersIcon
 import moe.styx.common.compose.files.Storage
 import moe.styx.common.compose.utils.LocalGlobalNavigator
 import moe.styx.common.data.Changes
-import moe.styx.components.MainScaffold
 import moe.styx.logic.utils.pushMediaView
 import moe.styx.views.*
 import moe.styx.views.other.FontSizeView

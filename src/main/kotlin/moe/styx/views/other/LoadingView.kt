@@ -11,11 +11,11 @@ import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import kotlinx.coroutines.delay
 import moe.styx.Styx__.BuildConfig
+import moe.styx.common.compose.components.layout.MainScaffold
 import moe.styx.common.compose.files.Storage
 import moe.styx.common.compose.utils.LocalGlobalNavigator
 import moe.styx.common.compose.utils.ServerStatus
 import moe.styx.common.isWindows
-import moe.styx.components.MainScaffold
 import moe.styx.logic.utils.MpvUtils
 import moe.styx.logic.utils.downloadNewInstaller
 import moe.styx.logic.utils.isUpToDate

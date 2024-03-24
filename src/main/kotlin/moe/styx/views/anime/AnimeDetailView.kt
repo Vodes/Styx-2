@@ -19,6 +19,7 @@ import cafe.adriel.voyager.core.screen.ScreenKey
 import com.russhwolf.settings.get
 import moe.styx.common.compose.components.anime.*
 import moe.styx.common.compose.components.buttons.FavouriteIconButton
+import moe.styx.common.compose.components.layout.MainScaffold
 import moe.styx.common.compose.components.misc.OnlineUsersIcon
 import moe.styx.common.compose.extensions.getPainter
 import moe.styx.common.compose.extensions.getThumb
@@ -30,7 +31,6 @@ import moe.styx.common.compose.utils.LocalGlobalNavigator
 import moe.styx.common.data.Media
 import moe.styx.common.data.MediaEntry
 import moe.styx.common.extension.eqI
-import moe.styx.components.MainScaffold
 import moe.styx.components.anime.AppendDialog
 import moe.styx.components.anime.BigScalingCardImage
 import moe.styx.components.anime.FailedDialog
