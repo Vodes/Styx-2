@@ -65,6 +65,7 @@ class MpvConfigView : Screen {
                         Toggles.ContainerSwitch(
                             "Prefer English dub", value = preferences.preferEnDub,
                         ) { preferences = preferences.copy(preferEnDub = it) }
+                        Spacer(Modifier.height(3.dp))
                     }
 
                     Column(Modifier.settingsContainer()) {

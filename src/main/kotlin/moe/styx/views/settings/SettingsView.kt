@@ -43,7 +43,7 @@ class SettingsView : SimpleTab("Settings", Icons.Default.Settings) {
                 Column(Modifier.settingsContainer()) {
                     Text("Layout Options", modifier = Modifier.padding(10.dp, 7.dp), style = MaterialTheme.typography.titleLarge)
                     Toggles.ContainerSwitch("Darkmode", value = darkMode) { darkMode = it }
-                    Toggles.ContainerSwitch("Show Names by default", value = settings["display-names", false]) { settings["display-names"] = it }
+                    Toggles.ContainerSwitch("Show names by default", value = settings["display-names", false]) { settings["display-names"] = it }
                     Toggles.ContainerSwitch(
                         "Show episode summaries",
                         value = settings["display-ep-synopsis", false]
@@ -91,7 +91,7 @@ class SettingsView : SimpleTab("Settings", Icons.Default.Settings) {
                         }
 
                         Toggles.ContainerSwitch(
-                            "Show RPC when Idle",
+                            "Show RPC when idle",
                             "Disabling this means the discord status will only show while you're watching something.",
                             value = settings["discord-rpc-idle", true], modifier = Modifier.weight(1f), paddingValues = Toggles.rowEndPadding
                         ) { settings["discord-rpc-idle"] = it }

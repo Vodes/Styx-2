@@ -245,7 +245,7 @@ data class MpvStatus(
 
             var shouldAutoplay = percent == 100 && eof && playlistCurrent + 1 == playlistSize
 
-            if (!was100 && shouldAutoplay && settings["mpv-play-next", true]) {
+            if (!was100 && shouldAutoplay) {
                 was100 = true
                 shouldAutoplay = true
             } else {

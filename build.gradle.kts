@@ -35,7 +35,7 @@ dependencies {
     implementation("com.github.caoimhebyrne:KDiscordIPC:0.2.2")
 
     // Styx
-    implementation("moe.styx:styx-common-compose-jvm:41e2ce86")
+    implementation("moe.styx:styx-common-compose-jvm:0.0.4")
 }
 
 tasks.withType<KotlinCompile> {
