@@ -69,7 +69,6 @@ object DiscordRPC {
         else null
         val entry = mediaActivity?.let { act -> runBlocking { Storage.stores.entryStore.getOrEmpty() }.find { it.GUID eqI act.mediaEntry } }
         val media = entry?.let { ent -> runBlocking { Storage.stores.mediaStore.getOrEmpty() }.find { it.GUID eqI ent.mediaID } }
-//        val media = entry?.let { ent -> Storage.mediaList.find { it.GUID eqI ent.mediaID } }
         ipc!!.scope.launch {
             if (errored)
                 return@launch
