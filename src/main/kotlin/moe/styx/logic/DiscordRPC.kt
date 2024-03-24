@@ -18,6 +18,7 @@ import moe.styx.common.compose.utils.Log
 import moe.styx.common.data.MediaActivity
 import moe.styx.common.extension.currentUnixSeconds
 import moe.styx.common.extension.eqI
+import moe.styx.common.extension.toBoolean
 import moe.styx.common.util.launchGlobal
 import moe.styx.logic.runner.MpvStatus
 import moe.styx.logic.runner.currentPlayer
@@ -85,7 +86,10 @@ object DiscordRPC {
                         }
                         return@let
                     }
-                    it.activityManager.setActivity(if (mediaActivity.playing) "Watching" else "Paused", "${media.name} - ${entry.entryNumber}") {
+                    it.activityManager.setActivity(
+                        if (mediaActivity.playing) "Watching" else "Paused",
+                        media.name + if (media.isSeries.toBoolean()) " - ${entry.entryNumber}" else ""
+                    ) {
                         button("View on GitHub", "https://github.com/Vodes?tab=repositories&q=Styx&language=kotlin")
                         val image = media.getThumb()
                         if (mediaActivity.playing)
