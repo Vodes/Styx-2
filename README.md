@@ -22,13 +22,14 @@ The new native desktop client for yet another mediaserver stack.
 	<summary>Click here</summary>
 
  #### Search
- ![search](https://i.ibb.co/jLyzCvt/java-MZr-Msm-Msu-Q.webp)
- 
+ <img src="https://i.ibb.co/jLyzCvt/java-MZr-Msm-Msu-Q.webp" title="search" height="500" />
+
  #### Show detail view
- ![detail view](https://i.ibb.co/9ZsfxCV/java-Eo-VTH9-B4-Qg.webp)
+ <img src="https://i.ibb.co/9ZsfxCV/java-Eo-VTH9-B4-Qg.webp" title="detail view" height="500" />
 
  #### Settings
- ![settings](https://i.ibb.co/xLvHqVK/java-NSb-QJld4qg.webp)
+ <img src="https://i.ibb.co/xLvHqVK/java-NSb-QJld4qg.webp" title="settings" height="500" />
+ 
 </details>
 
 ## How do I use this?
