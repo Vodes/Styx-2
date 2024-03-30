@@ -50,7 +50,10 @@ fun downloadNewInstaller() = launchGlobal {
         runCatching { outChannel.close() }
         if (Desktop.isDesktopSupported() && outFile.exists() && outFile.length() > 100) {
             delay(1500L)
+            Desktop.getDesktop().open(outFile.parentFile)
+            delay(500L)
             Desktop.getDesktop().open(outFile)
+            delay(1000L)
             exitProcess(0)
         }
     }

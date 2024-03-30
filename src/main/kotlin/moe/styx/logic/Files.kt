@@ -1,5 +1,6 @@
 package moe.styx.logic
 
+import moe.styx.common.extension.currentUnixSeconds
 import java.io.File
 
 object Files {
@@ -60,9 +61,13 @@ object Files {
                 }
             }
         }
+        val currentMillis = currentUnixSeconds() * 1000
         val installerFiles = getAppDir().listFiles()?.toList() ?: emptyList()
-        installerFiles.filter { it.name.contains(".msi", true) }.forEach {
-            runCatching { it.delete() }
-        }
+        installerFiles
+            .filter { it.name.contains(".msi", true) }
+            .filter { (it.lastModified() - 30000) > currentMillis }
+            .forEach {
+                runCatching { it.delete() }
+            }
     }
 }
