@@ -2,6 +2,8 @@ package moe.styx.views.login
 
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -11,12 +13,15 @@ import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import kotlinx.coroutines.delay
 import moe.styx.Styx__.BuildConfig
+import moe.styx.common.compose.components.buttons.IconButtonWithTooltip
 import moe.styx.common.compose.http.checkLogin
 import moe.styx.common.compose.http.generateCode
 import moe.styx.common.compose.http.isLoggedIn
 import moe.styx.common.compose.utils.LocalGlobalNavigator
 import moe.styx.views.other.LoadingView
 import java.awt.Desktop
+import java.awt.Toolkit
+import java.awt.datatransfer.StringSelection
 import java.net.URI
 
 class LoginView() : Screen {
@@ -58,11 +63,20 @@ class LoginView() : Screen {
                     style = MaterialTheme.typography.titleLarge
                 )
 
-                Text(
-                    creationResponse?.let { "${it.code}" } ?: "Failed to request code",
-                    Modifier.align(Alignment.CenterHorizontally).padding(0.dp, 10.dp),
-                    style = MaterialTheme.typography.headlineLarge.copy(fontWeight = FontWeight.Bold)
-                )
+                Row(Modifier.align(Alignment.CenterHorizontally), verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        creationResponse?.let { "${it.code}" } ?: "Failed to request code",
+                        Modifier.padding(0.dp, 10.dp),
+                        style = MaterialTheme.typography.headlineLarge.copy(fontWeight = FontWeight.Bold)
+                    )
+                    creationResponse?.let {
+                        IconButtonWithTooltip(Icons.Default.ContentCopy, "Copy code") {
+                            val clipboard = Toolkit.getDefaultToolkit().systemClipboard
+                            val content = StringSelection(it.code.toString())
+                            clipboard.setContents(content, content)
+                        }
+                    }
+                }
 
                 CircularProgressIndicator(
                     progress = { progressAnimation },
