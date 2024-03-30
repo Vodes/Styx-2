@@ -28,13 +28,14 @@ import moe.styx.common.compose.appConfig
 import moe.styx.common.compose.extensions.kamelConfig
 import moe.styx.common.compose.http.*
 import moe.styx.common.compose.settings
+import moe.styx.common.compose.threads.DownloadQueue
 import moe.styx.common.compose.threads.Heartbeats
 import moe.styx.common.compose.threads.RequestQueue
 import moe.styx.common.compose.utils.LocalGlobalNavigator
-import moe.styx.common.compose.utils.Log
 import moe.styx.common.compose.utils.ServerStatus
 import moe.styx.common.extension.formattedStrFile
 import moe.styx.common.http.getHttpClient
+import moe.styx.common.util.Log
 import moe.styx.common.util.launchGlobal
 import moe.styx.logic.DiscordRPC
 import moe.styx.logic.Files
@@ -83,6 +84,7 @@ fun main(args: Array<String>) = application {
     }
     RequestQueue.start()
     Heartbeats.start()
+    DownloadQueue.start()
 
     launchGlobal {
         while (true) {

@@ -11,11 +11,11 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import moe.styx.common.compose.http.Endpoints
 import moe.styx.common.compose.settings
-import moe.styx.common.compose.utils.Log
 import moe.styx.common.compose.utils.MpvPreferences
 import moe.styx.common.compose.utils.ServerStatus
 import moe.styx.common.extension.eqI
 import moe.styx.common.http.httpClient
+import moe.styx.common.util.Log
 import moe.styx.common.util.launchGlobal
 import moe.styx.logic.Files
 import net.lingala.zip4j.ZipFile

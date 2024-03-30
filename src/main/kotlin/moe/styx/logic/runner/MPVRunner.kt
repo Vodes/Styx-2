@@ -12,7 +12,6 @@ import moe.styx.common.compose.http.login
 import moe.styx.common.compose.settings
 import moe.styx.common.compose.threads.Heartbeats
 import moe.styx.common.compose.threads.RequestQueue
-import moe.styx.common.compose.utils.Log
 import moe.styx.common.compose.utils.MpvPreferences
 import moe.styx.common.data.MediaActivity
 import moe.styx.common.data.MediaEntry
@@ -21,6 +20,7 @@ import moe.styx.common.extension.currentUnixSeconds
 import moe.styx.common.extension.eqI
 import moe.styx.common.isWindows
 import moe.styx.common.json
+import moe.styx.common.util.Log
 import moe.styx.common.util.launchThreaded
 import moe.styx.logic.Files
 import java.io.*
@@ -100,21 +100,22 @@ class MpvInstance {
             currentPlayer = null
             return false
         }
-        if (login == null || login!!.watchToken.isBlank()) {
+        val downloadedEntry = runBlocking { Storage.stores.downloadedStore.getOrEmpty() }.find { it.entryID eqI mediaEntry.GUID }
+        val uri = downloadedEntry?.path ?: "${Endpoints.WATCH.url}/${mediaEntry.GUID}?token=${login?.watchToken}"
+        if ((login == null || login!!.watchToken.isBlank()) && downloadedEntry == null) {
             onFail("You are not logged in right now.")
             currentPlayer = null
             return false
         }
-        val url = "${Endpoints.WATCH.url}/${mediaEntry.GUID}?token=${login!!.watchToken}"
         val pipe = if (isWindows) """--input-ipc-server=\\.\pipe\styx-mpvsocket""" else "--input-ipc-server=/tmp/styx-mpvsocket"
         val commands = if (!isWindows && tryFlatpak) mutableListOf(
             mpvExecutable.absolutePath,
             "run",
             "io.mpv.Mpv",
-            url,
+            uri,
             pipe,
             "--keep-open=yes"
-        ) else mutableListOf(mpvExecutable.absolutePath, url, pipe, "--keep-open=yes")
+        ) else mutableListOf(mpvExecutable.absolutePath, uri, pipe, "--keep-open=yes")
         val pref = MpvPreferences.getOrDefault()
         commands.add("-slang=${pref.getSlangArg()}")
         commands.add("-alang=${pref.getAlangArg()}")
@@ -176,10 +177,12 @@ class MpvInstance {
 
     fun play(mediaEntry: MediaEntry, append: Boolean = true): Boolean {
         val current = MpvStatus.current.copy()
-        val url = "${Endpoints.WATCH.url}/${mediaEntry.GUID}?token=${login!!.watchToken}"
+        val downloadedEntry = runBlocking { Storage.stores.downloadedStore.getOrEmpty() }.find { it.entryID eqI mediaEntry.GUID }
+        val uri = downloadedEntry?.okioPath?.normalized()?.toString()?.replace("\\", "\\\\")
+            ?: "${Endpoints.WATCH.url}/${mediaEntry.GUID}?token=${login?.watchToken}"
         val appendType = if (current.percentage == 100 && current.eof) "append-play" else "append"
         val options = if (append) " $appendType" else ""
-        val loaded = runCommand("loadfile \"$url\"$options")
+        val loaded = runCommand("loadfile \"$uri\"$options")
         if (loaded) {
             if (current.percentage == 100 && (current.paused || current.eof))
                 runCommand("set pause no").also { return it }
@@ -236,7 +239,7 @@ data class MpvStatus(
             val obj = json.decodeFromString<Map<String, String>>(output)
 
             var path = obj["path"]
-            path = if (path.isNullOrBlank()) "" else path.split("?")[0]
+            path = if (path.isNullOrBlank()) "" else path.split("?")[0].split(".")[0]
 
             val percent = obj["pos-percent"]?.toIntOrNull() ?: -1
             val eof = obj["eof"]?.equals("yes") ?: false

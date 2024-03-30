@@ -14,11 +14,11 @@ import moe.styx.common.compose.extensions.getThumb
 import moe.styx.common.compose.extensions.getURL
 import moe.styx.common.compose.files.Storage
 import moe.styx.common.compose.settings
-import moe.styx.common.compose.utils.Log
 import moe.styx.common.data.MediaActivity
 import moe.styx.common.extension.currentUnixSeconds
 import moe.styx.common.extension.eqI
 import moe.styx.common.extension.toBoolean
+import moe.styx.common.util.Log
 import moe.styx.common.util.launchGlobal
 import moe.styx.logic.runner.MpvStatus
 import moe.styx.logic.runner.currentPlayer

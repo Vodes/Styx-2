@@ -15,6 +15,7 @@ version = "0.0.5"
 repositories {
     google()
     mavenCentral()
+    mavenLocal()
     maven("https://jitpack.io")
     maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
     maven("https://repo.styx.moe/releases")
@@ -33,9 +34,10 @@ dependencies {
     implementation("org.slf4j:slf4j-simple:2.0.9")
     implementation("net.lingala.zip4j:zip4j:2.11.5")
     implementation("com.github.caoimhebyrne:KDiscordIPC:0.2.2")
+    implementation("com.squareup.okio:okio:3.9.0")
 
     // Styx
-    implementation("moe.styx:styx-common-compose-jvm:0.0.4")
+    implementation("moe.styx:styx-common-compose-jvm:0.0.5")
 }
 
 tasks.withType<KotlinCompile> {
