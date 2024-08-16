@@ -1,6 +1,7 @@
 package moe.styx.logic.runner
 
 import com.russhwolf.settings.get
+import dev.cbyrne.kdiscordipc.core.socket.impl.UnixSocket
 import io.github.xxfast.kstore.extensions.getOrEmpty
 import kotlinx.coroutines.*
 import kotlinx.serialization.json.JsonObject
@@ -61,21 +62,28 @@ fun launchMPV(entry: MediaEntry, append: Boolean, onFail: (String) -> Unit = {},
 
 class MpvInstance {
     private lateinit var process: Process
+    private var socket: UnixSocket = UnixSocket()
     private val tryFlatpak = settings["mpv-flatpak", false]
     private val instanceJob = Job()
     private var firstPrint = true
     val execUpdate: () -> Unit = {}
 
-    private fun openSocket(): RandomAccessFile {
+    private fun openRandomAccessFile(): RandomAccessFile {
         val socket = File(if (isWindows) "\\\\.\\pipe\\styx-mpvsocket" else "/tmp/styx-mpvsocket")
         return RandomAccessFile(socket, "rw")
     }
 
     fun runCommand(command: String): Boolean {
         runCatching {
-            val socket = openSocket()
-            socket.write((command + "\n").toByteArray())
-            runCatching { socket.close() }
+            if (isWindows) {
+                val socket = openRandomAccessFile()
+                socket.write((command + "\n").toByteArray())
+                runCatching { socket.close() }
+            } else {
+                if (!socket.connected)
+                    socket.connect(File("/tmp/styx-mpvsocket"))
+                socket.write((command + "\n").toByteArray())
+            }
         }.onFailure { return false }
         return true
     }
@@ -86,7 +94,7 @@ class MpvInstance {
 
     fun start(mediaEntry: MediaEntry, onFail: (String) -> Unit = {}, execUpdate: () -> Unit = {}, onFinish: (Int) -> Unit = {}): Boolean {
         val systemMpv = settings["mpv-system", !isWindows]
-        val useConfigRegardless = settings["mpv-system-styx-conf", false]
+        val useConfigRegardless = settings["mpv-system-styx-conf", !isWindows]
         val mpvExecutable = if (systemMpv || !isWindows) {
             if (!isWindows && tryFlatpak)
                 getExecutableFromPath("flatpak")
