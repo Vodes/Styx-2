@@ -1,5 +1,4 @@
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     kotlin("jvm") version "1.9.23"
@@ -38,10 +37,6 @@ dependencies {
 
     // Styx
     implementation("moe.styx:styx-common-compose-jvm:0.0.5")
-}
-
-tasks.withType<KotlinCompile> {
-    kotlinOptions.jvmTarget = "17"
 }
 
 compose.desktop {
@@ -98,9 +93,12 @@ buildConfig {
     buildConfigField("SITE", siteURL.split("https://").getOrElse(1) { siteURL })
     buildConfigField("BUILD_TIME", (System.currentTimeMillis() / 1000))
     buildConfigField("VERSION_CHECK_URL", "https://raw.githubusercontent.com/Vodes/Styx-2/master/build.gradle.kts")
-    buildConfigField("DISCORD_CLIENT_ID", System.getenv("STYX_DISCORDCLIENT"))
+    buildConfigField("DISCORD_CLIENT_ID", "")//System.getenv("STYX_DISCORDCLIENT"))
 }
 
 kotlin {
-    jvmToolchain(17)
+    jvmToolchain {
+        languageVersion.set(JavaLanguageVersion.of(17))
+        vendor.set(JvmVendorSpec.JETBRAINS)
+    }
 }
