@@ -22,7 +22,7 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import moe.styx.Main.isUiModeDark
 import moe.styx.Main.setupLogFile
-import moe.styx.Styx__.BuildConfig
+import moe.styx.Styx_2.BuildConfig
 import moe.styx.common.compose.AppConfig
 import moe.styx.common.compose.appConfig
 import moe.styx.common.compose.extensions.kamelConfig
@@ -105,15 +105,16 @@ fun main(args: Array<String>) = application {
         icon = painterResource("icons/icon.ico")
     )
     {
+        val isLoggedIn = remember { isLoggedIn() }
         Log.i { "Compose window initialized with: ${this.window.renderApi}" }
         Log.i { "Starting ${BuildConfig.APP_NAME} v${BuildConfig.APP_VERSION}" }
         Surface(modifier = Modifier.fillMaxSize()) {
             MaterialTheme(
-                colorScheme = (if (darkMode) DarkColorScheme else LightColorScheme).transition(),
+                colorScheme = if (darkMode) darkScheme else lightScheme,
                 typography = AppTypography,
                 shapes = AppShapes
             ) {
-                val view = if (isLoggedIn()) {
+                val view = if (isLoggedIn) {
                     Log.i { "Logged in as: ${login?.name}" }
                     LoadingView()
                 } else {

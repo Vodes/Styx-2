@@ -12,7 +12,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import kotlinx.coroutines.delay
-import moe.styx.Styx__.BuildConfig
+import moe.styx.Styx_2.BuildConfig
 import moe.styx.common.compose.components.buttons.IconButtonWithTooltip
 import moe.styx.common.compose.http.checkLogin
 import moe.styx.common.compose.http.generateCode

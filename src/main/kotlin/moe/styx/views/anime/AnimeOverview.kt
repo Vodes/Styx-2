@@ -12,7 +12,7 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.tab.*
 import kotlinx.coroutines.runBlocking
 import moe.styx.Main
-import moe.styx.Styx__.BuildConfig
+import moe.styx.Styx_2.BuildConfig
 import moe.styx.common.compose.components.buttons.IconButtonWithTooltip
 import moe.styx.common.compose.components.layout.MainScaffold
 import moe.styx.common.compose.components.misc.OnlineUsersIcon

@@ -1,0 +1,23 @@
+[versions]
+kotlin = "2.0.21"
+compose = "1.7.0"
+styx-common-compose = "0.0.6-SNAPSHOT9"
+buildconfig = "5.4.0"
+slf4j-simple = "2.0.16"
+okio = "3.9.0"
+kdiscord-ipc = "0.2.2"
+zip4j = "2.11.5"
+
+[plugins]
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+compose = { id = "org.jetbrains.compose", version.ref = "compose" }
+compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+buildconfig = { id = "com.github.gmazzo.buildconfig", version.ref = "buildconfig" }
+
+[libraries]
+zip4j = { module = "net.lingala.zip4j:zip4j", version.ref = "zip4j" }
+kdiscord-ipc = { module = "com.github.caoimhebyrne:KDiscordIPC", version.ref = "kdiscord-ipc" }
+okio = { module = "com.squareup.okio:okio", version.ref = "okio" }
+slf4j-simple = { module = "org.slf4j:slf4j-simple", version.ref = "slf4j-simple" }
+styx-common-compose = { module = "moe.styx:styx-common-compose-jvm", version.ref = "styx-common-compose" }

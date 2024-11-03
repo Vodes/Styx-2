@@ -14,6 +14,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import cafe.adriel.voyager.core.model.rememberNavigatorScreenModel
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
 import com.russhwolf.settings.get
@@ -22,12 +23,12 @@ import moe.styx.common.compose.components.buttons.FavouriteIconButton
 import moe.styx.common.compose.components.layout.MainScaffold
 import moe.styx.common.compose.components.misc.OnlineUsersIcon
 import moe.styx.common.compose.extensions.getPainter
-import moe.styx.common.compose.extensions.getThumb
 import moe.styx.common.compose.files.Storage
 import moe.styx.common.compose.files.getCurrentAndCollectFlow
 import moe.styx.common.compose.settings
 import moe.styx.common.compose.threads.Heartbeats
 import moe.styx.common.compose.utils.LocalGlobalNavigator
+import moe.styx.common.data.Image
 import moe.styx.common.data.Media
 import moe.styx.common.data.MediaEntry
 import moe.styx.common.extension.eqI
@@ -38,6 +39,7 @@ import moe.styx.logic.runner.currentPlayer
 import moe.styx.logic.runner.launchMPV
 import moe.styx.logic.utils.*
 import moe.styx.theme.AppShapes
+import moe.styx.views.data.MainDataViewModel
 import moe.styx.views.settings.SettingsView
 import java.awt.Desktop
 import java.net.URI
@@ -51,22 +53,19 @@ class AnimeDetailView(private val mediaID: String) : Screen {
     @Composable
     override fun Content() {
         val nav = LocalGlobalNavigator.current
+        val sm = nav.rememberNavigatorScreenModel("main-vm") { MainDataViewModel() }
+        val storage by sm.storageFlow.collectAsState()
+        val mediaStorage = remember { sm.getMediaStorageForID(mediaID, storage) }
 
-        val mediaList by Storage.stores.mediaStore.getCurrentAndCollectFlow()
-        val media = remember { mediaList.find { it.GUID eqI mediaID } }
-        if (media == null) {
-            nav.pop()
-            return
-        }
-        val entries = fetchEntries(mediaID)
+        println("${mediaStorage.media.GUID} | ${mediaStorage.media.name}")
 
         val preferGerman = settings["prefer-german-metadata", false]
         val scrollState = rememberScrollState()
         val showSelection = remember { mutableStateOf(false) }
 
-        MainScaffold(title = media.name, actions = {
+        MainScaffold(title = mediaStorage.media.name, actions = {
             OnlineUsersIcon { nav.pushMediaView(it, true) }
-            FavouriteIconButton(media)
+            FavouriteIconButton(mediaStorage.media)
         }) {
             var failedToPlayMessage by remember { mutableStateOf("") }
             if (failedToPlayMessage.isNotBlank()) {
@@ -91,26 +90,32 @@ class AnimeDetailView(private val mediaID: String) : Screen {
             ) {
                 Row(Modifier.padding(5.dp).fillMaxSize()) {
                     Column(Modifier.fillMaxHeight().fillMaxWidth(.52F).verticalScroll(scrollState)) {
-                        StupidImageNameArea(media)
+                        StupidImageNameArea(mediaStorage.media to mediaStorage.image)
 
                         Spacer(Modifier.height(6.dp))
 
                         Text("About", Modifier.padding(6.dp, 2.dp), style = MaterialTheme.typography.titleLarge)
-                        MediaGenreListing(media)
-                        val synopsis = if (!media.synopsisDE.isNullOrBlank() && preferGerman) media.synopsisDE else media.synopsisEN
+                        MediaGenreListing(mediaStorage.media)
+                        val synopsis =
+                            if (!mediaStorage.media.synopsisDE.isNullOrBlank() && preferGerman) mediaStorage.media.synopsisDE else mediaStorage.media.synopsisEN
                         if (!synopsis.isNullOrBlank())
                             SelectionContainer {
                                 Text(synopsis.removeSomeHTMLTags(), Modifier.padding(6.dp), style = MaterialTheme.typography.bodyMedium)
                             }
 
-                        if (media.sequel != null || media.prequel != null) {
+                        if (mediaStorage.sequel != null || mediaStorage.prequel != null) {
                             HorizontalDivider(Modifier.fillMaxWidth().padding(0.dp, 4.dp, 0.dp, 2.dp), thickness = 2.dp)
-                            MediaRelations(media, mediaList) { nav.pushMediaView(it, true) }
+                            MediaRelations(mediaStorage.prequel to mediaStorage.prequelImage, mediaStorage.sequel to mediaStorage.sequelImage) {
+                                nav.pushMediaView(
+                                    it,
+                                    true
+                                )
+                            }
                         }
                     }
                     VerticalDivider(Modifier.fillMaxHeight().padding(6.dp), thickness = 3.dp)
 
-                    EpisodeList(entries, showSelection, SettingsView(), onPlay = { entry ->
+                    EpisodeList(mediaStorage.entries, showSelection, SettingsView(), onPlay = { entry ->
                         if (currentPlayer == null) {
                             launchMPV(entry, false, {
                                 failedToPlayMessage = it
@@ -127,15 +132,34 @@ class AnimeDetailView(private val mediaID: String) : Screen {
 }
 
 @Composable
+fun MediaRelations(prequel: Pair<Media?, Image?>, sequel: Pair<Media?, Image?>, onClick: (Media) -> Unit) {
+    Text("Relations", Modifier.padding(6.dp, 4.dp), style = MaterialTheme.typography.titleLarge)
+    Column(Modifier.padding(5.dp, 2.dp)) {
+        if (prequel.first != null && prequel.second != null) {
+            Column(Modifier.align(Alignment.Start)) {
+                Text("Prequel", Modifier.padding(4.dp, 5.dp, 4.dp, 6.dp), style = MaterialTheme.typography.bodyMedium)
+                AnimeListItem(prequel.first!! to prequel.second!!) { onClick(prequel.first!!) }
+            }
+        }
+        if (sequel.first != null && sequel.second != null) {
+            Column(Modifier.align(Alignment.Start)) {
+                Text("Sequel", Modifier.padding(4.dp, 5.dp, 4.dp, 6.dp), style = MaterialTheme.typography.bodyMedium)
+                AnimeListItem(sequel.first!! to sequel.second!!) { onClick(sequel.first!!) }
+            }
+        }
+    }
+}
+
+@Composable
 fun StupidImageNameArea(
-    media: Media,
+    mediaImagePair: Pair<Media, Image?>,
     dynamicMaxWidth: Dp = 760.dp,
     requiredWidth: Dp = 385.dp,
     requiredHeight: Dp = 535.dp,
     otherContent: @Composable () -> Unit = {}
 ) {
-    val img = media.getThumb()!!
-    val painter = img.getPainter()
+    val (media, img) = mediaImagePair
+    val painter = img?.getPainter()
     BoxWithConstraints {
         val width = this.maxWidth
         Row(Modifier.align(Alignment.TopStart).height(IntrinsicSize.Max).fillMaxWidth()) {

@@ -12,15 +12,20 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
+import cafe.adriel.voyager.core.model.rememberNavigatorScreenModel
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
 import com.russhwolf.settings.get
-import moe.styx.common.compose.components.anime.*
+import moe.styx.common.compose.components.anime.MediaGenreListing
+import moe.styx.common.compose.components.anime.MediaInfoDialog
+import moe.styx.common.compose.components.anime.WatchedIndicator
 import moe.styx.common.compose.components.buttons.FavouriteIconButton
 import moe.styx.common.compose.components.buttons.IconButtonWithTooltip
 import moe.styx.common.compose.components.layout.MainScaffold
 import moe.styx.common.compose.components.misc.OnlineUsersIcon
-import moe.styx.common.compose.files.*
+import moe.styx.common.compose.files.Storage
+import moe.styx.common.compose.files.collectWithEmptyInitial
+import moe.styx.common.compose.files.updateList
 import moe.styx.common.compose.http.login
 import moe.styx.common.compose.settings
 import moe.styx.common.compose.threads.DownloadQueue
@@ -40,6 +45,7 @@ import moe.styx.logic.runner.launchMPV
 import moe.styx.logic.utils.pushMediaView
 import moe.styx.logic.utils.readableSize
 import moe.styx.logic.utils.removeSomeHTMLTags
+import moe.styx.views.data.MainDataViewModel
 import moe.styx.views.settings.SettingsView
 
 class MovieDetailView(private val mediaID: String) : Screen {
@@ -51,13 +57,17 @@ class MovieDetailView(private val mediaID: String) : Screen {
     @Composable
     override fun Content() {
         val nav = LocalGlobalNavigator.current
-        val mediaList by Storage.stores.mediaStore.getCurrentAndCollectFlow()
-        val media = remember { mediaList.find { it.GUID eqI mediaID } }
-        val movieEntry = fetchEntries(mediaID).minByOrNull { it.entryNumber.toDoubleOrNull() ?: 0.0 }
-        if (media == null) {
+        val sm = nav.rememberNavigatorScreenModel("main-vm") { MainDataViewModel() }
+        val storage by sm.storageFlow.collectAsState()
+        val mediaStorage = remember { sm.getMediaStorageForID(mediaID, storage) }
+        val movieEntry = mediaStorage.entries.getOrNull(0)
+
+        println("${mediaStorage.media.GUID} | ${mediaStorage.media.name}")
+        if (mediaStorage.image == null) {
             nav.pop()
             return
         }
+
         val watchedList by Storage.stores.watchedStore.collectWithEmptyInitial()
         val watched = movieEntry?.let { watchedList.find { it.entryID eqI movieEntry.GUID } }
         var showMediaInfoDialog by remember { mutableStateOf(false) }
@@ -65,9 +75,9 @@ class MovieDetailView(private val mediaID: String) : Screen {
             MediaInfoDialog(movieEntry) { showMediaInfoDialog = false }
         }
 
-        MainScaffold(title = media.name, actions = {
+        MainScaffold(title = mediaStorage.media.name, actions = {
             OnlineUsersIcon { nav.replace(if (it.isSeries.toBoolean()) AnimeDetailView(it.GUID) else MovieDetailView(it.GUID)) }
-            FavouriteIconButton(media)
+            FavouriteIconButton(mediaStorage.media)
         }) {
             val scrollState = rememberScrollState()
             ElevatedCard(
@@ -91,7 +101,7 @@ class MovieDetailView(private val mediaID: String) : Screen {
                 }
 
                 Column(Modifier.fillMaxSize().verticalScroll(scrollState)) {
-                    StupidImageNameArea(media) {
+                    StupidImageNameArea(mediaStorage.media to mediaStorage.image) {
                         Column(Modifier.padding(6.dp).widthIn(0.dp, 560.dp).fillMaxWidth()) {
                             Row(Modifier.padding(3.dp).fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                                 IconButton({
@@ -134,17 +144,23 @@ class MovieDetailView(private val mediaID: String) : Screen {
                     Spacer(Modifier.height(6.dp))
 
                     Text("About", Modifier.padding(6.dp, 2.dp), style = MaterialTheme.typography.titleLarge)
-                    MediaGenreListing(media)
+                    MediaGenreListing(mediaStorage.media)
                     val preferGerman = settings["prefer-german-metadata", false]
-                    val synopsis = if (!media.synopsisDE.isNullOrBlank() && preferGerman) media.synopsisDE else media.synopsisEN
+                    val synopsis =
+                        if (!mediaStorage.media.synopsisDE.isNullOrBlank() && preferGerman) mediaStorage.media.synopsisDE else mediaStorage.media.synopsisEN
                     if (!synopsis.isNullOrBlank())
                         SelectionContainer {
                             Text(synopsis.removeSomeHTMLTags(), Modifier.padding(6.dp), style = MaterialTheme.typography.bodyMedium)
                         }
 
-                    if (media.sequel != null || media.prequel != null) {
+                    if (mediaStorage.sequel != null || mediaStorage.prequel != null) {
                         HorizontalDivider(Modifier.fillMaxWidth().padding(8.dp, 6.dp), thickness = 2.dp)
-                        MediaRelations(media, mediaList) { nav.pushMediaView(it, true) }
+                        MediaRelations(mediaStorage.prequel to mediaStorage.prequelImage, mediaStorage.sequel to mediaStorage.sequelImage) {
+                            nav.pushMediaView(
+                                it,
+                                true
+                            )
+                        }
                     }
                 }
             }

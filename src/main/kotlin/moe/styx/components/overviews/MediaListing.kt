@@ -19,12 +19,14 @@ import moe.styx.common.compose.files.Storage
 import moe.styx.common.compose.files.collectWithEmptyInitial
 import moe.styx.common.compose.utils.LocalGlobalNavigator
 import moe.styx.common.data.Media
+import moe.styx.common.extension.eqI
 import moe.styx.logic.utils.pushMediaView
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun MediaGrid(media: List<Media>, showUnseen: Boolean = false) {
     val nav = LocalGlobalNavigator.current
+    val imageList by Storage.stores.imageStore.collectWithEmptyInitial()
     if (showUnseen) {
         val entryList by Storage.stores.entryStore.collectWithEmptyInitial()
         val watchedList by Storage.stores.watchedStore.collectWithEmptyInitial()
@@ -34,7 +36,12 @@ fun MediaGrid(media: List<Media>, showUnseen: Boolean = false) {
         ) {
             items(media, key = { it.GUID }) {
                 Row(modifier = Modifier.animateItemPlacement()) {
-                    AnimeCard(it, showUnseen, entryList = entryList, watchedEntries = watchedList) { nav.pushMediaView(it) }
+                    AnimeCard(
+                        it to imageList.find { img -> img.GUID eqI it.thumbID },
+                        showUnseen,
+                        entryList = entryList,
+                        watchedEntries = watchedList
+                    ) { nav.pushMediaView(it) }
                 }
             }
         }
@@ -45,7 +52,7 @@ fun MediaGrid(media: List<Media>, showUnseen: Boolean = false) {
         ) {
             items(media, key = { it.GUID }) {
                 Row(modifier = Modifier.animateItemPlacement()) {
-                    AnimeCard(it, showUnseen) { nav.pushMediaView(it) }
+                    AnimeCard(it to imageList.find { img -> img.GUID eqI it.thumbID }, showUnseen) { nav.pushMediaView(it) }
                 }
             }
         }
@@ -56,10 +63,11 @@ fun MediaGrid(media: List<Media>, showUnseen: Boolean = false) {
 @Composable
 fun MediaList(media: List<Media>) {
     val nav = LocalGlobalNavigator.current
+    val imageList by Storage.stores.imageStore.collectWithEmptyInitial()
     LazyColumn {
         items(media, key = { it.GUID }) {
             Row(Modifier.animateItemPlacement().padding(3.dp)) {
-                AnimeListItem(it) { nav.pushMediaView(it) }
+                AnimeListItem(it to imageList.find { img -> img.GUID eqI it.thumbID }) { nav.pushMediaView(it) }
             }
         }
     }

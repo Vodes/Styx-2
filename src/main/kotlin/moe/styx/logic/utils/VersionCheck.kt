@@ -6,7 +6,7 @@ import io.ktor.http.*
 import io.ktor.util.cio.*
 import io.ktor.utils.io.*
 import kotlinx.coroutines.*
-import moe.styx.Styx__.BuildConfig
+import moe.styx.Styx_2.BuildConfig
 import moe.styx.common.compose.http.login
 import moe.styx.common.extension.eqI
 import moe.styx.common.http.httpClient

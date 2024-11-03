@@ -1,11 +1,11 @@
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 
 plugins {
-    kotlin("jvm") version "1.9.23"
-    id("org.jetbrains.compose") version "1.6.1"
-    id("org.jetbrains.kotlin.plugin.serialization") version "1.9.23"
-    id("com.github.gmazzo.buildconfig") version "5.3.5"
-    id("org.ajoberstar.grgit") version "5.2.1"
+    alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.compose)
+    alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.buildconfig)
 }
 
 group = "moe.styx"
@@ -30,13 +30,13 @@ dependencies {
     implementation(compose.materialIconsExtended)
 
     // Misc
-    implementation("org.slf4j:slf4j-simple:2.0.9")
-    implementation("net.lingala.zip4j:zip4j:2.11.5")
-    implementation("com.github.caoimhebyrne:KDiscordIPC:0.2.2")
-    implementation("com.squareup.okio:okio:3.9.0")
+    implementation(libs.slf4j.simple)
+    implementation(libs.zip4j)
+    implementation(libs.kdiscord.ipc)
+    implementation(libs.okio)
 
     // Styx
-    implementation("moe.styx:styx-common-compose-jvm:0.0.5")
+    implementation(libs.styx.common.compose)
 }
 
 compose.desktop {
