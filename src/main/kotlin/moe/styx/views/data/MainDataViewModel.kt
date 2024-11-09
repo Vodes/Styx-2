@@ -3,10 +3,10 @@ package moe.styx.views.data
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import com.russhwolf.settings.get
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
 import moe.styx.common.compose.files.Storage
+import moe.styx.common.compose.files.Stores
 import moe.styx.common.compose.files.getBlocking
 import moe.styx.common.compose.settings
 import moe.styx.common.data.*
@@ -20,22 +20,38 @@ class MainDataViewModel : ScreenModel {
     private val _storageFlow = MutableStateFlow(MainDataViewModelStorage())
     val storageFlow = _storageFlow.stateIn(screenModelScope, SharingStarted.WhileSubscribed(2000), MainDataViewModelStorage())
 
+    val loadingStateFlow = Storage.loadingProgress.stateIn(screenModelScope, SharingStarted.WhileSubscribed(2000), "")
+    private val _isLoadingStateFlow = MutableStateFlow(false)
+    val isLoadingStateFlow = _isLoadingStateFlow.combine(Storage.isLoaded.asStateFlow()) { a, b -> a || !b }
+        .stateIn(screenModelScope, SharingStarted.WhileSubscribed(2000), false)
+
     init {
         Log.d { "Initializing MainDataViewModel" }
-        updateData(true)
-        screenModelScope.launch {
-            delay(20000)
-            while (true) {
-                delay(5.toDuration(DurationUnit.MINUTES))
-                Log.d("MainDataViewModel") { "Running automatic data refresh." }
-                Storage.loadData()
-                updateData()
-            }
+        startUpdateLoop()
+    }
+
+    private fun startUpdateLoop() = screenModelScope.launch {
+        _isLoadingStateFlow.emit(true)
+        updateData()
+        updateData(forceUpdate = true, updateStores = true)
+        _isLoadingStateFlow.emit(false)
+        delay(20000)
+        while (isActive) {
+            delay(5.toDuration(DurationUnit.MINUTES))
+            ensureActive()
+            Log.d("MainDataViewModel") { "Running automatic data refresh." }
+            _isLoadingStateFlow.emit(true)
+            updateData(updateStores = true)
+            _isLoadingStateFlow.emit(true)
         }
     }
 
-    fun updateData(forceUpdate: Boolean = false) {
+    fun updateData(forceUpdate: Boolean = false, updateStores: Boolean = false) {
         screenModelScope.launch {
+            if (updateStores) {
+                launch { Storage.loadData() }.also { Storage.refreshDataJob = it }.join()
+                Storage.refreshDataJob = null
+            }
             if (forceUpdate)
                 _storageFlow.emit(getUpdatedStorage())
             else
@@ -45,10 +61,12 @@ class MainDataViewModel : ScreenModel {
 
     private fun getUpdatedStorage(unixSeconds: Long? = null): MainDataViewModelStorage {
         return MainDataViewModelStorage(
-            Storage.stores.mediaStore.getBlocking(),
-            Storage.stores.entryStore.getBlocking(),
-            Storage.stores.imageStore.getBlocking(),
-            Storage.stores.categoryStore.getBlocking(),
+            Stores.mediaStore.getBlocking(),
+            Stores.entryStore.getBlocking(),
+            Stores.imageStore.getBlocking(),
+            Stores.categoryStore.getBlocking(),
+            Stores.favouriteStore.getBlocking(),
+            Stores.watchedStore.getBlocking(),
             unixSeconds ?: currentUnixSeconds()
         )
     }
@@ -89,9 +107,13 @@ data class MainDataViewModelStorage(
     val entryList: List<MediaEntry> = emptyList(),
     val imageList: List<Image> = emptyList(),
     val categoryList: List<Category> = emptyList(),
+    val favouritesList: List<Favourite> = emptyList(),
+    val watchedList: List<MediaWatched> = emptyList(),
     val updated: Long = 0L
 ) {
-    override fun hashCode() = (updated + mediaList.size + entryList.size + imageList.size + categoryList.size).hashCode()
+    override fun hashCode() =
+        (updated + mediaList.size + entryList.size + imageList.size + categoryList.size + favouritesList.size + watchedList.size).hashCode()
+
     override fun equals(other: Any?): Boolean {
         if (other !is MainDataViewModelStorage)
             return super.equals(other)
@@ -99,6 +121,8 @@ data class MainDataViewModelStorage(
                 mediaList.size == other.mediaList.size &&
                 entryList.size == other.entryList.size &&
                 imageList.size == other.imageList.size &&
+                watchedList.size == other.watchedList.size &&
+                favouritesList.size == other.favouritesList.size &&
                 categoryList.size == other.categoryList.size
     }
 }

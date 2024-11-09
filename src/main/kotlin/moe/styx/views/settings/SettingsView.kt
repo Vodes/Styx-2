@@ -1,6 +1,5 @@
 package moe.styx.views.settings
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -9,10 +8,7 @@ import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.navigator.Navigator
 import com.russhwolf.settings.get
 import com.russhwolf.settings.set
@@ -20,16 +16,11 @@ import moe.styx.Main.isUiModeDark
 import moe.styx.common.compose.components.misc.Toggles
 import moe.styx.common.compose.components.misc.Toggles.settingsContainer
 import moe.styx.common.compose.extensions.SimpleTab
-import moe.styx.common.compose.http.isLoggedIn
 import moe.styx.common.compose.http.login
 import moe.styx.common.compose.settings
 import moe.styx.common.compose.utils.LocalGlobalNavigator
-import moe.styx.common.compose.utils.ServerStatus
 import moe.styx.components.misc.MpvVersionAndDownload
 import moe.styx.logic.DiscordRPC
-import moe.styx.views.login.LoginView
-import moe.styx.views.login.OfflineView
-import moe.styx.views.other.LoadingView
 
 class SettingsView : SimpleTab("Settings", Icons.Default.Settings) {
 
@@ -122,25 +113,25 @@ fun LoggedInComponent(nav: Navigator) {
             Modifier.padding(10.dp)
         )
     } else {
-        Text("You're not logged in right now.", Modifier.padding(10.dp).drawBehind {
-            val strokeWidthPx = 1.dp.toPx()
-            val verticalOffset = size.height - 1.sp.toPx()
-            drawLine(
-                color = primaryColor,
-                strokeWidth = strokeWidthPx,
-                start = Offset(0f, verticalOffset),
-                end = Offset(size.width, verticalOffset)
-            )
-        }.clickable {
-            val view = if (isLoggedIn())
-                LoadingView()
-            else {
-                if (ServerStatus.lastKnown !in listOf(ServerStatus.ONLINE, ServerStatus.UNAUTHORIZED))
-                    OfflineView()
-                else
-                    LoginView()
-            }
-            nav.replaceAll(view)
-        })
+//        Text("You're not logged in right now.", Modifier.padding(10.dp).drawBehind {
+//            val strokeWidthPx = 1.dp.toPx()
+//            val verticalOffset = size.height - 1.sp.toPx()
+//            drawLine(
+//                color = primaryColor,
+//                strokeWidth = strokeWidthPx,
+//                start = Offset(0f, verticalOffset),
+//                end = Offset(size.width, verticalOffset)
+//            )
+//        }.clickable {
+//            val view = if (isLoggedIn())
+//                LoadingView()
+//            else {
+//                if (ServerStatus.lastKnown !in listOf(ServerStatus.ONLINE, ServerStatus.UNAUTHORIZED))
+//                    OfflineView()
+//                else
+//                    LoginView()
+//            }
+//            nav.replaceAll(view)
+//        })
     }
 }

@@ -12,7 +12,7 @@ import cafe.adriel.voyager.core.screen.Screen
 import moe.styx.common.compose.components.layout.MainScaffold
 import moe.styx.common.compose.utils.LocalGlobalNavigator
 import moe.styx.common.compose.utils.ServerStatus
-import moe.styx.views.other.LoadingView
+import moe.styx.views.anime.AnimeOverview
 
 class OfflineView : Screen {
 
@@ -26,7 +26,7 @@ class OfflineView : Screen {
                 Text(ServerStatus.getLastKnownText(), style = MaterialTheme.typography.headlineSmall)
                 Text("Feel free to keep using Styx with the data you have from your last use.", Modifier.padding(0.dp, 15.dp).weight(1f))
 
-                Button({ nav.replaceAll(LoadingView()) }) {
+                Button({ nav.replaceAll(AnimeOverview()) }) {
                     Text("OK")
                 }
             }

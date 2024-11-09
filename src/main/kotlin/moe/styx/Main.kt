@@ -26,13 +26,13 @@ import moe.styx.Styx_2.BuildConfig
 import moe.styx.common.compose.AppConfig
 import moe.styx.common.compose.appConfig
 import moe.styx.common.compose.extensions.kamelConfig
-import moe.styx.common.compose.http.*
+import moe.styx.common.compose.http.Endpoints
+import moe.styx.common.compose.http.sendObject
 import moe.styx.common.compose.settings
 import moe.styx.common.compose.threads.DownloadQueue
 import moe.styx.common.compose.threads.Heartbeats
 import moe.styx.common.compose.threads.RequestQueue
 import moe.styx.common.compose.utils.LocalGlobalNavigator
-import moe.styx.common.compose.utils.ServerStatus
 import moe.styx.common.extension.formattedStrFile
 import moe.styx.common.http.getHttpClient
 import moe.styx.common.util.Log
@@ -41,9 +41,7 @@ import moe.styx.logic.DiscordRPC
 import moe.styx.logic.Files
 import moe.styx.logic.runner.currentPlayer
 import moe.styx.theme.*
-import moe.styx.views.login.LoginView
-import moe.styx.views.login.OfflineView
-import moe.styx.views.other.LoadingView
+import moe.styx.views.anime.AnimeOverview
 import java.io.File
 import java.io.PrintStream
 
@@ -82,11 +80,12 @@ fun main(args: Array<String>) = application {
     if (settings["discord-rpc", true]) {
         DiscordRPC.start()
     }
-    RequestQueue.start()
-    Heartbeats.start()
-    DownloadQueue.start()
 
     launchGlobal {
+        Heartbeats.start()
+        delay(10000)
+        RequestQueue.start()
+        DownloadQueue.start()
         while (true) {
             delay(3000)
             DiscordRPC.updateActivity()
@@ -105,7 +104,6 @@ fun main(args: Array<String>) = application {
         icon = painterResource("icons/icon.ico")
     )
     {
-        val isLoggedIn = remember { isLoggedIn() }
         Log.i { "Compose window initialized with: ${this.window.renderApi}" }
         Log.i { "Starting ${BuildConfig.APP_NAME} v${BuildConfig.APP_VERSION}" }
         Surface(modifier = Modifier.fillMaxSize()) {
@@ -114,16 +112,16 @@ fun main(args: Array<String>) = application {
                 typography = AppTypography,
                 shapes = AppShapes
             ) {
-                val view = if (isLoggedIn) {
-                    Log.i { "Logged in as: ${login?.name}" }
-                    LoadingView()
-                } else {
-                    if (ServerStatus.lastKnown !in listOf(ServerStatus.ONLINE, ServerStatus.UNAUTHORIZED))
-                        OfflineView()
-                    else
-                        LoginView()
-                }
-                Navigator(view) { navigator ->
+//                val view = if (isLoggedIn) {
+//                    Log.i { "Logged in as: ${login?.name}" }
+//                    LoadingView()
+//                } else {
+//                    if (ServerStatus.lastKnown !in listOf(ServerStatus.ONLINE, ServerStatus.UNAUTHORIZED))
+//                        OfflineView()
+//                    else
+//                        LoginView()
+//                }
+                Navigator(AnimeOverview()) { navigator ->
                     CompositionLocalProvider(LocalGlobalNavigator provides navigator, LocalKamelConfig provides kamelConfig) {
                         SlideTransition(
                             navigator, animationSpec = spring(

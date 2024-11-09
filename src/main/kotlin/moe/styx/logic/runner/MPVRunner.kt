@@ -8,6 +8,7 @@ import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 import moe.styx.Main
 import moe.styx.common.compose.files.Storage
+import moe.styx.common.compose.files.getBlocking
 import moe.styx.common.compose.http.Endpoints
 import moe.styx.common.compose.http.login
 import moe.styx.common.compose.settings
@@ -196,7 +197,7 @@ class MpvInstance {
                 runCommand("set pause no").also { return it }
 
             if (!append) {
-                val watched = Storage.watchedList.find { it.entryID eqI mediaEntry.GUID }
+                val watched = Storage.stores.watchedStore.getBlocking().find { it.entryID eqI mediaEntry.GUID }
                 if (watched != null)
                     launchThreaded {
                         delay(100)

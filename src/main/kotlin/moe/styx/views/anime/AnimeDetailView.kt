@@ -57,9 +57,7 @@ class AnimeDetailView(private val mediaID: String) : Screen {
         val storage by sm.storageFlow.collectAsState()
         val mediaStorage = remember { sm.getMediaStorageForID(mediaID, storage) }
 
-        println("${mediaStorage.media.GUID} | ${mediaStorage.media.name}")
-
-        val preferGerman = settings["prefer-german-metadata", false]
+        val preferGerman = remember { settings["prefer-german-metadata", false] }
         val scrollState = rememberScrollState()
         val showSelection = remember { mutableStateOf(false) }
 

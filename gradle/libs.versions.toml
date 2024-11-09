@@ -1,7 +1,7 @@
 [versions]
 kotlin = "2.0.21"
 compose = "1.7.0"
-styx-common-compose = "0.0.6-SNAPSHOT9"
+styx-common-compose = "0.0.6-SNAPSHOT10"
 buildconfig = "5.4.0"
 slf4j-simple = "2.0.16"
 okio = "3.9.0"
