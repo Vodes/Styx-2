@@ -57,14 +57,18 @@ object Main {
         val stream = PrintStream(file.outputStream())
         System.setOut(stream)
         System.setErr(stream)
+        if (settings["enable-debug-logs", false])
+            Log.debugEnabled = true
     }
 }
 
 fun main(args: Array<String>) = application {
     if (!args.contains("-debug"))
         setupLogFile()
-    else
+    else {
         Main.wasLaunchedInDebug = true
+        Log.debugEnabled = true
+    }
     getHttpClient("${BuildConfig.APP_NAME} - ${BuildConfig.APP_VERSION}")
     appConfig = {
         AppConfig(

@@ -8,7 +8,9 @@ import kotlinx.coroutines.flow.*
 import moe.styx.common.compose.files.Storage
 import moe.styx.common.compose.files.Stores
 import moe.styx.common.compose.files.getBlocking
+import moe.styx.common.compose.http.login
 import moe.styx.common.compose.settings
+import moe.styx.common.compose.utils.ServerStatus
 import moe.styx.common.data.*
 import moe.styx.common.extension.currentUnixSeconds
 import moe.styx.common.extension.eqI
@@ -33,8 +35,14 @@ class MainDataViewModel : ScreenModel {
     private fun startUpdateLoop() = screenModelScope.launch {
         _isLoadingStateFlow.emit(true)
         updateData()
+        while ((ServerStatus.lastKnown == ServerStatus.UNKNOWN || login == null) && isActive) {
+            Log.d("MainDataViewModel") { "Waiting for login..." }
+            delay(2000)
+        }
+        ensureActive()
         updateData(forceUpdate = true, updateStores = true)
         _isLoadingStateFlow.emit(false)
+
         delay(20000)
         while (isActive) {
             delay(5.toDuration(DurationUnit.MINUTES))
@@ -42,7 +50,7 @@ class MainDataViewModel : ScreenModel {
             Log.d("MainDataViewModel") { "Running automatic data refresh." }
             _isLoadingStateFlow.emit(true)
             updateData(updateStores = true)
-            _isLoadingStateFlow.emit(true)
+            _isLoadingStateFlow.emit(false)
         }
     }
 

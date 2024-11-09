@@ -24,6 +24,10 @@ class OverviewViewModel : ScreenModel {
         private set
 
     init {
+        screenModelScope.launch { runLogin() }
+    }
+
+    private fun runLogin() {
         Log.d { "Checking login..." }
         if (isLoggedIn == null) {
             isLoggedIn = isLoggedIn()
