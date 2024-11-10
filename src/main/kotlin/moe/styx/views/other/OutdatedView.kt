@@ -16,9 +16,8 @@ import cafe.adriel.voyager.core.screen.Screen
 import moe.styx.Styx_2.BuildConfig
 import moe.styx.common.compose.components.layout.MainScaffold
 import moe.styx.common.isWindows
+import moe.styx.logic.runner.openURI
 import moe.styx.logic.utils.downloadNewInstaller
-import java.awt.Desktop
-import java.net.URI
 
 class OutdatedView : Screen {
 
@@ -46,8 +45,7 @@ class OutdatedView : Screen {
                         Modifier.weight(1f).padding(16.dp)
                     )
                 Button({
-                    if (Desktop.isDesktopSupported())
-                        Desktop.getDesktop().browse(URI(BuildConfig.SITE_URL))
+                    openURI("${BuildConfig.SITE_URL}/user")
                 }) {
                     Text("Open ${BuildConfig.SITE}")
                 }

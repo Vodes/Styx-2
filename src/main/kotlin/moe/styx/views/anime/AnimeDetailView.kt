@@ -37,12 +37,11 @@ import moe.styx.components.anime.BigScalingCardImage
 import moe.styx.components.anime.FailedDialog
 import moe.styx.logic.runner.currentPlayer
 import moe.styx.logic.runner.launchMPV
+import moe.styx.logic.runner.openURI
 import moe.styx.logic.utils.*
 import moe.styx.theme.AppShapes
 import moe.styx.views.data.MainDataViewModel
 import moe.styx.views.settings.SettingsView
-import java.awt.Desktop
-import java.net.URI
 
 class AnimeDetailView(private val mediaID: String) : Screen {
 
@@ -200,8 +199,7 @@ fun MappingIcons(media: Media) {
                 painterResource("icons/al.svg"),
                 "AniList",
                 Modifier.padding(8.dp, 3.dp).size(25.dp).clip(AppShapes.small).clickable {
-                    if (Desktop.isDesktopSupported())
-                        Desktop.getDesktop().browse(URI(anilistURL))
+                    openURI(anilistURL)
                 },
                 contentScale = ContentScale.FillWidth,
                 colorFilter = filter
@@ -211,8 +209,7 @@ fun MappingIcons(media: Media) {
                 painterResource("icons/myanimelist.svg"),
                 "MyAnimeList",
                 Modifier.padding(8.dp, 3.dp).size(25.dp).clip(AppShapes.small).clickable {
-                    if (Desktop.isDesktopSupported())
-                        Desktop.getDesktop().browse(URI(malURL))
+                    openURI(malURL)
                 },
                 contentScale = ContentScale.FillWidth,
                 colorFilter = filter
@@ -222,8 +219,7 @@ fun MappingIcons(media: Media) {
                 painterResource("icons/tmdb.svg"),
                 "TheMovieDB",
                 Modifier.padding(8.dp, 3.dp).size(25.dp).clip(AppShapes.small).clickable {
-                    if (Desktop.isDesktopSupported())
-                        Desktop.getDesktop().browse(URI(tmdbURL))
+                    openURI(tmdbURL)
                 },
                 contentScale = ContentScale.FillWidth,
                 colorFilter = filter
