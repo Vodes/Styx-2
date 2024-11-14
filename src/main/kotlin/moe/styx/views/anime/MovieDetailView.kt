@@ -16,9 +16,7 @@ import cafe.adriel.voyager.core.model.rememberNavigatorScreenModel
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
 import com.russhwolf.settings.get
-import moe.styx.common.compose.components.anime.MediaGenreListing
-import moe.styx.common.compose.components.anime.MediaInfoDialog
-import moe.styx.common.compose.components.anime.WatchedIndicator
+import moe.styx.common.compose.components.anime.*
 import moe.styx.common.compose.components.buttons.FavouriteIconButton
 import moe.styx.common.compose.components.buttons.IconButtonWithTooltip
 import moe.styx.common.compose.components.layout.MainScaffold
@@ -31,6 +29,7 @@ import moe.styx.common.compose.settings
 import moe.styx.common.compose.threads.DownloadQueue
 import moe.styx.common.compose.threads.RequestQueue
 import moe.styx.common.compose.utils.LocalGlobalNavigator
+import moe.styx.common.compose.viewmodels.MainDataViewModel
 import moe.styx.common.data.MediaEntry
 import moe.styx.common.data.MediaWatched
 import moe.styx.common.extension.currentUnixSeconds
@@ -45,7 +44,6 @@ import moe.styx.logic.runner.launchMPV
 import moe.styx.logic.utils.pushMediaView
 import moe.styx.logic.utils.readableSize
 import moe.styx.logic.utils.removeSomeHTMLTags
-import moe.styx.views.data.MainDataViewModel
 import moe.styx.views.settings.SettingsView
 
 class MovieDetailView(private val mediaID: String) : Screen {
@@ -62,7 +60,6 @@ class MovieDetailView(private val mediaID: String) : Screen {
         val mediaStorage = remember { sm.getMediaStorageForID(mediaID, storage) }
         val movieEntry = mediaStorage.entries.getOrNull(0)
 
-        println("${mediaStorage.media.GUID} | ${mediaStorage.media.name}")
         if (mediaStorage.image == null) {
             nav.pop()
             return
@@ -96,21 +93,27 @@ class MovieDetailView(private val mediaID: String) : Screen {
                     AppendDialog(movieEntry, Modifier.fillMaxWidth(0.6F), Modifier.align(Alignment.CenterHorizontally), {
                         showAppendDialog = false
                     }) {
-                        failedToPlayMessage = it
+                        if (!it.isOK)
+                            failedToPlayMessage = it.message
+                        else
+                            sm.updateData(true)
                     }
                 }
 
                 Column(Modifier.fillMaxSize().verticalScroll(scrollState)) {
-                    StupidImageNameArea(mediaStorage.media to mediaStorage.image) {
+                    StupidImageNameArea(mediaStorage) {
                         Column(Modifier.padding(6.dp).widthIn(0.dp, 560.dp).fillMaxWidth()) {
                             Row(Modifier.padding(3.dp).fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                                 IconButton({
                                     if (movieEntry == null)
                                         return@IconButton
                                     if (currentPlayer == null) {
-                                        launchMPV(movieEntry, false, {
-                                            failedToPlayMessage = it
-                                        })
+                                        launchMPV(movieEntry, false) {
+                                            if (!it.isOK)
+                                                failedToPlayMessage = it.message
+                                            else
+                                                sm.updateData(true)
+                                        }
                                     } else {
                                         showAppendDialog = true
                                     }
@@ -155,7 +158,7 @@ class MovieDetailView(private val mediaID: String) : Screen {
 
                     if (mediaStorage.sequel != null || mediaStorage.prequel != null) {
                         HorizontalDivider(Modifier.fillMaxWidth().padding(8.dp, 6.dp), thickness = 2.dp)
-                        MediaRelations(mediaStorage.prequel to mediaStorage.prequelImage, mediaStorage.sequel to mediaStorage.sequelImage) {
+                        MediaRelations(mediaStorage) {
                             nav.pushMediaView(
                                 it,
                                 true

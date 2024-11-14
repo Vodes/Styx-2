@@ -6,6 +6,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import moe.styx.common.data.MediaEntry
+import moe.styx.logic.runner.MpvFinishStatus
 import moe.styx.logic.runner.launchMPV
 
 @Composable
@@ -30,8 +31,7 @@ fun AppendDialog(
     modifier: Modifier = Modifier,
     buttonModifier: Modifier = Modifier,
     onDismiss: () -> Unit = {},
-    execUpdate: () -> Unit = {},
-    onFail: (String) -> Unit = {}
+    onResult: (MpvFinishStatus) -> Unit = {}
 ) {
     AlertDialog(
         { onDismiss() },
@@ -40,13 +40,13 @@ fun AppendDialog(
         text = { Text("Do you want to start playing now or append to the current playlist?") },
         dismissButton = {
             Button({
-                launchMPV(mediaEntry, false, { onFail(it) }, execUpdate = execUpdate)
+                launchMPV(mediaEntry, false, onResult)
                 onDismiss()
             }, modifier = buttonModifier) { Text("Play now") }
         },
         confirmButton = {
             Button({
-                launchMPV(mediaEntry, true, { onFail(it) }, execUpdate = execUpdate)
+                launchMPV(mediaEntry, true, onResult)
                 onDismiss()
             }, modifier = buttonModifier) { Text("Append") }
         }

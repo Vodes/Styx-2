@@ -9,7 +9,7 @@ plugins {
 }
 
 group = "moe.styx"
-version = "0.0.8"
+version = "0.0.7"
 
 repositories {
     google()

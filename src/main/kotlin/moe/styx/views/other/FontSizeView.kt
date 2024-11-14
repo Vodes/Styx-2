@@ -1,9 +1,10 @@
 package moe.styx.views.other
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import moe.styx.common.compose.components.layout.MainScaffold
 
@@ -28,6 +29,42 @@ class FontSizeView : Screen {
                 Text("Label Large", style = MaterialTheme.typography.labelLarge)
                 Text("Label Medium", style = MaterialTheme.typography.labelMedium)
                 Text("Label Small", style = MaterialTheme.typography.labelSmall)
+                HorizontalDivider()
+                LinearProgressIndicator(
+                    { .5f },
+                    Modifier.padding(5.dp).fillMaxWidth().height(5.dp),
+                    trackColor = MaterialTheme.colorScheme.onSurface
+                )
+                LinearProgressIndicator(
+                    { .5f },
+                    Modifier.padding(5.dp).fillMaxWidth().height(5.dp),
+                    trackColor = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                LinearProgressIndicator(
+                    { .5f },
+                    Modifier.padding(5.dp).fillMaxWidth().height(5.dp),
+                    trackColor = MaterialTheme.colorScheme.inverseOnSurface
+                )
+                LinearProgressIndicator(
+                    { .5f },
+                    Modifier.padding(5.dp).fillMaxWidth().height(5.dp),
+                    trackColor = MaterialTheme.colorScheme.surfaceColorAtElevation(1.dp)
+                )
+                LinearProgressIndicator(
+                    { .5f },
+                    Modifier.padding(5.dp).fillMaxWidth().height(5.dp),
+                    trackColor = MaterialTheme.colorScheme.surfaceColorAtElevation(2.dp)
+                )
+                LinearProgressIndicator(
+                    { .5f },
+                    Modifier.padding(5.dp).fillMaxWidth().height(5.dp),
+                    trackColor = MaterialTheme.colorScheme.surfaceColorAtElevation(5.dp)
+                )
+                LinearProgressIndicator(
+                    { .5f },
+                    Modifier.padding(5.dp).fillMaxWidth().height(5.dp),
+                    trackColor = MaterialTheme.colorScheme.surfaceColorAtElevation(15.dp)
+                )
             }
         }
     }

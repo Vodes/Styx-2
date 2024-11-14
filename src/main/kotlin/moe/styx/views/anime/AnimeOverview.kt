@@ -6,7 +6,9 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -25,11 +27,11 @@ import moe.styx.common.compose.components.misc.OnlineUsersIcon
 import moe.styx.common.compose.files.Storage
 import moe.styx.common.compose.utils.LocalGlobalNavigator
 import moe.styx.common.compose.utils.ServerStatus
+import moe.styx.common.compose.viewmodels.MainDataViewModel
 import moe.styx.common.data.Changes
 import moe.styx.logic.utils.pushMediaView
+import moe.styx.logic.viewmodels.DesktopOverViewModel
 import moe.styx.views.*
-import moe.styx.views.data.MainDataViewModel
-import moe.styx.views.data.OverviewViewModel
 import moe.styx.views.login.LoginView
 import moe.styx.views.other.FontSizeView
 import moe.styx.views.other.OutdatedView
@@ -39,7 +41,7 @@ class AnimeOverview() : Screen {
     @OptIn(ExperimentalFoundationApi::class, ExperimentalVoyagerApi::class)
     @Composable
     override fun Content() {
-        val overviewSm = rememberScreenModel { OverviewViewModel() }
+        val overviewSm = rememberScreenModel { DesktopOverViewModel() }
         LifecycleEffectOnce {
             overviewSm.runChecks()
         }
@@ -49,11 +51,9 @@ class AnimeOverview() : Screen {
         if (overviewSm.isOutdated == true) {
             nav.replaceAll(OutdatedView())
         }
-        
-        LaunchedEffect(overviewSm.isLoggedIn) {
-            if (overviewSm.isLoggedIn == false && ServerStatus.lastKnown == ServerStatus.UNAUTHORIZED) {
-                nav.replaceAll(LoginView())
-            }
+
+        if (overviewSm.isLoggedIn == false && ServerStatus.lastKnown == ServerStatus.UNAUTHORIZED) {
+            nav.replaceAll(LoginView())
         }
 
         val sm = nav.rememberNavigatorScreenModel("main-vm") { MainDataViewModel() }
@@ -65,7 +65,7 @@ class AnimeOverview() : Screen {
                 TooltipArea({ Text(loadingState) }, Modifier.fillMaxHeight(.9f), delayMillis = 200) {
                     Row(Modifier.fillMaxHeight(), verticalAlignment = Alignment.CenterVertically) {
                         LinearProgressIndicator(
-                            trackColor = MaterialTheme.colorScheme.onSurface,
+                            trackColor = MaterialTheme.colorScheme.surfaceColorAtElevation(18.dp),
                             gapSize = 0.dp,
                             modifier = Modifier.requiredWidthIn(20.dp, 40.dp)
                         )

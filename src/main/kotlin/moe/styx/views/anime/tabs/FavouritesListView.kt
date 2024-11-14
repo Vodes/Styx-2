@@ -13,9 +13,9 @@ import moe.styx.common.compose.extensions.SimpleTab
 import moe.styx.common.compose.files.Storage
 import moe.styx.common.compose.utils.LocalGlobalNavigator
 import moe.styx.common.compose.utils.SearchState
+import moe.styx.common.compose.viewmodels.MainDataViewModel
 import moe.styx.common.extension.eqI
 import moe.styx.views.barWithListComp
-import moe.styx.views.data.MainDataViewModel
 
 class FavouritesListView : SimpleTab("Favourites", Icons.Default.Star) {
 

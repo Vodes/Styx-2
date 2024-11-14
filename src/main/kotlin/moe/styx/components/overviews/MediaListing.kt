@@ -35,7 +35,7 @@ fun MediaGrid(media: List<Media>, showUnseen: Boolean = false) {
             contentPadding = PaddingValues(10.dp, 7.dp),
         ) {
             items(media, key = { it.GUID }) {
-                Row(modifier = Modifier.animateItemPlacement()) {
+                Row(modifier = Modifier.animateItem()) {
                     AnimeCard(
                         it to imageList.find { img -> img.GUID eqI it.thumbID },
                         showUnseen,
@@ -51,7 +51,7 @@ fun MediaGrid(media: List<Media>, showUnseen: Boolean = false) {
             contentPadding = PaddingValues(10.dp, 7.dp),
         ) {
             items(media, key = { it.GUID }) {
-                Row(modifier = Modifier.animateItemPlacement()) {
+                Row(modifier = Modifier.animateItem()) {
                     AnimeCard(it to imageList.find { img -> img.GUID eqI it.thumbID }, showUnseen) { nav.pushMediaView(it) }
                 }
             }
@@ -66,8 +66,8 @@ fun MediaList(media: List<Media>) {
     val imageList by Storage.stores.imageStore.collectWithEmptyInitial()
     LazyColumn {
         items(media, key = { it.GUID }) {
-            Row(Modifier.animateItemPlacement().padding(3.dp)) {
-                AnimeListItem(it to imageList.find { img -> img.GUID eqI it.thumbID }) { nav.pushMediaView(it) }
+            Row(Modifier.animateItem().padding(3.dp)) {
+                AnimeListItem(it, imageList.find { img -> img.GUID eqI it.thumbID }) { nav.pushMediaView(it) }
             }
         }
     }
