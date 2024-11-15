@@ -1,46 +1,48 @@
 package moe.styx.components.overviews
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.grid.*
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import moe.styx.common.compose.components.anime.AnimeCard
 import moe.styx.common.compose.components.anime.AnimeListItem
-import moe.styx.common.compose.files.Storage
-import moe.styx.common.compose.files.collectWithEmptyInitial
 import moe.styx.common.compose.utils.LocalGlobalNavigator
+import moe.styx.common.compose.viewmodels.MainDataViewModelStorage
 import moe.styx.common.data.Media
 import moe.styx.common.extension.eqI
 import moe.styx.logic.utils.pushMediaView
+import moe.styx.views.ListPosViewModel
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun MediaGrid(media: List<Media>, showUnseen: Boolean = false) {
+fun MediaGrid(storage: MainDataViewModelStorage, mediaList: List<Media>, listPosViewModel: ListPosViewModel, showUnseen: Boolean = false) {
     val nav = LocalGlobalNavigator.current
-    val imageList by Storage.stores.imageStore.collectWithEmptyInitial()
+    val listState = rememberLazyGridState(listPosViewModel.scrollIndex, listPosViewModel.scrollOffset)
+    LaunchedEffect(listState.isScrollInProgress) {
+        if (!listState.isScrollInProgress) {
+            listPosViewModel.scrollIndex = listState.firstVisibleItemIndex
+            listPosViewModel.scrollOffset = listState.firstVisibleItemScrollOffset
+        }
+    }
     if (showUnseen) {
-        val entryList by Storage.stores.entryStore.collectWithEmptyInitial()
-        val watchedList by Storage.stores.watchedStore.collectWithEmptyInitial()
         LazyVerticalGrid(
             columns = GridCells.Adaptive(minSize = 160.dp),
             contentPadding = PaddingValues(10.dp, 7.dp),
+            state = listState
         ) {
-            items(media, key = { it.GUID }) {
+            items(mediaList, key = { it.GUID }) {
                 Row(modifier = Modifier.animateItem()) {
                     AnimeCard(
-                        it to imageList.find { img -> img.GUID eqI it.thumbID },
-                        showUnseen,
-                        entryList = entryList,
-                        watchedEntries = watchedList
+                        it to storage.imageList.find { img -> img.GUID eqI it.thumbID },
+                        true,
+                        entryList = storage.entryList,
+                        watchedEntries = storage.watchedList
                     ) { nav.pushMediaView(it) }
                 }
             }
@@ -49,25 +51,31 @@ fun MediaGrid(media: List<Media>, showUnseen: Boolean = false) {
         LazyVerticalGrid(
             columns = GridCells.Adaptive(minSize = 160.dp),
             contentPadding = PaddingValues(10.dp, 7.dp),
+            state = listState
         ) {
-            items(media, key = { it.GUID }) {
+            items(mediaList, key = { it.GUID }) {
                 Row(modifier = Modifier.animateItem()) {
-                    AnimeCard(it to imageList.find { img -> img.GUID eqI it.thumbID }, showUnseen) { nav.pushMediaView(it) }
+                    AnimeCard(it to storage.imageList.find { img -> img.GUID eqI it.thumbID }) { nav.pushMediaView(it) }
                 }
             }
         }
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun MediaList(media: List<Media>) {
+fun MediaList(storage: MainDataViewModelStorage, mediaList: List<Media>, listPosViewModel: ListPosViewModel) {
     val nav = LocalGlobalNavigator.current
-    val imageList by Storage.stores.imageStore.collectWithEmptyInitial()
-    LazyColumn {
-        items(media, key = { it.GUID }) {
+    val listState = rememberLazyListState(listPosViewModel.scrollIndex, listPosViewModel.scrollOffset)
+    LaunchedEffect(listState.isScrollInProgress) {
+        if (!listState.isScrollInProgress) {
+            listPosViewModel.scrollIndex = listState.firstVisibleItemIndex
+            listPosViewModel.scrollOffset = listState.firstVisibleItemScrollOffset
+        }
+    }
+    LazyColumn(state = listState) {
+        items(mediaList, key = { it.GUID }) {
             Row(Modifier.animateItem().padding(3.dp)) {
-                AnimeListItem(it, imageList.find { img -> img.GUID eqI it.thumbID }) { nav.pushMediaView(it) }
+                AnimeListItem(it, storage.imageList.find { img -> img.GUID eqI it.thumbID }) { nav.pushMediaView(it) }
             }
         }
     }

@@ -42,6 +42,7 @@ dependencies {
 compose.desktop {
     application {
         mainClass = "moe.styx.MainKt"
+        jvmArgs += listOf("-Xmx1250M", "-Xms300M")
         buildTypes.release.proguard {
             configurationFiles.from(project.file("proguard.rules"))
         }

@@ -50,12 +50,7 @@ class AnimeDetailView(private val mediaID: String) : Screen {
         val nav = LocalGlobalNavigator.current
         val sm = nav.rememberNavigatorScreenModel("main-vm") { MainDataViewModel() }
         val storage by sm.storageFlow.collectAsState()
-        LaunchedEffect(storage) {
-            println("Storage emitted") // This does get printed
-        }
-        // Does not get updated when `storage` gets a new emission
-        // val mediaStorage = remember { sm.getMediaStorageForID(mediaID, storage) } // This does not work either
-        val mediaStorage by remember { mutableStateOf(sm.getMediaStorageForID(mediaID, storage)) }
+        val mediaStorage = remember(storage) { sm.getMediaStorageForID(mediaID, storage) }
 
         val preferGerman = remember { settings["prefer-german-metadata", false] }
         val scrollState = rememberScrollState()

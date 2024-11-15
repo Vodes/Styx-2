@@ -57,7 +57,7 @@ class MovieDetailView(private val mediaID: String) : Screen {
         val nav = LocalGlobalNavigator.current
         val sm = nav.rememberNavigatorScreenModel("main-vm") { MainDataViewModel() }
         val storage by sm.storageFlow.collectAsState()
-        val mediaStorage = remember { sm.getMediaStorageForID(mediaID, storage) }
+        val mediaStorage = remember(storage) { sm.getMediaStorageForID(mediaID, storage) }
         val movieEntry = mediaStorage.entries.getOrNull(0)
 
         if (mediaStorage.image == null) {
