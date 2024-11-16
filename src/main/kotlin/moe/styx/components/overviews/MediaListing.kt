@@ -14,11 +14,11 @@ import androidx.compose.ui.unit.dp
 import moe.styx.common.compose.components.anime.AnimeCard
 import moe.styx.common.compose.components.anime.AnimeListItem
 import moe.styx.common.compose.utils.LocalGlobalNavigator
+import moe.styx.common.compose.viewmodels.ListPosViewModel
 import moe.styx.common.compose.viewmodels.MainDataViewModelStorage
 import moe.styx.common.data.Media
 import moe.styx.common.extension.eqI
 import moe.styx.logic.utils.pushMediaView
-import moe.styx.views.ListPosViewModel
 
 @Composable
 fun MediaGrid(storage: MainDataViewModelStorage, mediaList: List<Media>, listPosViewModel: ListPosViewModel, showUnseen: Boolean = false) {

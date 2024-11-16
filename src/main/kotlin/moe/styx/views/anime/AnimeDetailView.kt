@@ -58,7 +58,7 @@ class AnimeDetailView(private val mediaID: String) : Screen {
 
         MainScaffold(title = mediaStorage.media.name, actions = {
             OnlineUsersIcon { nav.pushMediaView(it, true) }
-            FavouriteIconButton(mediaStorage.media)
+            FavouriteIconButton(mediaStorage.media, sm, storage)
         }) {
             var failedToPlayMessage by remember { mutableStateOf("") }
             if (failedToPlayMessage.isNotBlank()) {

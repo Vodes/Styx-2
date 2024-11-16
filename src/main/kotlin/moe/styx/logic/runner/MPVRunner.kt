@@ -53,7 +53,7 @@ fun launchMPV(entry: MediaEntry, append: Boolean, onClose: (MpvFinishStatus) -> 
                             MpvStatus.current.percentage.toFloat(),
                             MpvStatus.current.percentage.toFloat()
                         )
-                        RequestQueue.updateWatched(watched).join()
+                        RequestQueue.updateWatched(watched).first.join()
                         onClose(MpvFinishStatus(0))
                     }
                 }
@@ -73,7 +73,7 @@ class MpvInstance {
     private val tryFlatpak = settings["mpv-flatpak", false]
     private val instanceJob = Job()
     private var firstPrint = true
-    val execUpdate: () -> Unit = {}
+    var onClose: (MpvFinishStatus) -> Unit = {}
 
     private fun openRandomAccessFile(): RandomAccessFile {
         val socket = File(if (isWindows) "\\\\.\\pipe\\styx-mpvsocket" else "/tmp/styx-mpvsocket")
@@ -100,6 +100,7 @@ class MpvInstance {
     }
 
     fun start(mediaEntry: MediaEntry, onClose: (MpvFinishStatus) -> Unit = {}, onFinish: (Int) -> Unit): Boolean {
+        this.onClose = onClose
         val systemMpv = settings["mpv-system", !isWindows]
         val useConfigRegardless = settings["mpv-system-styx-conf", !isWindows]
         val mpvExecutable = if (systemMpv || !isWindows) {
@@ -297,8 +298,10 @@ data class MpvStatus(
                             current.percentage.toFloat(),
                             current.percentage.toFloat()
                         )
-                        RequestQueue.updateWatched(watched)
-                        currentPlayer?.let { it.execUpdate() }
+                        launchThreaded {
+                            RequestQueue.updateWatched(watched).first.join()
+                            currentPlayer?.onClose?.let { it(MpvFinishStatus(0)) }
+                        }
                     }
                 }
                 current = new

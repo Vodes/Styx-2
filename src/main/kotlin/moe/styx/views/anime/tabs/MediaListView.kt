@@ -19,10 +19,10 @@ import moe.styx.common.compose.files.Stores
 import moe.styx.common.compose.settings
 import moe.styx.common.compose.utils.LocalGlobalNavigator
 import moe.styx.common.compose.utils.SearchState
+import moe.styx.common.compose.viewmodels.ListPosViewModel
 import moe.styx.common.compose.viewmodels.MainDataViewModel
 import moe.styx.common.extension.eqI
 import moe.styx.common.extension.toBoolean
-import moe.styx.views.ListPosViewModel
 import moe.styx.views.barWithListComp
 
 class MediaListView(private val movies: Boolean = false, private val favourites: Boolean = false) : Tab {

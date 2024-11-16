@@ -74,7 +74,7 @@ class MovieDetailView(private val mediaID: String) : Screen {
 
         MainScaffold(title = mediaStorage.media.name, actions = {
             OnlineUsersIcon { nav.replace(if (it.isSeries.toBoolean()) AnimeDetailView(it.GUID) else MovieDetailView(it.GUID)) }
-            FavouriteIconButton(mediaStorage.media)
+            FavouriteIconButton(mediaStorage.media, sm, storage)
         }) {
             val scrollState = rememberScrollState()
             ElevatedCard(
@@ -124,14 +124,22 @@ class MovieDetailView(private val mediaID: String) : Screen {
 
                                 IconButton(onClick = {
                                     movieEntry?.let {
-                                        RequestQueue.updateWatched(
-                                            MediaWatched(movieEntry.GUID, login?.userID ?: "", currentUnixSeconds(), 0, 0F, 100F)
-                                        )
+                                        launchThreaded {
+                                            RequestQueue.updateWatched(
+                                                MediaWatched(movieEntry.GUID, login?.userID ?: "", currentUnixSeconds(), 0, 0F, 100F)
+                                            ).first.join()
+                                            sm.updateData(true)
+                                        }
                                     }
                                 }) { Icon(Icons.Default.Visibility, "Set Watched") }
 
                                 IconButton(onClick = {
-                                    movieEntry?.let { RequestQueue.removeWatched(movieEntry) }
+                                    movieEntry?.let {
+                                        launchThreaded {
+                                            RequestQueue.removeWatched(movieEntry).first.join()
+                                            sm.updateData(true)
+                                        }
+                                    }
                                 }) { Icon(Icons.Default.VisibilityOff, "Set Unwatched") }
 
                                 Spacer(Modifier.weight(1f))
