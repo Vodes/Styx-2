@@ -24,7 +24,7 @@ import moe.styx.Main.isUiModeDark
 import moe.styx.Main.setupLogFile
 import moe.styx.Styx_2.BuildConfig
 import moe.styx.common.compose.AppConfig
-import moe.styx.common.compose.appConfig
+import moe.styx.common.compose.AppContextImpl.appConfig
 import moe.styx.common.compose.extensions.kamelConfig
 import moe.styx.common.compose.http.Endpoints
 import moe.styx.common.compose.http.sendObject
@@ -116,15 +116,6 @@ fun main(args: Array<String>) = application {
                 typography = AppTypography,
                 shapes = AppShapes
             ) {
-//                val view = if (isLoggedIn) {
-//                    Log.i { "Logged in as: ${login?.name}" }
-//                    LoadingView()
-//                } else {
-//                    if (ServerStatus.lastKnown !in listOf(ServerStatus.ONLINE, ServerStatus.UNAUTHORIZED))
-//                        OfflineView()
-//                    else
-//                        LoginView()
-//                }
                 Navigator(AnimeOverview()) { navigator ->
                     CompositionLocalProvider(LocalGlobalNavigator provides navigator, LocalKamelConfig provides kamelConfig) {
                         SlideTransition(
