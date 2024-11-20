@@ -17,7 +17,6 @@ import cafe.adriel.voyager.navigator.tab.*
 import com.dokar.sonner.TextToastAction
 import com.dokar.sonner.Toast
 import kotlinx.coroutines.runBlocking
-import moe.styx.LocalToasterState
 import moe.styx.Main
 import moe.styx.Styx_2.BuildConfig
 import moe.styx.common.compose.components.buttons.IconButtonWithTooltip
@@ -25,6 +24,7 @@ import moe.styx.common.compose.components.layout.MainScaffold
 import moe.styx.common.compose.components.misc.OnlineUsersIcon
 import moe.styx.common.compose.files.Storage
 import moe.styx.common.compose.utils.LocalGlobalNavigator
+import moe.styx.common.compose.utils.LocalToaster
 import moe.styx.common.compose.utils.ServerStatus
 import moe.styx.common.compose.viewmodels.MainDataViewModel
 import moe.styx.common.data.Changes
@@ -40,7 +40,7 @@ class AnimeOverview() : Screen {
     @OptIn(ExperimentalFoundationApi::class)
     @Composable
     override fun Content() {
-        val toaster = LocalToasterState.current
+        val toaster = LocalToaster.current
         val overviewSm = rememberScreenModel { DesktopOverViewModel() }
 
         val nav = LocalGlobalNavigator.current

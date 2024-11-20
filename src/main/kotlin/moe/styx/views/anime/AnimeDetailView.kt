@@ -17,6 +17,9 @@ import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.model.rememberNavigatorScreenModel
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
+import com.dokar.sonner.TextToastAction
+import com.dokar.sonner.Toast
+import com.dokar.sonner.ToastType
 import com.russhwolf.settings.get
 import moe.styx.common.compose.components.anime.*
 import moe.styx.common.compose.components.buttons.FavouriteIconButton
@@ -25,18 +28,19 @@ import moe.styx.common.compose.components.misc.OnlineUsersIcon
 import moe.styx.common.compose.extensions.getPainter
 import moe.styx.common.compose.settings
 import moe.styx.common.compose.utils.LocalGlobalNavigator
+import moe.styx.common.compose.utils.LocalToaster
 import moe.styx.common.compose.viewmodels.MainDataViewModel
 import moe.styx.common.compose.viewmodels.MediaStorage
 import moe.styx.common.data.Media
 import moe.styx.common.data.MediaEntry
 import moe.styx.components.anime.AppendDialog
 import moe.styx.components.anime.BigScalingCardImage
-import moe.styx.components.anime.FailedDialog
 import moe.styx.logic.runner.currentPlayer
 import moe.styx.logic.runner.launchMPV
 import moe.styx.logic.runner.openURI
 import moe.styx.logic.utils.*
 import moe.styx.theme.AppShapes
+import moe.styx.views.settings.SettingsTab
 import moe.styx.views.settings.SettingsView
 
 class AnimeDetailView(private val mediaID: String) : Screen {
@@ -48,6 +52,7 @@ class AnimeDetailView(private val mediaID: String) : Screen {
     @Composable
     override fun Content() {
         val nav = LocalGlobalNavigator.current
+        val toaster = LocalToaster.current
         val sm = nav.rememberNavigatorScreenModel("main-vm") { MainDataViewModel() }
         val storage by sm.storageFlow.collectAsState()
         val mediaStorage = remember(storage) { sm.getMediaStorageForID(mediaID, storage) }
@@ -62,10 +67,10 @@ class AnimeDetailView(private val mediaID: String) : Screen {
         }) {
             var failedToPlayMessage by remember { mutableStateOf("") }
             if (failedToPlayMessage.isNotBlank()) {
-                FailedDialog(failedToPlayMessage, Modifier.fillMaxWidth(0.6F)) {
-                    failedToPlayMessage = ""
-                    if (it) nav.push(SettingsView())
-                }
+                toaster.show(Toast(failedToPlayMessage, type = ToastType.Error, action = TextToastAction("Open Settings") {
+                    nav.push(SettingsView())
+                }))
+                failedToPlayMessage = ""
             }
             var appendEntry by remember { mutableStateOf<MediaEntry?>(null) }
             if (appendEntry != null) {
@@ -79,9 +84,7 @@ class AnimeDetailView(private val mediaID: String) : Screen {
                 }
             }
             ElevatedCard(
-                Modifier.padding(8.dp).fillMaxSize(),
-                colors = CardDefaults.elevatedCardColors(containerColor = MaterialTheme.colorScheme.surface),
-                elevation = CardDefaults.elevatedCardElevation(8.dp)
+                Modifier.padding(8.dp).fillMaxSize()
             ) {
                 Row(Modifier.padding(5.dp).fillMaxSize()) {
                     Column(Modifier.fillMaxHeight().fillMaxWidth(.52F).verticalScroll(scrollState)) {
@@ -105,7 +108,7 @@ class AnimeDetailView(private val mediaID: String) : Screen {
                     }
                     VerticalDivider(Modifier.fillMaxHeight().padding(6.dp), thickness = 3.dp)
 
-                    EpisodeList(storage, mediaStorage, showSelection, SettingsView(), onPlay = { entry ->
+                    EpisodeList(storage, mediaStorage, showSelection, SettingsTab(), onPlay = { entry ->
                         if (currentPlayer == null) {
                             launchMPV(entry, false) {
                                 if (!it.isOK)

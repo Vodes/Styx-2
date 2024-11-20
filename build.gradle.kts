@@ -28,8 +28,6 @@ dependencies {
     implementation(compose.desktop.currentOs)
     implementation(compose.material3)
     implementation(compose.materialIconsExtended)
-    implementation("io.github.dokar3:sonner:0.3.8")
-
 
     // Misc
     implementation(libs.slf4j.simple)

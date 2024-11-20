@@ -15,6 +15,9 @@ import androidx.compose.ui.zIndex
 import cafe.adriel.voyager.core.model.rememberNavigatorScreenModel
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
+import com.dokar.sonner.TextToastAction
+import com.dokar.sonner.Toast
+import com.dokar.sonner.ToastType
 import com.russhwolf.settings.get
 import moe.styx.common.compose.components.anime.*
 import moe.styx.common.compose.components.buttons.FavouriteIconButton
@@ -29,6 +32,7 @@ import moe.styx.common.compose.settings
 import moe.styx.common.compose.threads.DownloadQueue
 import moe.styx.common.compose.threads.RequestQueue
 import moe.styx.common.compose.utils.LocalGlobalNavigator
+import moe.styx.common.compose.utils.LocalToaster
 import moe.styx.common.compose.viewmodels.MainDataViewModel
 import moe.styx.common.data.MediaEntry
 import moe.styx.common.data.MediaWatched
@@ -38,7 +42,6 @@ import moe.styx.common.extension.toBoolean
 import moe.styx.common.util.SYSTEMFILES
 import moe.styx.common.util.launchThreaded
 import moe.styx.components.anime.AppendDialog
-import moe.styx.components.anime.FailedDialog
 import moe.styx.logic.runner.currentPlayer
 import moe.styx.logic.runner.launchMPV
 import moe.styx.logic.utils.pushMediaView
@@ -55,6 +58,7 @@ class MovieDetailView(private val mediaID: String) : Screen {
     @Composable
     override fun Content() {
         val nav = LocalGlobalNavigator.current
+        val toaster = LocalToaster.current
         val sm = nav.rememberNavigatorScreenModel("main-vm") { MainDataViewModel() }
         val storage by sm.storageFlow.collectAsState()
         val mediaStorage = remember(storage) { sm.getMediaStorageForID(mediaID, storage) }
@@ -83,10 +87,10 @@ class MovieDetailView(private val mediaID: String) : Screen {
             ) {
                 var failedToPlayMessage by remember { mutableStateOf("") }
                 if (failedToPlayMessage.isNotBlank()) {
-                    FailedDialog(failedToPlayMessage, Modifier.fillMaxWidth(0.6F)) {
-                        failedToPlayMessage = ""
-                        if (it) nav.push(SettingsView())
-                    }
+                    toaster.show(Toast(failedToPlayMessage, type = ToastType.Error, action = TextToastAction("Open Settings") {
+                        nav.push(SettingsView())
+                    }))
+                    failedToPlayMessage = ""
                 }
                 var showAppendDialog by remember { mutableStateOf(false) }
                 if (showAppendDialog && movieEntry != null) {

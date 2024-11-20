@@ -15,8 +15,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.*
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.transitions.SlideTransition
+import com.dokar.sonner.ToastWidthPolicy
 import com.dokar.sonner.Toaster
-import com.dokar.sonner.ToasterState
 import com.dokar.sonner.rememberToasterState
 import com.russhwolf.settings.get
 import io.kamel.image.config.LocalKamelConfig
@@ -37,6 +37,7 @@ import moe.styx.common.compose.threads.DownloadQueue
 import moe.styx.common.compose.threads.Heartbeats
 import moe.styx.common.compose.threads.RequestQueue
 import moe.styx.common.compose.utils.LocalGlobalNavigator
+import moe.styx.common.compose.utils.LocalToaster
 import moe.styx.common.extension.formattedStrFile
 import moe.styx.common.http.getHttpClient
 import moe.styx.common.util.Log
@@ -65,9 +66,6 @@ object Main {
             Log.debugEnabled = true
     }
 }
-
-val LocalToasterState: ProvidableCompositionLocal<ToasterState> =
-    staticCompositionLocalOf { error("LocalToasterState not initialized") }
 
 @OptIn(ExperimentalComposeUiApi::class)
 fun main(args: Array<String>) = application {
@@ -126,12 +124,12 @@ fun main(args: Array<String>) = application {
                 typography = AppTypography,
                 shapes = AppShapes
             ) {
-                Toaster(toasterState, darkTheme = darkMode)
+                Toaster(toasterState, darkTheme = darkMode, richColors = true, widthPolicy = { ToastWidthPolicy(0.dp, 450.dp) })
                 Navigator(AnimeOverview()) { navigator ->
                     CompositionLocalProvider(
                         LocalGlobalNavigator provides navigator,
                         LocalKamelConfig provides kamelConfig,
-                        LocalToasterState provides toasterState
+                        LocalToaster provides toasterState
                     ) {
                         SlideTransition(
                             navigator, animationSpec = spring(
