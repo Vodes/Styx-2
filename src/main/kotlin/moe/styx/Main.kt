@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Surface
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.IntOffset
@@ -14,6 +15,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.*
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.transitions.SlideTransition
+import com.dokar.sonner.Toaster
+import com.dokar.sonner.ToasterState
+import com.dokar.sonner.rememberToasterState
 import com.russhwolf.settings.get
 import io.kamel.image.config.LocalKamelConfig
 import kotlinx.coroutines.delay
@@ -62,6 +66,10 @@ object Main {
     }
 }
 
+val LocalToasterState: ProvidableCompositionLocal<ToasterState> =
+    staticCompositionLocalOf { error("LocalToasterState not initialized") }
+
+@OptIn(ExperimentalComposeUiApi::class)
 fun main(args: Array<String>) = application {
     if (!args.contains("-debug"))
         setupLogFile()
@@ -78,7 +86,8 @@ fun main(args: Array<String>) = application {
             BuildConfig.IMAGE_URL,
             null,
             Files.getCacheDir().absolutePath,
-            Files.getDataDir().absolutePath
+            Files.getDataDir().absolutePath,
+            BuildConfig.VERSION_CHECK_URL
         )
     }
     if (settings["discord-rpc", true]) {
@@ -111,13 +120,19 @@ fun main(args: Array<String>) = application {
         Log.i { "Compose window initialized with: ${this.window.renderApi}" }
         Log.i { "Starting ${BuildConfig.APP_NAME} v${BuildConfig.APP_VERSION}" }
         Surface(modifier = Modifier.fillMaxSize()) {
+            val toasterState = rememberToasterState()
             MaterialTheme(
                 colorScheme = if (darkMode) darkScheme else lightScheme,
                 typography = AppTypography,
                 shapes = AppShapes
             ) {
+                Toaster(toasterState, darkTheme = darkMode)
                 Navigator(AnimeOverview()) { navigator ->
-                    CompositionLocalProvider(LocalGlobalNavigator provides navigator, LocalKamelConfig provides kamelConfig) {
+                    CompositionLocalProvider(
+                        LocalGlobalNavigator provides navigator,
+                        LocalKamelConfig provides kamelConfig,
+                        LocalToasterState provides toasterState
+                    ) {
                         SlideTransition(
                             navigator, animationSpec = spring(
                                 stiffness = Spring.StiffnessMedium,

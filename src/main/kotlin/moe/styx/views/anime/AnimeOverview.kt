@@ -6,19 +6,18 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import cafe.adriel.voyager.core.annotation.ExperimentalVoyagerApi
-import cafe.adriel.voyager.core.lifecycle.LifecycleEffectOnce
 import cafe.adriel.voyager.core.model.rememberNavigatorScreenModel
 import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.tab.*
+import com.dokar.sonner.TextToastAction
+import com.dokar.sonner.Toast
 import kotlinx.coroutines.runBlocking
+import moe.styx.LocalToasterState
 import moe.styx.Main
 import moe.styx.Styx_2.BuildConfig
 import moe.styx.common.compose.components.buttons.IconButtonWithTooltip
@@ -38,13 +37,11 @@ import moe.styx.views.other.OutdatedView
 
 class AnimeOverview() : Screen {
 
-    @OptIn(ExperimentalFoundationApi::class, ExperimentalVoyagerApi::class)
+    @OptIn(ExperimentalFoundationApi::class)
     @Composable
     override fun Content() {
+        val toaster = LocalToasterState.current
         val overviewSm = rememberScreenModel { DesktopOverViewModel() }
-        LifecycleEffectOnce {
-            overviewSm.runChecks()
-        }
 
         val nav = LocalGlobalNavigator.current
 
@@ -54,6 +51,21 @@ class AnimeOverview() : Screen {
 
         if (overviewSm.isLoggedIn == false && ServerStatus.lastKnown == ServerStatus.UNAUTHORIZED) {
             nav.replaceAll(LoginView())
+        }
+
+        LaunchedEffect(overviewSm.availablePreRelease) {
+            val ver = overviewSm.availablePreRelease
+            if (!ver.isNullOrBlank()) {
+                toaster.show(
+                    Toast(
+                        "New Pre-Release version available: $ver",
+                        action = TextToastAction("Download") {
+                            println("test")
+                        }
+                    )
+                )
+                overviewSm.availablePreRelease = null
+            }
         }
 
         val sm = nav.rememberNavigatorScreenModel("main-vm") { MainDataViewModel() }
@@ -78,7 +90,7 @@ class AnimeOverview() : Screen {
 
             if (overviewSm.isLoggedIn == false) {
                 IconButtonWithTooltip(Icons.Filled.NoAccounts, "You are not logged in!") {
-                    overviewSm.runChecks()
+                    overviewSm.runLoginAndChecks()
                 }
             }
 

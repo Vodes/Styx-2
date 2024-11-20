@@ -28,6 +28,8 @@ dependencies {
     implementation(compose.desktop.currentOs)
     implementation(compose.material3)
     implementation(compose.materialIconsExtended)
+    implementation("io.github.dokar3:sonner:0.3.8")
+
 
     // Misc
     implementation(libs.slf4j.simple)
@@ -93,7 +95,7 @@ buildConfig {
     buildConfigField("IMAGE_URL", System.getenv("STYX_IMAGEURL")) // Example: https://images.company.com
     buildConfigField("SITE", siteURL.split("https://").getOrElse(1) { siteURL })
     buildConfigField("BUILD_TIME", (System.currentTimeMillis() / 1000))
-    buildConfigField("VERSION_CHECK_URL", "https://raw.githubusercontent.com/Vodes/Styx-2/master/build.gradle.kts")
+    buildConfigField("VERSION_CHECK_URL", "https://api.github.com/repos/Vodes/Styx-2/tags")
     buildConfigField("DISCORD_CLIENT_ID", "")//System.getenv("STYX_DISCORDCLIENT"))
 }
 
