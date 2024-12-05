@@ -33,37 +33,43 @@ object AppFont {
         Font("fonts/OpenSans-Italic.ttf", FontWeight.Normal, FontStyle.Italic),
         Font("fonts/OpenSans-Medium.ttf", FontWeight.Medium, FontStyle.Normal),
         Font("fonts/OpenSans-MediumItalic.ttf", FontWeight.Medium, FontStyle.Italic),
-        Font("fonts/OpenSans-SemiBold.ttf", FontWeight.SemiBold, FontStyle.Normal),
-        Font("fonts/OpenSans-SemiBoldItalic.ttf", FontWeight.SemiBold, FontStyle.Italic),
         Font("fonts/OpenSans-Bold.ttf", FontWeight.Bold, FontStyle.Normal),
         Font("fonts/OpenSans-BoldItalic.ttf", FontWeight.Bold, FontStyle.Italic),
-        Font("fonts/OpenSans-ExtraBold.ttf", FontWeight.ExtraBold, FontStyle.Normal),
-        Font("fonts/OpenSans-ExtraBoldItalic.ttf", FontWeight.ExtraBold, FontStyle.Italic),
+    )
+    val JetbrainsMono = FontFamily(
+        Font("fonts/JetBrainsMono-Light.ttf", FontWeight.Light, FontStyle.Normal),
+        Font("fonts/JetBrainsMono-LightItalic.ttf", FontWeight.Light, FontStyle.Italic),
+        Font("fonts/JetBrainsMono-Regular.ttf", FontWeight.Normal, FontStyle.Normal),
+        Font("fonts/JetBrainsMono-Italic.ttf", FontWeight.Normal, FontStyle.Italic),
+        Font("fonts/JetBrainsMono-Medium.ttf", FontWeight.Medium, FontStyle.Normal),
+        Font("fonts/JetBrainsMono-MediumItalic.ttf", FontWeight.Medium, FontStyle.Italic),
+        Font("fonts/JetBrainsMono-Bold.ttf", FontWeight.Bold, FontStyle.Normal),
+        Font("fonts/JetBrainsMono-BoldItalic.ttf", FontWeight.Bold, FontStyle.Italic),
     )
 }
 
-val AppTypography = Typography(
-    displayLarge = defaultTypo.displayLarge.copy(fontFamily = AppFont.OpenSans),
-    displayMedium = defaultTypo.displayMedium.copy(fontFamily = AppFont.OpenSans),
-    displaySmall = defaultTypo.displaySmall.copy(fontFamily = AppFont.OpenSans),
+val FontFamily.Typography: Typography
+    get() = Typography(
+        displayLarge = defaultTypo.displayLarge.copy(fontFamily = this),
+        displayMedium = defaultTypo.displayMedium.copy(fontFamily = this),
+        displaySmall = defaultTypo.displaySmall.copy(fontFamily = this),
 
-    headlineLarge = defaultTypo.headlineLarge.copy(fontFamily = AppFont.OpenSans),
-    headlineMedium = defaultTypo.headlineMedium.copy(fontFamily = AppFont.OpenSans),
-    headlineSmall = defaultTypo.headlineSmall.copy(fontFamily = AppFont.OpenSans),
+        headlineLarge = defaultTypo.headlineLarge.copy(fontFamily = this),
+        headlineMedium = defaultTypo.headlineMedium.copy(fontFamily = this),
+        headlineSmall = defaultTypo.headlineSmall.copy(fontFamily = this),
 
-    titleLarge = defaultTypo.titleLarge.copy(fontFamily = AppFont.OpenSans),
-    titleMedium = defaultTypo.titleMedium.copy(fontFamily = AppFont.OpenSans),
-    titleSmall = defaultTypo.titleSmall.copy(fontFamily = AppFont.OpenSans),
+        titleLarge = defaultTypo.titleLarge.copy(fontFamily = this),
+        titleMedium = defaultTypo.titleMedium.copy(fontFamily = this),
+        titleSmall = defaultTypo.titleSmall.copy(fontFamily = this),
 
-    bodyLarge = defaultTypo.bodyLarge.copy(fontFamily = AppFont.OpenSans),
-    bodyMedium = defaultTypo.bodyMedium.copy(fontFamily = AppFont.OpenSans),
-    bodySmall = defaultTypo.bodySmall.copy(fontFamily = AppFont.OpenSans),
+        bodyLarge = defaultTypo.bodyLarge.copy(fontFamily = this),
+        bodyMedium = defaultTypo.bodyMedium.copy(fontFamily = this),
+        bodySmall = defaultTypo.bodySmall.copy(fontFamily = this),
 
-    labelLarge = defaultTypo.labelLarge.copy(fontFamily = AppFont.OpenSans),
-    labelMedium = defaultTypo.labelMedium.copy(fontFamily = AppFont.OpenSans),
-    labelSmall = defaultTypo.labelSmall.copy(fontFamily = AppFont.OpenSans)
-)
-
+        labelLarge = defaultTypo.labelLarge.copy(fontFamily = this),
+        labelMedium = defaultTypo.labelMedium.copy(fontFamily = this),
+        labelSmall = defaultTypo.labelSmall.copy(fontFamily = this)
+    )
 
 private val animationSpec: TweenSpec<Color> = tween(durationMillis = 650)
 

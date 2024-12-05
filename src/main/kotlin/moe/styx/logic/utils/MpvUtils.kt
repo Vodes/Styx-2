@@ -71,7 +71,7 @@ object MpvUtils {
             return
         launchGlobal {
             delay(8000)
-            val response = httpClient.get(Endpoints.MPV.url)
+            val response = httpClient.get(Endpoints.MPV.url())
 
             if (!response.status.isSuccess()) {
                 Log.w("MpvUtils::checkVersionAndDownload") { "Failed to check for mpv version." }
@@ -92,7 +92,7 @@ object MpvUtils {
             launch {
                 Log.i { "Downloading latest mpv bundle" }
 
-                val downloadResp = httpClient.get(Endpoints.MPV_DOWNLOAD.url)
+                val downloadResp = httpClient.get(Endpoints.MPV_DOWNLOAD.url())
                 if (Files.getMpvDir().exists() && downloadResp.status.isSuccess())
                     Files.getMpvDir().deleteRecursively()
                 val openChannel = downloadResp.bodyAsChannel()

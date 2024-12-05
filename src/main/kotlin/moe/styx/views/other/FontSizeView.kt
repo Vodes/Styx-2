@@ -6,6 +6,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
+import moe.styx.Main
 import moe.styx.common.compose.components.layout.MainScaffold
 
 class FontSizeView : Screen {
@@ -14,6 +15,18 @@ class FontSizeView : Screen {
     override fun Content() {
         MainScaffold(title = "Font Sizes") {
             Column {
+                Row {
+                    Button({
+                        Main.densityScale.value -= 0.25f
+                    }) {
+                        Text("Down the scale")
+                    }
+                    Button({
+                        Main.densityScale.value += 0.25f
+                    }) {
+                        Text("Up the scale")
+                    }
+                }
                 Text("Display Large", style = MaterialTheme.typography.displayLarge)
                 Text("Display Medium", style = MaterialTheme.typography.displayMedium)
                 Text("Display Small", style = MaterialTheme.typography.displaySmall)

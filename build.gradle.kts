@@ -94,7 +94,7 @@ buildConfig {
     buildConfigField("SITE", siteURL.split("https://").getOrElse(1) { siteURL })
     buildConfigField("BUILD_TIME", (System.currentTimeMillis() / 1000))
     buildConfigField("VERSION_CHECK_URL", "https://api.github.com/repos/Vodes/Styx-2/tags")
-    buildConfigField("DISCORD_CLIENT_ID", "")//System.getenv("STYX_DISCORDCLIENT"))
+    buildConfigField("DISCORD_CLIENT_ID", "686174250259709983")
 }
 
 kotlin {

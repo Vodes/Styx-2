@@ -117,7 +117,7 @@ class MpvInstance {
             return false
         }
         val downloadedEntry = runBlocking { Storage.stores.downloadedStore.getOrEmpty() }.find { it.entryID eqI mediaEntry.GUID }
-        val uri = downloadedEntry?.path ?: "${Endpoints.WATCH.url}/${mediaEntry.GUID}?token=${login?.watchToken}"
+        val uri = downloadedEntry?.path ?: "${Endpoints.WATCH.url()}/${mediaEntry.GUID}?token=${login?.watchToken}"
         if ((login == null || login!!.watchToken.isBlank()) && downloadedEntry == null) {
             onClose(MpvFinishStatus(403, "MPV executable not found!"))
             currentPlayer = null
@@ -195,7 +195,7 @@ class MpvInstance {
         val current = MpvStatus.current.copy()
         val downloadedEntry = runBlocking { Storage.stores.downloadedStore.getOrEmpty() }.find { it.entryID eqI mediaEntry.GUID }
         val uri = downloadedEntry?.okioPath?.normalized()?.toString()?.replace("\\", "\\\\")
-            ?: "${Endpoints.WATCH.url}/${mediaEntry.GUID}?token=${login?.watchToken}"
+            ?: "${Endpoints.WATCH.url()}/${mediaEntry.GUID}?token=${login?.watchToken}"
         val appendType = if (current.percentage == 100 && current.eof) "append-play" else "append"
         val options = if (append) " $appendType" else ""
         val loaded = runCommand("loadfile \"$uri\"$options")

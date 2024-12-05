@@ -9,6 +9,8 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.model.rememberNavigatorScreenModel
 import cafe.adriel.voyager.core.model.rememberScreenModel
@@ -19,6 +21,7 @@ import com.dokar.sonner.Toast
 import kotlinx.coroutines.runBlocking
 import moe.styx.Main
 import moe.styx.Styx_2.BuildConfig
+import moe.styx.common.compose.components.AppShapes
 import moe.styx.common.compose.components.buttons.IconButtonWithTooltip
 import moe.styx.common.compose.components.layout.MainScaffold
 import moe.styx.common.compose.components.misc.OnlineUsersIcon
@@ -60,7 +63,7 @@ class AnimeOverview() : Screen {
                     Toast(
                         "New Pre-Release version available: $ver",
                         action = TextToastAction("Download") {
-                            println("test")
+                            nav.push(OutdatedView(ver))
                         }
                     )
                 )
@@ -72,7 +75,7 @@ class AnimeOverview() : Screen {
         val isLoading by sm.isLoadingStateFlow.collectAsState()
         val loadingState by sm.loadingStateFlow.collectAsState()
 
-        MainScaffold(title = BuildConfig.APP_NAME, addPopButton = false, actions = {
+        MainScaffold(title = BuildConfig.APP_NAME, addPopButton = false, addAnimatedTitleBackground = true, actions = {
             if (isLoading) {
                 TooltipArea({ Text(loadingState) }, Modifier.fillMaxHeight(.9f), delayMillis = 200) {
                     Row(Modifier.fillMaxHeight(), verticalAlignment = Alignment.CenterVertically) {
@@ -113,7 +116,11 @@ class AnimeOverview() : Screen {
 
     @Composable
     private fun SideNavRail() {
-        NavigationRail(Modifier.fillMaxHeight().padding(0.dp, 0.dp, 5.dp, 0.dp)) {
+        NavigationRail(
+            Modifier.fillMaxHeight().padding(7.dp, 6.dp, 3.dp, 8.dp).shadow(2.dp, AppShapes.large).clip(AppShapes.large),
+            containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(1.dp)
+        ) {
+            Spacer(Modifier.height(8.dp))
             RailNavItem(defaultTab)
             RailNavItem(movieTab)
             RailNavItem(favsTab)
@@ -128,6 +135,7 @@ class AnimeOverview() : Screen {
                     indicatorColor = MaterialTheme.colorScheme.secondary
                 )
             )
+            Spacer(Modifier.height(5.dp))
         }
     }
 
@@ -140,7 +148,7 @@ class AnimeOverview() : Screen {
             selected = tabNavigator.current.key == tab.key,
             onClick = { tabNavigator.current = tab },
             icon = { Icon(painter = tab.options.icon!!, contentDescription = tab.options.title) },
-            label = { Text(tab.options.title) },
+            label = { Text(tab.options.title, modifier = Modifier.padding(3.dp, 1.dp)) },
             alwaysShowLabel = true,
             colors = colors
                 ?: NavigationRailItemDefaults.colors(
