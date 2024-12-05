@@ -41,7 +41,7 @@ class OutdatedView(private val requestedVersion: String? = null) : Screen {
                 DownloadButtons(shouldBeDownloading)
                 Button({
                     openURI("${BuildConfig.SITE_URL}/user")
-                }, colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary)) {
+                }, colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary), modifier = Modifier.padding(10.dp)) {
                     Text("Open ${BuildConfig.SITE}")
                 }
             }

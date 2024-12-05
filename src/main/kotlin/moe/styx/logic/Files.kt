@@ -1,5 +1,6 @@
 package moe.styx.logic
 
+import moe.styx.common.extension.containsAny
 import moe.styx.common.extension.currentUnixSeconds
 import java.io.File
 
@@ -64,8 +65,8 @@ object Files {
         val currentMillis = currentUnixSeconds() * 1000
         val installerFiles = getAppDir().listFiles()?.toList() ?: emptyList()
         installerFiles
-            .filter { it.name.contains(".msi", true) }
-            .filter { (it.lastModified() - 30000) > currentMillis }
+            .filter { it.name.containsAny("msi", "rpm", "deb") }
+            .filter { it.lastModified() < (currentMillis - 30000) }
             .forEach {
                 runCatching { it.delete() }
             }
