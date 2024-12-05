@@ -9,7 +9,7 @@ plugins {
 }
 
 group = "moe.styx"
-version = "0.0.9"
+version = "0.1.0-rc1"
 
 repositories {
     google()
@@ -63,11 +63,13 @@ compose.desktop {
             vendor = "Vodes & Styx contributors"
             licenseFile.set(project.file("LICENSE"))
             windows {
+                packageVersion = project.version.toString().split("-")[0]
                 menuGroup = "Styx"
                 upgradeUuid = System.getenv("STYX_APP_GUID")
                 iconFile.set(project.file("src/main/resources/icons/icon.ico"))
             }
             linux {
+                packageVersion = project.version.toString().split("-")[0]
                 iconFile.set(project.file("src/main/resources/icons/icon.png"))
                 menuGroup = "AudioVideo;Video"
                 shortcut = true
@@ -75,7 +77,7 @@ compose.desktop {
             macOS {
                 packageVersion = project.version.toString().let {
                     if (it.startsWith("0.")) it.replaceFirst("0.", "1.") else it
-                }
+                }.split("-")[0]
                 appStore = false
                 iconFile.set(project.file("src/main/resources/icons/icon.icns"))
             }
