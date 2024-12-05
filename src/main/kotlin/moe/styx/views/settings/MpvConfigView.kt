@@ -2,6 +2,7 @@ package moe.styx.views.settings
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -12,21 +13,49 @@ import com.russhwolf.settings.get
 import com.russhwolf.settings.set
 import kotlinx.serialization.encodeToString
 import moe.styx.common.compose.components.layout.MainScaffold
+import moe.styx.common.compose.components.misc.ExpandableSettings
 import moe.styx.common.compose.components.misc.Toggles
 import moe.styx.common.compose.components.misc.Toggles.settingsContainer
 import moe.styx.common.compose.settings
 import moe.styx.common.compose.utils.*
 import moe.styx.common.isWindows
 import moe.styx.common.json
+import moe.styx.logic.Files
 import moe.styx.logic.utils.generateNewConfig
+import java.io.File
 
 class MpvConfigView : Screen {
     @Composable
     override fun Content() {
         var preferences by remember { mutableStateOf(MpvPreferences.getOrDefault()) }
+        var tipsExpanded by remember { mutableStateOf(false) }
         MainScaffold(title = "Mpv Configuration") {
             Column {
                 Column(Modifier.padding(8.dp).fillMaxWidth().weight(1f).verticalScroll(rememberScrollState())) {
+                    ExpandableSettings("MPV Tips and tricks", tipsExpanded, { tipsExpanded = !tipsExpanded }) {
+                        SelectionContainer {
+                            Text(
+                                """
+                            Here are some possibly useful keybinds:
+                            
+                            CTRL+R      Attempts to reload the video, may be useful if the API is having issues and stuff starts buffering.
+                            
+                            SHIFT+C     Tries to Auto-Crop the video. Useful if the actual content is 21:9 but has black bars in the file itself.
+                            
+                            SHIFT+W     Opens the Recording/Clip-Maker Menu. These clips are just dumped in your user folder.
+                            
+                            H           Toggle debanding on the fly.
+                            
+                            You can also step frame by frame with SHIFT + Arrow Keys.
+                            
+                            You can also create a custom config that will be persisted through mpv updates by creating a file at:
+                            ${File(Files.getAppDir(), "custom-mpv.conf").absolutePath}
+                            """.trimIndent(),
+                                modifier = Modifier.padding(8.dp, 4.dp),
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+                        }
+                    }
                     Column(Modifier.settingsContainer()) {
                         Text("General", Modifier.padding(10.dp, 7.dp), style = MaterialTheme.typography.titleLarge)
                         Toggles.ContainerSwitch(
