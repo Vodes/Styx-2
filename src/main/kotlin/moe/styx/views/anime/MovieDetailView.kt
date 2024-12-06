@@ -12,20 +12,28 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
+import cafe.adriel.voyager.core.model.rememberNavigatorScreenModel
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
+import com.dokar.sonner.TextToastAction
+import com.dokar.sonner.Toast
+import com.dokar.sonner.ToastType
 import com.russhwolf.settings.get
 import moe.styx.common.compose.components.anime.*
 import moe.styx.common.compose.components.buttons.FavouriteIconButton
 import moe.styx.common.compose.components.buttons.IconButtonWithTooltip
 import moe.styx.common.compose.components.layout.MainScaffold
 import moe.styx.common.compose.components.misc.OnlineUsersIcon
-import moe.styx.common.compose.files.*
+import moe.styx.common.compose.files.Storage
+import moe.styx.common.compose.files.collectWithEmptyInitial
+import moe.styx.common.compose.files.updateList
 import moe.styx.common.compose.http.login
 import moe.styx.common.compose.settings
 import moe.styx.common.compose.threads.DownloadQueue
 import moe.styx.common.compose.threads.RequestQueue
 import moe.styx.common.compose.utils.LocalGlobalNavigator
+import moe.styx.common.compose.utils.LocalToaster
+import moe.styx.common.compose.viewmodels.MainDataViewModel
 import moe.styx.common.data.MediaEntry
 import moe.styx.common.data.MediaWatched
 import moe.styx.common.extension.currentUnixSeconds
@@ -34,7 +42,6 @@ import moe.styx.common.extension.toBoolean
 import moe.styx.common.util.SYSTEMFILES
 import moe.styx.common.util.launchThreaded
 import moe.styx.components.anime.AppendDialog
-import moe.styx.components.anime.FailedDialog
 import moe.styx.logic.runner.currentPlayer
 import moe.styx.logic.runner.launchMPV
 import moe.styx.logic.utils.pushMediaView
@@ -51,13 +58,17 @@ class MovieDetailView(private val mediaID: String) : Screen {
     @Composable
     override fun Content() {
         val nav = LocalGlobalNavigator.current
-        val mediaList by Storage.stores.mediaStore.getCurrentAndCollectFlow()
-        val media = remember { mediaList.find { it.GUID eqI mediaID } }
-        val movieEntry = fetchEntries(mediaID).minByOrNull { it.entryNumber.toDoubleOrNull() ?: 0.0 }
-        if (media == null) {
+        val toaster = LocalToaster.current
+        val sm = nav.rememberNavigatorScreenModel("main-vm") { MainDataViewModel() }
+        val storage by sm.storageFlow.collectAsState()
+        val mediaStorage = remember(storage) { sm.getMediaStorageForID(mediaID, storage) }
+        val movieEntry = mediaStorage.entries.getOrNull(0)
+
+        if (mediaStorage.image == null) {
             nav.pop()
             return
         }
+
         val watchedList by Storage.stores.watchedStore.collectWithEmptyInitial()
         val watched = movieEntry?.let { watchedList.find { it.entryID eqI movieEntry.GUID } }
         var showMediaInfoDialog by remember { mutableStateOf(false) }
@@ -65,9 +76,9 @@ class MovieDetailView(private val mediaID: String) : Screen {
             MediaInfoDialog(movieEntry) { showMediaInfoDialog = false }
         }
 
-        MainScaffold(title = media.name, actions = {
+        MainScaffold(title = mediaStorage.media.name, actions = {
             OnlineUsersIcon { nav.replace(if (it.isSeries.toBoolean()) AnimeDetailView(it.GUID) else MovieDetailView(it.GUID)) }
-            FavouriteIconButton(media)
+            FavouriteIconButton(mediaStorage.media, sm, storage)
         }) {
             val scrollState = rememberScrollState()
             ElevatedCard(
@@ -76,31 +87,37 @@ class MovieDetailView(private val mediaID: String) : Screen {
             ) {
                 var failedToPlayMessage by remember { mutableStateOf("") }
                 if (failedToPlayMessage.isNotBlank()) {
-                    FailedDialog(failedToPlayMessage, Modifier.fillMaxWidth(0.6F)) {
-                        failedToPlayMessage = ""
-                        if (it) nav.push(SettingsView())
-                    }
+                    toaster.show(Toast(failedToPlayMessage, type = ToastType.Error, action = TextToastAction("Open Settings") {
+                        nav.push(SettingsView())
+                    }))
+                    failedToPlayMessage = ""
                 }
                 var showAppendDialog by remember { mutableStateOf(false) }
                 if (showAppendDialog && movieEntry != null) {
                     AppendDialog(movieEntry, Modifier.fillMaxWidth(0.6F), Modifier.align(Alignment.CenterHorizontally), {
                         showAppendDialog = false
                     }) {
-                        failedToPlayMessage = it
+                        if (!it.isOK)
+                            failedToPlayMessage = it.message
+                        else
+                            sm.updateData(true)
                     }
                 }
 
                 Column(Modifier.fillMaxSize().verticalScroll(scrollState)) {
-                    StupidImageNameArea(media) {
+                    StupidImageNameArea(mediaStorage) {
                         Column(Modifier.padding(6.dp).widthIn(0.dp, 560.dp).fillMaxWidth()) {
                             Row(Modifier.padding(3.dp).fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                                 IconButton({
                                     if (movieEntry == null)
                                         return@IconButton
                                     if (currentPlayer == null) {
-                                        launchMPV(movieEntry, false, {
-                                            failedToPlayMessage = it
-                                        })
+                                        launchMPV(movieEntry, false) {
+                                            if (!it.isOK)
+                                                failedToPlayMessage = it.message
+                                            else
+                                                sm.updateData(true)
+                                        }
                                     } else {
                                         showAppendDialog = true
                                     }
@@ -111,14 +128,22 @@ class MovieDetailView(private val mediaID: String) : Screen {
 
                                 IconButton(onClick = {
                                     movieEntry?.let {
-                                        RequestQueue.updateWatched(
-                                            MediaWatched(movieEntry.GUID, login?.userID ?: "", currentUnixSeconds(), 0, 0F, 100F)
-                                        )
+                                        launchThreaded {
+                                            RequestQueue.updateWatched(
+                                                MediaWatched(movieEntry.GUID, login?.userID ?: "", currentUnixSeconds(), 0, 0F, 100F)
+                                            ).first.join()
+                                            sm.updateData(true)
+                                        }
                                     }
                                 }) { Icon(Icons.Default.Visibility, "Set Watched") }
 
                                 IconButton(onClick = {
-                                    movieEntry?.let { RequestQueue.removeWatched(movieEntry) }
+                                    movieEntry?.let {
+                                        launchThreaded {
+                                            RequestQueue.removeWatched(movieEntry).first.join()
+                                            sm.updateData(true)
+                                        }
+                                    }
                                 }) { Icon(Icons.Default.VisibilityOff, "Set Unwatched") }
 
                                 Spacer(Modifier.weight(1f))
@@ -134,17 +159,23 @@ class MovieDetailView(private val mediaID: String) : Screen {
                     Spacer(Modifier.height(6.dp))
 
                     Text("About", Modifier.padding(6.dp, 2.dp), style = MaterialTheme.typography.titleLarge)
-                    MediaGenreListing(media)
+                    MediaGenreListing(mediaStorage.media)
                     val preferGerman = settings["prefer-german-metadata", false]
-                    val synopsis = if (!media.synopsisDE.isNullOrBlank() && preferGerman) media.synopsisDE else media.synopsisEN
+                    val synopsis =
+                        if (!mediaStorage.media.synopsisDE.isNullOrBlank() && preferGerman) mediaStorage.media.synopsisDE else mediaStorage.media.synopsisEN
                     if (!synopsis.isNullOrBlank())
                         SelectionContainer {
                             Text(synopsis.removeSomeHTMLTags(), Modifier.padding(6.dp), style = MaterialTheme.typography.bodyMedium)
                         }
 
-                    if (media.sequel != null || media.prequel != null) {
+                    if (mediaStorage.sequel != null || mediaStorage.prequel != null) {
                         HorizontalDivider(Modifier.fillMaxWidth().padding(8.dp, 6.dp), thickness = 2.dp)
-                        MediaRelations(media, mediaList) { nav.pushMediaView(it, true) }
+                        MediaRelations(mediaStorage) {
+                            nav.pushMediaView(
+                                it,
+                                true
+                            )
+                        }
                     }
                 }
             }

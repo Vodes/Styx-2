@@ -40,6 +40,13 @@ jobs:
         env:
           JAVA_HOME: ${{ steps.setup-java.outputs.path }}
         run: "./gradlew packageReleaseUberJarForCurrentOS"
+      - name: "Print and save sha384 for binaries"
+        run: find ./build/compose -type f \( -iname Styx\*linux\*.jar -o -iname \*.deb -o -iname \*.rpm \) -exec shasum -a 384 {} \; | tee checksums.sha384
+      - name: "Upload checksum file"
+        uses: actions/upload-artifact@v4
+        with:
+          name: checksums.sha384
+          path: checksums.sha384
       - name: "Upload binaries to FTP"
         uses: "SamKirkland/FTP-Deploy-Action@v4.3.4"
         with:

@@ -7,15 +7,14 @@ import dev.cbyrne.kdiscordipc.core.event.impl.ErrorEvent
 import dev.cbyrne.kdiscordipc.core.event.impl.ReadyEvent
 import dev.cbyrne.kdiscordipc.data.activity.*
 import io.github.xxfast.kstore.extensions.getOrEmpty
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import moe.styx.Styx__.BuildConfig
-import moe.styx.common.compose.extensions.getThumb
+import moe.styx.Styx_2.BuildConfig
 import moe.styx.common.compose.extensions.getURL
-import moe.styx.common.compose.files.Storage
+import moe.styx.common.compose.files.Stores
 import moe.styx.common.compose.settings
 import moe.styx.common.data.MediaActivity
-import moe.styx.common.extension.currentUnixSeconds
 import moe.styx.common.extension.eqI
 import moe.styx.common.extension.toBoolean
 import moe.styx.common.util.Log
@@ -43,6 +42,7 @@ object DiscordRPC {
                 ipc!!.on<ReadyEvent> {
                     errored = false
                     Log.i { "Discord-RPC initialized." }
+                    delay(5000)
                     updateActivity()
                 }.start()
                 ipc!!.connect()
@@ -67,8 +67,9 @@ object DiscordRPC {
         val mediaActivity = if (currentPlayer != null && MpvStatus.current.file.isNotEmpty() && MpvStatus.current.percentage > -1)
             MediaActivity(MpvStatus.current.file, MpvStatus.current.seconds.toLong(), !MpvStatus.current.paused)
         else null
-        val entry = mediaActivity?.let { act -> runBlocking { Storage.stores.entryStore.getOrEmpty() }.find { it.GUID eqI act.mediaEntry } }
-        val media = entry?.let { ent -> runBlocking { Storage.stores.mediaStore.getOrEmpty() }.find { it.GUID eqI ent.mediaID } }
+        val entry = mediaActivity?.let { act -> runBlocking { Stores.entryStore.getOrEmpty() }.find { it.GUID eqI act.mediaEntry } }
+        val media = entry?.let { ent -> runBlocking { Stores.mediaStore.getOrEmpty() }.find { it.GUID eqI ent.mediaID } }
+        val image = media?.let { ent -> runBlocking { Stores.imageStore.getOrEmpty() }.find { it.GUID eqI ent.thumbID } }
         ipc!!.scope.launch {
             if (errored)
                 return@launch
@@ -90,9 +91,8 @@ object DiscordRPC {
                         media.name + if (media.isSeries.toBoolean()) " - ${entry.entryNumber}" else ""
                     ) {
                         button("View on GitHub", "https://github.com/Vodes?tab=repositories&q=Styx&language=kotlin")
-                        val image = media.getThumb()
                         if (mediaActivity.playing)
-                            timestamps(currentUnixSeconds(), currentUnixSeconds() + MpvStatus.current.timeRemaining)
+                            timestamps(1, 1 + MpvStatus.current.seconds.toLong())
                         if (image == null) {
                             largeImage("styx", "v${BuildConfig.APP_VERSION}")
                         } else {

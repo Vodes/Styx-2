@@ -1,15 +1,15 @@
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 
 plugins {
-    kotlin("jvm") version "1.9.23"
-    id("org.jetbrains.compose") version "1.6.1"
-    id("org.jetbrains.kotlin.plugin.serialization") version "1.9.23"
-    id("com.github.gmazzo.buildconfig") version "5.3.5"
-    id("org.ajoberstar.grgit") version "5.2.1"
+    alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.compose)
+    alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.buildconfig)
 }
 
 group = "moe.styx"
-version = "0.0.7"
+version = "0.1.0"
 
 repositories {
     google()
@@ -30,18 +30,19 @@ dependencies {
     implementation(compose.materialIconsExtended)
 
     // Misc
-    implementation("org.slf4j:slf4j-simple:2.0.9")
-    implementation("net.lingala.zip4j:zip4j:2.11.5")
-    implementation("com.github.caoimhebyrne:KDiscordIPC:0.2.2")
-    implementation("com.squareup.okio:okio:3.9.0")
+    implementation(libs.slf4j.simple)
+    implementation(libs.zip4j)
+    implementation(libs.kdiscord.ipc)
+    implementation(libs.okio)
 
     // Styx
-    implementation("moe.styx:styx-common-compose-jvm:0.0.5")
+    implementation(libs.styx.common.compose)
 }
 
 compose.desktop {
     application {
         mainClass = "moe.styx.MainKt"
+        jvmArgs += listOf("-Xmx1250M", "-Xms300M")
         buildTypes.release.proguard {
             configurationFiles.from(project.file("proguard.rules"))
         }
@@ -62,11 +63,13 @@ compose.desktop {
             vendor = "Vodes & Styx contributors"
             licenseFile.set(project.file("LICENSE"))
             windows {
+                packageVersion = project.version.toString().split("-")[0]
                 menuGroup = "Styx"
                 upgradeUuid = System.getenv("STYX_APP_GUID")
                 iconFile.set(project.file("src/main/resources/icons/icon.ico"))
             }
             linux {
+                packageVersion = project.version.toString().split("-")[0]
                 iconFile.set(project.file("src/main/resources/icons/icon.png"))
                 menuGroup = "AudioVideo;Video"
                 shortcut = true
@@ -74,7 +77,7 @@ compose.desktop {
             macOS {
                 packageVersion = project.version.toString().let {
                     if (it.startsWith("0.")) it.replaceFirst("0.", "1.") else it
-                }
+                }.split("-")[0]
                 appStore = false
                 iconFile.set(project.file("src/main/resources/icons/icon.icns"))
             }
@@ -92,8 +95,8 @@ buildConfig {
     buildConfigField("IMAGE_URL", System.getenv("STYX_IMAGEURL")) // Example: https://images.company.com
     buildConfigField("SITE", siteURL.split("https://").getOrElse(1) { siteURL })
     buildConfigField("BUILD_TIME", (System.currentTimeMillis() / 1000))
-    buildConfigField("VERSION_CHECK_URL", "https://raw.githubusercontent.com/Vodes/Styx-2/master/build.gradle.kts")
-    buildConfigField("DISCORD_CLIENT_ID", "")//System.getenv("STYX_DISCORDCLIENT"))
+    buildConfigField("VERSION_CHECK_URL", "https://api.github.com/repos/Vodes/Styx-2/tags")
+    buildConfigField("DISCORD_CLIENT_ID", "686174250259709983")
 }
 
 kotlin {

@@ -12,13 +12,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import kotlinx.coroutines.delay
-import moe.styx.Styx__.BuildConfig
+import moe.styx.Styx_2.BuildConfig
 import moe.styx.common.compose.components.buttons.IconButtonWithTooltip
 import moe.styx.common.compose.http.checkLogin
 import moe.styx.common.compose.http.generateCode
 import moe.styx.common.compose.http.isLoggedIn
 import moe.styx.common.compose.utils.LocalGlobalNavigator
-import moe.styx.views.other.LoadingView
+import moe.styx.views.anime.AnimeOverview
 import java.awt.Desktop
 import java.awt.Toolkit
 import java.awt.datatransfer.StringSelection
@@ -39,7 +39,7 @@ class LoginView() : Screen {
                     return@let checkLogin(creationResponse!!.GUID, true)
                 }
                 if (log != null) {
-                    nav.push(LoadingView())
+                    nav.replace(AnimeOverview())
                     break
                 }
 

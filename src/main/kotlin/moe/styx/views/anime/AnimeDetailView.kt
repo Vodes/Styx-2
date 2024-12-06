@@ -14,33 +14,34 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import cafe.adriel.voyager.core.model.rememberNavigatorScreenModel
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
+import com.dokar.sonner.TextToastAction
+import com.dokar.sonner.Toast
+import com.dokar.sonner.ToastType
 import com.russhwolf.settings.get
 import moe.styx.common.compose.components.anime.*
 import moe.styx.common.compose.components.buttons.FavouriteIconButton
 import moe.styx.common.compose.components.layout.MainScaffold
 import moe.styx.common.compose.components.misc.OnlineUsersIcon
 import moe.styx.common.compose.extensions.getPainter
-import moe.styx.common.compose.extensions.getThumb
-import moe.styx.common.compose.files.Storage
-import moe.styx.common.compose.files.getCurrentAndCollectFlow
 import moe.styx.common.compose.settings
-import moe.styx.common.compose.threads.Heartbeats
 import moe.styx.common.compose.utils.LocalGlobalNavigator
+import moe.styx.common.compose.utils.LocalToaster
+import moe.styx.common.compose.viewmodels.MainDataViewModel
+import moe.styx.common.compose.viewmodels.MediaStorage
 import moe.styx.common.data.Media
 import moe.styx.common.data.MediaEntry
-import moe.styx.common.extension.eqI
 import moe.styx.components.anime.AppendDialog
 import moe.styx.components.anime.BigScalingCardImage
-import moe.styx.components.anime.FailedDialog
 import moe.styx.logic.runner.currentPlayer
 import moe.styx.logic.runner.launchMPV
+import moe.styx.logic.runner.openURI
 import moe.styx.logic.utils.*
 import moe.styx.theme.AppShapes
+import moe.styx.views.settings.SettingsTab
 import moe.styx.views.settings.SettingsView
-import java.awt.Desktop
-import java.net.URI
 
 class AnimeDetailView(private val mediaID: String) : Screen {
 
@@ -51,70 +52,70 @@ class AnimeDetailView(private val mediaID: String) : Screen {
     @Composable
     override fun Content() {
         val nav = LocalGlobalNavigator.current
+        val toaster = LocalToaster.current
+        val sm = nav.rememberNavigatorScreenModel("main-vm") { MainDataViewModel() }
+        val storage by sm.storageFlow.collectAsState()
+        val mediaStorage = remember(storage) { sm.getMediaStorageForID(mediaID, storage) }
 
-        val mediaList by Storage.stores.mediaStore.getCurrentAndCollectFlow()
-        val media = remember { mediaList.find { it.GUID eqI mediaID } }
-        if (media == null) {
-            nav.pop()
-            return
-        }
-        val entries = fetchEntries(mediaID)
-
-        val preferGerman = settings["prefer-german-metadata", false]
+        val preferGerman = remember { settings["prefer-german-metadata", false] }
         val scrollState = rememberScrollState()
         val showSelection = remember { mutableStateOf(false) }
 
-        MainScaffold(title = media.name, actions = {
+        MainScaffold(title = mediaStorage.media.name, actions = {
             OnlineUsersIcon { nav.pushMediaView(it, true) }
-            FavouriteIconButton(media)
+            FavouriteIconButton(mediaStorage.media, sm, storage)
         }) {
             var failedToPlayMessage by remember { mutableStateOf("") }
             if (failedToPlayMessage.isNotBlank()) {
-                FailedDialog(failedToPlayMessage, Modifier.fillMaxWidth(0.6F)) {
-                    failedToPlayMessage = ""
-                    if (it) nav.push(SettingsView())
-                }
+                toaster.show(Toast(failedToPlayMessage, type = ToastType.Error, action = TextToastAction("Open Settings") {
+                    nav.push(SettingsView())
+                }))
+                failedToPlayMessage = ""
             }
             var appendEntry by remember { mutableStateOf<MediaEntry?>(null) }
             if (appendEntry != null) {
                 AppendDialog(appendEntry!!, Modifier.fillMaxWidth(0.6F), onDismiss = {
                     appendEntry = null
                 }) {
-                    failedToPlayMessage = it
-                    appendEntry = null
+                    if (!it.isOK)
+                        failedToPlayMessage = it.message
+                    else
+                        sm.updateData(true)
                 }
             }
             ElevatedCard(
-                Modifier.padding(8.dp).fillMaxSize(),
-                colors = CardDefaults.elevatedCardColors(containerColor = MaterialTheme.colorScheme.surface),
-                elevation = CardDefaults.elevatedCardElevation(8.dp)
+                Modifier.padding(8.dp).fillMaxSize()
             ) {
                 Row(Modifier.padding(5.dp).fillMaxSize()) {
                     Column(Modifier.fillMaxHeight().fillMaxWidth(.52F).verticalScroll(scrollState)) {
-                        StupidImageNameArea(media)
+                        StupidImageNameArea(mediaStorage)
 
                         Spacer(Modifier.height(6.dp))
 
                         Text("About", Modifier.padding(6.dp, 2.dp), style = MaterialTheme.typography.titleLarge)
-                        MediaGenreListing(media)
-                        val synopsis = if (!media.synopsisDE.isNullOrBlank() && preferGerman) media.synopsisDE else media.synopsisEN
+                        MediaGenreListing(mediaStorage.media)
+                        val synopsis =
+                            if (!mediaStorage.media.synopsisDE.isNullOrBlank() && preferGerman) mediaStorage.media.synopsisDE else mediaStorage.media.synopsisEN
                         if (!synopsis.isNullOrBlank())
                             SelectionContainer {
                                 Text(synopsis.removeSomeHTMLTags(), Modifier.padding(6.dp), style = MaterialTheme.typography.bodyMedium)
                             }
 
-                        if (media.sequel != null || media.prequel != null) {
+                        if (mediaStorage.sequel != null || mediaStorage.prequel != null) {
                             HorizontalDivider(Modifier.fillMaxWidth().padding(0.dp, 4.dp, 0.dp, 2.dp), thickness = 2.dp)
-                            MediaRelations(media, mediaList) { nav.pushMediaView(it, true) }
+                            MediaRelations(mediaStorage) { nav.pushMediaView(it, true) }
                         }
                     }
                     VerticalDivider(Modifier.fillMaxHeight().padding(6.dp), thickness = 3.dp)
 
-                    EpisodeList(entries, showSelection, SettingsView(), onPlay = { entry ->
+                    EpisodeList(storage, mediaStorage, showSelection, SettingsTab(), onPlay = { entry ->
                         if (currentPlayer == null) {
-                            launchMPV(entry, false, {
-                                failedToPlayMessage = it
-                            })
+                            launchMPV(entry, false) {
+                                if (!it.isOK)
+                                    failedToPlayMessage = it.message
+                                else
+                                    sm.updateData(true)
+                            }
                         } else {
                             appendEntry = entry
                         }
@@ -128,14 +129,14 @@ class AnimeDetailView(private val mediaID: String) : Screen {
 
 @Composable
 fun StupidImageNameArea(
-    media: Media,
+    mediaStorage: MediaStorage,
     dynamicMaxWidth: Dp = 760.dp,
     requiredWidth: Dp = 385.dp,
     requiredHeight: Dp = 535.dp,
     otherContent: @Composable () -> Unit = {}
 ) {
-    val img = media.getThumb()!!
-    val painter = img.getPainter()
+    val (media, img) = mediaStorage.media to mediaStorage.image
+    val painter = img?.getPainter()
     BoxWithConstraints {
         val width = this.maxWidth
         Row(Modifier.align(Alignment.TopStart).height(IntrinsicSize.Max).fillMaxWidth()) {
@@ -157,16 +158,6 @@ fun StupidImageNameArea(
 }
 
 @Composable
-fun fetchEntries(mediaID: String): List<MediaEntry> {
-    Heartbeats.mediaActivity = null
-    val flow by Storage.stores.entryStore.getCurrentAndCollectFlow()
-    val filtered = flow.filter { it.mediaID eqI mediaID }
-    return if (settings["episode-asc", false]) filtered.sortedBy {
-        it.entryNumber.toDoubleOrNull() ?: 0.0
-    } else filtered.sortedByDescending { it.entryNumber.toDoubleOrNull() ?: 0.0 }
-}
-
-@Composable
 fun MappingIcons(media: Media) {
     val malURL = media.getURLFromMap(StackType.MAL)
     val anilistURL = media.getURLFromMap(StackType.ANILIST)
@@ -178,8 +169,7 @@ fun MappingIcons(media: Media) {
                 painterResource("icons/al.svg"),
                 "AniList",
                 Modifier.padding(8.dp, 3.dp).size(25.dp).clip(AppShapes.small).clickable {
-                    if (Desktop.isDesktopSupported())
-                        Desktop.getDesktop().browse(URI(anilistURL))
+                    openURI(anilistURL)
                 },
                 contentScale = ContentScale.FillWidth,
                 colorFilter = filter
@@ -189,8 +179,7 @@ fun MappingIcons(media: Media) {
                 painterResource("icons/myanimelist.svg"),
                 "MyAnimeList",
                 Modifier.padding(8.dp, 3.dp).size(25.dp).clip(AppShapes.small).clickable {
-                    if (Desktop.isDesktopSupported())
-                        Desktop.getDesktop().browse(URI(malURL))
+                    openURI(malURL)
                 },
                 contentScale = ContentScale.FillWidth,
                 colorFilter = filter
@@ -200,8 +189,7 @@ fun MappingIcons(media: Media) {
                 painterResource("icons/tmdb.svg"),
                 "TheMovieDB",
                 Modifier.padding(8.dp, 3.dp).size(25.dp).clip(AppShapes.small).clickable {
-                    if (Desktop.isDesktopSupported())
-                        Desktop.getDesktop().browse(URI(tmdbURL))
+                    openURI(tmdbURL)
                 },
                 contentScale = ContentScale.FillWidth,
                 colorFilter = filter

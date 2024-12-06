@@ -14,17 +14,18 @@ import io.kamel.core.Resource
 import io.kamel.image.KamelImage
 
 @Composable
-fun BigScalingCardImage(image: Resource<Painter>, modifier: Modifier = Modifier) {
+fun BigScalingCardImage(image: Resource<Painter>?, modifier: Modifier = Modifier) {
     Column(modifier) {
         ElevatedCard(
             Modifier.align(Alignment.Start).padding(12.dp).requiredHeightIn(150.dp, 500.dp).aspectRatio(0.71F),
         ) {
-            KamelImage(
-                image,
-                contentDescription = "Anime",
-                modifier = Modifier.padding(2.dp).clip(RoundedCornerShape(4.dp)),
-                contentScale = ContentScale.FillBounds
-            )
+            if (image != null)
+                KamelImage(
+                    { image },
+                    contentDescription = "Anime",
+                    modifier = Modifier.padding(2.dp).clip(RoundedCornerShape(4.dp)),
+                    contentScale = ContentScale.FillBounds
+                )
         }
     }
 }
