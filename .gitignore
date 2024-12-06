@@ -4,6 +4,7 @@ build/
 !**/src/main/**/build/
 !**/src/test/**/build/
 local.properties
+checksums.sha384
 
 
 ### IntelliJ IDEA ###
