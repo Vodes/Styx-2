@@ -119,7 +119,7 @@ class MpvInstance {
         val downloadedEntry = runBlocking { Storage.stores.downloadedStore.getOrEmpty() }.find { it.entryID eqI mediaEntry.GUID }
         val uri = downloadedEntry?.path ?: "${Endpoints.WATCH.url()}/${mediaEntry.GUID}?token=${login?.watchToken}"
         if ((login == null || login!!.watchToken.isBlank()) && downloadedEntry == null) {
-            onClose(MpvFinishStatus(403, "MPV executable not found!"))
+            onClose(MpvFinishStatus(403, "You are not logged in or online and don't have this downloaded!"))
             currentPlayer = null
             return false
         }

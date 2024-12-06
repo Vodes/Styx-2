@@ -14,10 +14,12 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.model.rememberNavigatorScreenModel
 import cafe.adriel.voyager.core.model.rememberScreenModel
+import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.tab.*
 import com.dokar.sonner.TextToastAction
 import com.dokar.sonner.Toast
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import moe.styx.Main
 import moe.styx.Styx_2.BuildConfig
@@ -26,6 +28,7 @@ import moe.styx.common.compose.components.buttons.IconButtonWithTooltip
 import moe.styx.common.compose.components.layout.MainScaffold
 import moe.styx.common.compose.components.misc.OnlineUsersIcon
 import moe.styx.common.compose.files.Storage
+import moe.styx.common.compose.http.login
 import moe.styx.common.compose.utils.LocalGlobalNavigator
 import moe.styx.common.compose.utils.LocalToaster
 import moe.styx.common.compose.utils.ServerStatus
@@ -92,8 +95,14 @@ class AnimeOverview() : Screen {
             }
 
             if (overviewSm.isLoggedIn == false) {
-                IconButtonWithTooltip(Icons.Filled.NoAccounts, "You are not logged in!") {
-                    overviewSm.runLoginAndChecks()
+                IconButtonWithTooltip(Icons.Filled.NoAccounts, "You are not logged in!\nClick to retry.") {
+                    overviewSm.screenModelScope.launch {
+                        val loginJob = overviewSm.runLoginAndChecks()
+                        loginJob.join()
+                        if (login != null) {
+                            sm.updateData(updateStores = true)
+                        }
+                    }
                 }
             }
 
