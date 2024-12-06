@@ -15,7 +15,6 @@ import moe.styx.common.compose.extensions.getURL
 import moe.styx.common.compose.files.Stores
 import moe.styx.common.compose.settings
 import moe.styx.common.data.MediaActivity
-import moe.styx.common.extension.currentUnixSeconds
 import moe.styx.common.extension.eqI
 import moe.styx.common.extension.toBoolean
 import moe.styx.common.util.Log
@@ -93,7 +92,7 @@ object DiscordRPC {
                     ) {
                         button("View on GitHub", "https://github.com/Vodes?tab=repositories&q=Styx&language=kotlin")
                         if (mediaActivity.playing)
-                            timestamps(currentUnixSeconds(), currentUnixSeconds() + MpvStatus.current.timeRemaining)
+                            timestamps(1, 1 + MpvStatus.current.seconds.toLong())
                         if (image == null) {
                             largeImage("styx", "v${BuildConfig.APP_VERSION}")
                         } else {
