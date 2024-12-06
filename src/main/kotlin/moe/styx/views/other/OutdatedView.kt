@@ -66,13 +66,13 @@ class OutdatedView(private val requestedVersion: String? = null) : Screen {
                 Button({
                     shouldBeDownloading = true
                     runDownload("rpm", toaster) { shouldBeDownloading = false }
-                }, enabled = !shouldBeDownloading) {
+                }, enabled = !shouldBeDownloading, modifier = Modifier.padding(12.dp)) {
                     Text("RPM")
                 }
                 Button({
                     shouldBeDownloading = true
                     runDownload("deb", toaster) { shouldBeDownloading = false }
-                }, enabled = !shouldBeDownloading) {
+                }, enabled = !shouldBeDownloading, modifier = Modifier.padding(12.dp)) {
                     Text("DEB")
                 }
             }
