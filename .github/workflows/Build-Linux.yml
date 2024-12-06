@@ -9,7 +9,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     env:
       STYX_BASEURL: ${{ secrets.STYX_BASEURL }}
       STYX_IMAGEURL: ${{ secrets.STYX_IMAGEURL }}
@@ -23,31 +23,35 @@ jobs:
         uses: actions/checkout@v4
       - name: "Setup JDK"
         id: java
-        uses: actions/setup-java@v4
+        uses: gmitch215/setup-java@main
         with:
-          distribution: "temurin"
-          java-version: |
-            11
-            17
+          distribution: jetbrains
+          java-version: 17
+          java-package: jdk
           cache: "gradle"
-      - name: "Build RPM & DEB"
+      - name: Setup Ruby (for fpm)
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.3'
+          bundler-cache: true
+      - name: Install fpm and bsdtar
+        run: |
+          gem install fpm
+          sudo apt install -y libarchive-tools
+      - name: "Build UberJar, RPM, DEB & PKG (for Arch)"
         env:
           JAVA_HOME: ${{ steps.java.outputs.path }}
         run: |
           chmod u+x ./gradlew
-          ./gradlew packageReleaseDeb packageReleaseRpm
-      - name: "Build Uber jar"
-        env:
-          JAVA_HOME: ${{ steps.setup-java.outputs.path }}
-        run: "./gradlew packageReleaseUberJarForCurrentOS"
+          ./gradlew packageLinuxInstallers
       - name: "Print and save sha384 for binaries"
-        run: find ./build/compose -type f \( -iname Styx\*linux\*.jar -o -iname \*.deb -o -iname \*.rpm \) -exec shasum -a 384 {} \; | tee checksums.sha384
+        run: find ./build/compose -type f \( -iname Styx\*linux\*.jar -o -iname \*.deb -o -iname \*.rpm -o -iname \*.pkg.tar.zst \) -exec shasum -a 384 {} \; | tee checksums.sha384
       - name: "Upload checksum file"
         uses: actions/upload-artifact@v4
         with:
           name: checksums.sha384
           path: checksums.sha384
-      - name: "Upload binaries to FTP"
+      - name: "Upload installers to FTP"
         uses: "SamKirkland/FTP-Deploy-Action@v4.3.4"
         with:
           server: ${{ secrets.FTP_HOST }}
@@ -55,7 +59,7 @@ jobs:
           password: ${{ secrets.FTP_PASS }}
           protocol: ftps
           security: loose
-          local-dir: "./build/compose/binaries/main-release/"
+          local-dir: "./build/compose/binaries/installers/"
           server-dir: "/${{ inputs.version }}/linux/binaries/"
       - name: "Upload jars to FTP"
         uses: "SamKirkland/FTP-Deploy-Action@v4.3.4"
