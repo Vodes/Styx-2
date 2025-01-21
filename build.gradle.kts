@@ -10,7 +10,11 @@ plugins {
 }
 
 group = "moe.styx"
-version = "0.1.0"
+version = "0.1.1-beta1"
+
+// Necessary to have working Windows installers for rc/beta/etc versions.
+// Count up by one for every release until a new MINOR version bump.
+val subVersionClassifier = 2
 
 repositories {
     google()
@@ -67,7 +71,7 @@ compose.desktop {
             vendor = "Vodes & Styx contributors"
             licenseFile.set(project.file("LICENSE"))
             windows {
-                packageVersion = project.version.toString().split("-")[0]
+                packageVersion = project.version.toString().split("-")[0] + subVersionClassifier.toString().padStart(4, '0')
                 menuGroup = "Styx"
                 upgradeUuid = System.getenv("STYX_APP_GUID")
                 iconFile.set(project.file("src/main/resources/icons/icon.ico"))
