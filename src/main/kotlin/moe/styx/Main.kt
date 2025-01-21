@@ -8,11 +8,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.key
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.unit.Density
-import androidx.compose.ui.unit.IntOffset
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.*
 import androidx.compose.ui.window.*
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.transitions.SlideTransition
@@ -20,8 +20,11 @@ import com.dokar.sonner.ToastWidthPolicy
 import com.dokar.sonner.Toaster
 import com.dokar.sonner.rememberToasterState
 import com.russhwolf.settings.get
+import com.russhwolf.settings.set
 import io.kamel.image.config.LocalKamelConfig
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.debounce
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
@@ -53,6 +56,11 @@ object Main {
     var isUiModeDark: MutableState<Boolean> = mutableStateOf(true)
     var useMonoFont: MutableState<Boolean> = mutableStateOf(false)
     var densityScale: MutableState<Float> = mutableStateOf(1f)
+
+    private val _windowSizeFlow = MutableStateFlow<IntSize?>(null)
+    val windowSizeFlow: MutableStateFlow<IntSize?>
+        get() = _windowSizeFlow
+
     var wasLaunchedInDebug = false
 
     fun setupLogFile() {
@@ -75,7 +83,7 @@ fun main(args: Array<String>) = application {
         Main.wasLaunchedInDebug = true
         Log.debugEnabled = true
     }
-    getHttpClient("${BuildConfig.APP_NAME} - ${BuildConfig.APP_VERSION}")
+    getHttpClient("${BuildConfig.APP_NAME} - ${BuildConfig.APP_VERSION}", true)
     appConfig = {
         AppConfig(
             BuildConfig.APP_SECRET,
@@ -109,18 +117,31 @@ fun main(args: Array<String>) = application {
     Main.densityScale.value = settings["density-scale", 1f]
     val darkMode by remember { Main.isUiModeDark }
     val monoFont by remember { Main.useMonoFont }
+    var popCalled by remember { mutableStateOf(false) }
+    val windowState = rememberWindowState(width = settings["last_window_width", 800].dp, height = settings["last_window_height", 750].dp)
 
     Window(
         onCloseRequest = { onClose() },
         title = "${BuildConfig.APP_NAME} - ${BuildConfig.APP_VERSION}",
-        state = WindowState(width = 800.dp, height = 750.dp),
-        icon = painterResource("icons/icon.ico")
+        state = windowState,
+        icon = painterResource("icons/icon.ico"),
+        onKeyEvent = {
+            if (it.key == Key.Escape) {
+                popCalled = true
+            }
+            false
+        }
     )
     {
         Log.i { "Compose window initialized with: ${this.window.renderApi}" }
         Log.i { "Starting ${BuildConfig.APP_NAME} v${BuildConfig.APP_VERSION}" }
         Surface(modifier = Modifier.fillMaxSize()) {
             val currentDensity = LocalDensity.current
+            LaunchedEffect(windowState.size) {
+                with(currentDensity) {
+                    Main.windowSizeFlow.emit(IntSize(windowState.size.width.roundToPx(), windowState.size.height.roundToPx()))
+                }
+            }
             CompositionLocalProvider(LocalDensity provides Density(currentDensity.density * Main.densityScale.value)) {
                 val toasterState = rememberToasterState()
                 MaterialTheme(
@@ -135,12 +156,26 @@ fun main(args: Array<String>) = application {
                             LocalKamelConfig provides kamelConfig,
                             LocalToaster provides toasterState
                         ) {
+                            LaunchedEffect(popCalled) {
+                                if (popCalled) {
+                                    navigator.pop()
+                                    popCalled = false
+                                }
+                            }
                             SlideTransition(
                                 navigator, animationSpec = spring(
                                     stiffness = Spring.StiffnessMedium,
                                     visibilityThreshold = IntOffset.VisibilityThreshold
                                 )
                             )
+
+                            val debouncedWindowSize by Main.windowSizeFlow.debounce(500L).collectAsState(null)
+                            LaunchedEffect(debouncedWindowSize) {
+                                if (debouncedWindowSize != null) {
+                                    settings["last_window_width"] = debouncedWindowSize!!.width
+                                    settings["last_window_height"] = debouncedWindowSize!!.height
+                                }
+                            }
                         }
                     }
                 }
