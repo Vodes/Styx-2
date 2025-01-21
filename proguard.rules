@@ -10,6 +10,7 @@
 -keep class org.jetbrains.skia.** { *; }
 -keep class org.jetbrains.skiko.** { *; }
 -keep class org.newsclub.** { *; }
+-keep class com.github.luben.** { *; }
 
 -assumenosideeffects public class androidx.compose.runtime.ComposerKt {
     void sourceInformation(androidx.compose.runtime.Composer,java.lang.String);
