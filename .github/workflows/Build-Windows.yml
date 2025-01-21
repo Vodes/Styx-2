@@ -25,10 +25,8 @@ jobs:
         id: java
         uses: actions/setup-java@v4
         with:
-          distribution: "temurin"
-          java-version: |
-            11
-            17
+          distribution: "jetbrains"
+          java-version: "17"
           cache: "gradle"
       - name: "Build Msi"
         env:
