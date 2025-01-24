@@ -39,6 +39,7 @@ dependencies {
     implementation(libs.zip4j)
     implementation(libs.kdiscord.ipc)
     implementation(libs.okio)
+    implementation(libs.junixsocket)
 
     // Styx
     implementation(libs.styx.common.compose)
