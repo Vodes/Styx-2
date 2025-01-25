@@ -135,12 +135,14 @@ class MpvInstance {
                 instanceJob.complete()
                 mpvSock.closeAllTheThings()
             }
-            launch {
+            launchGlobal {
                 while (firstPrint || !MpvStatus.current.isAvailable())
                     delay(200)
 
                 delay(4000)
-                mpvSock.command("set", 0, listOf("start", 0))
+                val startSet = mpvSock.command("set", 11, listOf("start", "0"), waitForResponse = true)
+                if (!startSet)
+                    Log.w("MPV") { "Could not reset start value!" }
             }
 
             launchGlobal {
@@ -196,7 +198,7 @@ class MpvInstance {
                         while (!MpvStatus.current.isAvailable() || !MpvStatus.current.file.equals(mediaEntry.GUID, true))
                             delay(350)
                         mpvSock.command("set", 0, listOf("pause", "yes"))
-                        mpvSock.command("set", 0, listOf("playback-time", watched.progress - 5))
+                        mpvSock.command("set_property", 0, listOf("playback-time", watched.progress - 5))
                     }
             }
         }

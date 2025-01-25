@@ -27,6 +27,7 @@ data class MpvStatus(
     companion object {
         var current = MpvStatus(-1F, 0, "", true, 0, 0, false, 0F)
         private var was100 = false
+        var lastPrint = currentUnixSeconds()
 
         fun updateCurrent(dataMap: Map<String, String?>) {
             var path = dataMap["path"]
@@ -82,8 +83,8 @@ data class MpvStatus(
                 MediaActivity(current.file, current.seconds.toLong(), !current.paused)
             else null
 
-            if (Main.wasLaunchedInDebug)
-                println(current)
+            if (Main.wasLaunchedInDebug && lastPrint < (currentUnixSeconds() - 4))
+                println(current).also { lastPrint = currentUnixSeconds() }
             if (shouldAutoplay)
                 attemptPlayNext()
         }

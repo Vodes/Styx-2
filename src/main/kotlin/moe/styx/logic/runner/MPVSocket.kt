@@ -9,26 +9,83 @@ import moe.styx.common.util.Log
 import moe.styx.common.util.launchThreaded
 import org.newsclub.net.unix.AFUNIXSocket
 import org.newsclub.net.unix.AFUNIXSocketAddress
+import java.io.BufferedReader
 import java.io.File
+import java.io.RandomAccessFile
+
+class NamedPipeOrUnixSocket() {
+    private val socket: AFUNIXSocket = AFUNIXSocket.newInstance()
+    private var socketReader: BufferedReader? = null
+    private lateinit var pipe: RandomAccessFile
+
+    fun connect() {
+        if (isWindows)
+            pipe = RandomAccessFile("\\\\.\\pipe\\styx-mpvsocket", "rw")
+        else {
+            AFUNIXSocket.ensureSupported()
+            val file = File("/tmp/styx-mpvsocket")
+            socket.connect(AFUNIXSocketAddress.of(file))
+        }
+    }
+
+    val isConnected: Boolean
+        get() {
+            return if (isWindows) true
+            else socket.isConnected
+        }
+
+    val isClosed: Boolean
+        get() {
+            return if (isWindows) false
+            else socket.isClosed
+        }
+
+    fun writeLine(line: String) {
+        if (isWindows) {
+            pipe.writeBytes(line.trim() + "\n")
+        } else {
+            val writer = socket.outputStream.writer()
+            writer.appendLine(line.trim())
+            writer.flush()
+        }
+    }
+
+    fun readLine(): String? {
+        return runCatching {
+            if (isWindows)
+                return pipe.readLine()
+            else {
+                if (socketReader == null)
+                    socketReader = socket.inputStream.bufferedReader(Charsets.UTF_8)
+                return socketReader!!.readLine()
+            }
+
+        }.getOrNull()
+    }
+
+    fun closeAllTheThings() {
+        if (isWindows) {
+            runCatching { pipe.close() }
+            return
+        }
+        runCatching { socket.outputStream.close() }
+        runCatching { socket.inputStream.close() }
+        runCatching { socket.close() }
+    }
+}
+
 
 class MPVSocket {
-    private val socket: AFUNIXSocket = AFUNIXSocket.newInstance()
+    private val sysSocket = NamedPipeOrUnixSocket()
     private val scope = CoroutineScope(Dispatchers.IO)
     private val commandResponseQueue = mutableMapOf<Int, Boolean?>()
 
     val rawDataMap = mutableMapOf<String, String?>()
 
-    fun connect() {
-        AFUNIXSocket.ensureSupported()
-        val file = if (isWindows)
-            File("\\\\.\\pipe\\styx-mpvsocket")
-        else
-            File("/tmp/styx-mpvsocket")
-        socket.connect(AFUNIXSocketAddress.of(file))
-    }
+    fun connect() = sysSocket.connect()
 
     fun addListeners() = runBlocking {
-        while (!socket.isConnected || socket.isClosed)
+        while (!sysSocket.isConnected || sysSocket.isClosed)
             delay(50)
         listOf(
             "pause",
@@ -46,11 +103,9 @@ class MPVSocket {
     }
 
     fun rawCommand(cmd: String): Boolean {
-        val writer = socket.outputStream.writer()
         var success = true
         try {
-            writer.appendLine("""{ "command": $cmd }""")
-            writer.flush()
+            sysSocket.writeLine("""{ "command": $cmd }""")
         } catch (e: Exception) {
             Log.e("MPV", e) { "Failed to send raw command: $cmd" }
             success = false
@@ -59,13 +114,11 @@ class MPVSocket {
     }
 
     fun command(command: String, requestID: Int, params: List<Any> = emptyList(), waitForResponse: Boolean = false): Boolean {
-        val writer = socket.outputStream.writer()
         var success = true
         val paramsString = if (params.isEmpty()) "" else ", ${params.joinToString(", ") { if (it is String) "\"$it\"" else "$it" }}"
         val commandString = """{ "command": [ "$command" $paramsString ], "request_id": $requestID }"""
         try {
-            writer.appendLine(commandString)
-            writer.flush()
+            sysSocket.writeLine(commandString)
             if (waitForResponse)
                 commandResponseQueue[requestID] = null
         } catch (e: Exception) {
@@ -87,27 +140,21 @@ class MPVSocket {
     }
 
     private fun processListeners() = launchThreaded {
-        val reader = socket.inputStream.bufferedReader(Charsets.UTF_8)
-        var line: String
-        while (reader.readLine().also { line = it } != null && socket.isConnected) {
-            if (line.contains("property-change", ignoreCase = false)) {
-                val parsed = json.decodeFromString<MPVEvent>(line)
+        var line: String?
+        while (sysSocket.readLine().also { line = it } != null && sysSocket.isConnected) {
+            if (line!!.contains("property-change", ignoreCase = false)) {
+                val parsed = json.decodeFromString<MPVEvent>(line!!)
                 rawDataMap[parsed.name] = parsed.data
             }
-            if (line.contains("request_id") && line.contains("error")) {
-                val parsed = json.decodeFromString<MPVResponse>(line)
+            if (line!!.contains("request_id") && line!!.contains("error")) {
+                val parsed = json.decodeFromString<MPVResponse>(line!!)
                 if (commandResponseQueue.containsKey(parsed.requestID))
                     commandResponseQueue[parsed.requestID] = parsed.isOK()
             }
         }
-        reader.close()
     }
 
-    fun closeAllTheThings() {
-        runCatching { socket.outputStream.close() }
-        runCatching { socket.inputStream.close() }
-        runCatching { socket.close() }
-    }
+    fun closeAllTheThings() = sysSocket.closeAllTheThings()
 }
 
 @Serializable
