@@ -1,11 +1,11 @@
 [versions]
-kotlin = "2.0.21"
-compose = "1.7.1"
-styx-common-compose = "0.1.10"
-buildconfig = "5.4.0"
-slf4j-simple = "2.0.16"
-okio = "3.9.0"
-kdiscord-ipc = "0.2.2"
+kotlin = "2.1.10"
+compose = "1.7.3"
+styx-common-compose = "c19882b4"
+buildconfig = "5.6.2"
+slf4j-simple = "2.0.17"
+okio = "3.10.2"
+kdiscord-ipc = "0.2.3"
 junix = "2.10.1"
 zip4j = "2.11.5"
 
