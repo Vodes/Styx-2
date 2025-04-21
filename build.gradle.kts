@@ -28,6 +28,7 @@ repositories {
 
 dependencies {
     implementation(kotlin("stdlib-jdk8"))
+    implementation(libs.coroutines.core.swing)
 
     // Compose Stuff
     implementation(compose.desktop.currentOs)
