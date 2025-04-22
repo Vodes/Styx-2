@@ -239,7 +239,13 @@ fun attemptPlayNext() {
         }
     val next = entries.minByOrNull { it.entryNumber.toDoubleOrNull() ?: 9999.0 } ?: return
 
-    if (currentPlayer == null || !currentPlayer!!.mpvSock.command("show-text", 0, listOf("Playing next episode in 5 seconds...", 1500)))
+    if (currentPlayer == null || !currentPlayer!!.mpvSock.command(
+            "show-text",
+            0,
+            listOf("Playing next episode in 5 seconds...", 1500),
+            waitForResponse = true
+        )
+    )
         return
 
     currentPlayer!!.createScope().launch {

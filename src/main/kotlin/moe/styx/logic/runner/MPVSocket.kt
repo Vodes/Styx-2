@@ -7,79 +7,24 @@ import moe.styx.common.isWindows
 import moe.styx.common.json
 import moe.styx.common.util.Log
 import moe.styx.common.util.launchThreaded
-import org.newsclub.net.unix.AFUNIXSocket
-import org.newsclub.net.unix.AFUNIXSocketAddress
-import java.io.BufferedReader
-import java.io.File
-import java.io.RandomAccessFile
-
-class NamedPipeOrUnixSocket() {
-    private val socket: AFUNIXSocket = AFUNIXSocket.newInstance()
-    private var socketReader: BufferedReader? = null
-    private lateinit var pipe: RandomAccessFile
-
-    fun connect() {
-        if (isWindows)
-            pipe = RandomAccessFile("\\\\.\\pipe\\styx-mpvsocket", "rw")
-        else {
-            AFUNIXSocket.ensureSupported()
-            val file = File("/tmp/styx-mpvsocket")
-            socket.connect(AFUNIXSocketAddress.of(file))
-        }
-    }
-
-    val isConnected: Boolean
-        get() {
-            return if (isWindows) true
-            else socket.isConnected
-        }
-
-    val isClosed: Boolean
-        get() {
-            return if (isWindows) false
-            else socket.isClosed
-        }
-
-    fun writeLine(line: String) {
-        if (isWindows) {
-            pipe.writeBytes(line.trim() + "\n")
-        } else {
-            val writer = socket.outputStream.writer()
-            writer.appendLine(line.trim())
-            writer.flush()
-        }
-    }
-
-    fun readLine(): String? {
-        return runCatching {
-            if (isWindows)
-                return pipe.readLine()
-            else {
-                if (socketReader == null)
-                    socketReader = socket.inputStream.bufferedReader(Charsets.UTF_8)
-                return socketReader!!.readLine()
-            }
-
-        }.getOrNull()
-    }
-
-    fun closeAllTheThings() {
-        if (isWindows) {
-            runCatching { pipe.close() }
-            return
-        }
-        runCatching { socket.outputStream.close() }
-        runCatching { socket.inputStream.close() }
-        runCatching { socket.close() }
-    }
-}
-
+import moe.styx.logic.pipe.UnixPipe
+import moe.styx.logic.pipe.WinPipe
 
 class MPVSocket {
-    private val sysSocket = NamedPipeOrUnixSocket()
+    private val sysSocket = if (isWindows) WinPipe("\\\\.\\pipe\\styx-mpvsocket") else UnixPipe("/tmp/styx-mpvsocket")
     private val scope = CoroutineScope(Dispatchers.IO)
     private val commandResponseQueue = mutableMapOf<Int, Boolean?>()
 
+    val properties = mapOf(
+        1 to "pause",
+        2 to "path",
+        3 to "playback-time",
+        4 to "percent-pos",
+        5 to "eof-reached",
+        6 to "time-remaining",
+        7 to "playlist-current-pos",
+        8 to "playlist-count"
+    )
     val rawDataMap = mutableMapOf<String, String?>()
 
     fun connect() = sysSocket.connect()
@@ -87,16 +32,7 @@ class MPVSocket {
     fun addListeners() = runBlocking {
         while (!sysSocket.isConnected || sysSocket.isClosed)
             delay(50)
-        listOf(
-            "pause",
-            "path",
-            "playback-time",
-            "percent-pos",
-            "eof-reached",
-            "time-remaining",
-            "playlist-current-pos",
-            "playlist-count"
-        ).forEachIndexed { idx, prop ->
+        properties.forEach { idx, prop ->
             command("observe_property_string", "5$idx".toInt(), listOf(idx, prop))
         }
         processListeners()
@@ -144,7 +80,16 @@ class MPVSocket {
         while (sysSocket.readLine().also { line = it } != null && sysSocket.isConnected) {
             if (line!!.contains("property-change", ignoreCase = false)) {
                 val parsed = json.decodeFromString<MPVEvent>(line!!)
-                rawDataMap[parsed.name] = parsed.data
+                var propName = parsed.name
+                if (propName == null) {
+                    if (parsed.id != null) {
+                        propName = properties.getOrDefault(parsed.id, null)
+                        if (propName == null)
+                            continue
+                    } else
+                        continue
+                }
+                rawDataMap[propName] = parsed.data
             }
             if (line!!.contains("request_id") && line!!.contains("error")) {
                 val parsed = json.decodeFromString<MPVResponse>(line!!)
@@ -158,7 +103,7 @@ class MPVSocket {
 }
 
 @Serializable
-data class MPVEvent(val event: String, val id: Int? = null, val name: String, val data: String? = null)
+data class MPVEvent(val event: String, val id: Int? = null, val name: String? = null, val data: String? = null)
 
 @Serializable
 data class MPVResponse(@SerialName("request_id") val requestID: Int, val error: String) {
