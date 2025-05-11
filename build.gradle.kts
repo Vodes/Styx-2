@@ -1,4 +1,6 @@
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
+import org.jetbrains.compose.reload.ComposeHotRun
+import org.jetbrains.kotlin.compose.compiler.gradle.ComposeFeatureFlag
 import java.nio.file.Paths
 
 plugins {
@@ -7,6 +9,7 @@ plugins {
     alias(libs.plugins.compose)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.buildconfig)
+    alias(libs.plugins.compose.hot.reload)
 }
 
 group = "moe.styx"
@@ -93,6 +96,14 @@ compose.desktop {
             }
         }
     }
+}
+
+composeCompiler {
+    featureFlags.add(ComposeFeatureFlag.OptimizeNonSkippingGroups)
+}
+
+tasks.withType<ComposeHotRun>().configureEach {
+    mainClass.set("moe.styx.MainKt")
 }
 
 buildConfig {
