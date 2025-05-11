@@ -37,6 +37,7 @@ dependencies {
     implementation(compose.desktop.currentOs)
     implementation(compose.material3)
     implementation(compose.materialIconsExtended)
+    implementation(compose.components.resources)
 
     // Misc
     implementation(libs.slf4j.simple)
@@ -44,10 +45,6 @@ dependencies {
     implementation(libs.kdiscord.ipc)
     implementation(libs.okio)
     implementation(libs.junixsocket)
-
-    implementation("io.github.mflisar.composedialogs:core:2.1.3")
-    implementation("io.github.mflisar.composedialogs:dialog-list:2.1.3")
-    implementation("io.github.mflisar.composedialogs:dialog-number:2.1.3")
 
     // Styx
     implementation(libs.styx.common.compose)

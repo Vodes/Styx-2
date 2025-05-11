@@ -11,7 +11,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.model.rememberNavigatorScreenModel
@@ -21,10 +20,13 @@ import com.dokar.sonner.TextToastAction
 import com.dokar.sonner.Toast
 import com.dokar.sonner.ToastType
 import com.russhwolf.settings.get
+import moe.styx.common.compose.components.AppShapes
 import moe.styx.common.compose.components.anime.*
 import moe.styx.common.compose.components.buttons.FavouriteIconButton
 import moe.styx.common.compose.components.layout.MainScaffold
 import moe.styx.common.compose.components.misc.OnlineUsersIcon
+import moe.styx.common.compose.components.tracking.anilist.AnilistBottomSheetModel
+import moe.styx.common.compose.components.tracking.anilist.AnilistButtomSheet
 import moe.styx.common.compose.extensions.getPainter
 import moe.styx.common.compose.settings
 import moe.styx.common.compose.utils.LocalGlobalNavigator
@@ -33,17 +35,16 @@ import moe.styx.common.compose.viewmodels.MainDataViewModel
 import moe.styx.common.compose.viewmodels.MediaStorage
 import moe.styx.common.data.Media
 import moe.styx.common.data.MediaEntry
-import moe.styx.components.anilist.AnilistBottomSheetModel
-import moe.styx.components.anilist.AnilistButtomSheet
 import moe.styx.components.anime.AppendDialog
 import moe.styx.components.anime.BigScalingCardImage
 import moe.styx.logic.runner.currentPlayer
 import moe.styx.logic.runner.launchMPV
 import moe.styx.logic.runner.openURI
 import moe.styx.logic.utils.*
-import moe.styx.theme.AppShapes
+import moe.styx.styx_common_compose.generated.resources.*
 import moe.styx.views.settings.SettingsTab
 import moe.styx.views.settings.SettingsView
+import org.jetbrains.compose.resources.painterResource
 
 class AnimeDetailView(private val mediaID: String) : Screen {
 
@@ -170,7 +171,7 @@ fun MappingIcons(media: Media) {
         val filter = ColorFilter.tint(MaterialTheme.colorScheme.onSurface)
         if (!anilistURL.isNullOrBlank())
             Image(
-                painterResource("icons/al.svg"),
+                painterResource(Res.drawable.al),
                 "AniList",
                 Modifier.padding(8.dp, 3.dp).size(25.dp).clip(AppShapes.small).clickable {
                     showAnilistSheet = true
@@ -180,7 +181,7 @@ fun MappingIcons(media: Media) {
             )
         if (!malURL.isNullOrBlank())
             Image(
-                painterResource("icons/myanimelist.svg"),
+                painterResource(Res.drawable.myanimelist),
                 "MyAnimeList",
                 Modifier.padding(8.dp, 3.dp).size(25.dp).clip(AppShapes.small).clickable {
                     openURI(malURL)
@@ -190,7 +191,7 @@ fun MappingIcons(media: Media) {
             )
         if (!tmdbURL.isNullOrBlank())
             Image(
-                painterResource("icons/tmdb.svg"),
+                painterResource(Res.drawable.tmdb),
                 "TheMovieDB",
                 Modifier.padding(8.dp, 3.dp).size(25.dp).clip(AppShapes.small).clickable {
                     openURI(tmdbURL)
@@ -201,7 +202,8 @@ fun MappingIcons(media: Media) {
     }
     if (showAnilistSheet) {
         val state = nav.rememberNavigatorScreenModel("al-sheet-${media.GUID}") { AnilistBottomSheetModel() }
-        AnilistButtomSheet(media, state) {
+        val sm = nav.rememberNavigatorScreenModel("main-vm") { MainDataViewModel() }
+        AnilistButtomSheet(media, sm, state, { openURI(it) }) {
             showAnilistSheet = false
         }
     }
