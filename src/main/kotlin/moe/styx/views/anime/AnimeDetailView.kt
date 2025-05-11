@@ -33,6 +33,8 @@ import moe.styx.common.compose.viewmodels.MainDataViewModel
 import moe.styx.common.compose.viewmodels.MediaStorage
 import moe.styx.common.data.Media
 import moe.styx.common.data.MediaEntry
+import moe.styx.components.anilist.AnilistBottomSheetModel
+import moe.styx.components.anilist.AnilistButtomSheet
 import moe.styx.components.anime.AppendDialog
 import moe.styx.components.anime.BigScalingCardImage
 import moe.styx.logic.runner.currentPlayer
@@ -162,6 +164,8 @@ fun MappingIcons(media: Media) {
     val malURL = media.getURLFromMap(StackType.MAL)
     val anilistURL = media.getURLFromMap(StackType.ANILIST)
     val tmdbURL = media.getURLFromMap(StackType.TMDB)
+    val nav = LocalGlobalNavigator.current
+    var showAnilistSheet by remember { mutableStateOf(false) }
     Row(Modifier.padding(0.dp, 0.dp, 0.dp, 15.dp), verticalAlignment = Alignment.CenterVertically) {
         val filter = ColorFilter.tint(MaterialTheme.colorScheme.onSurface)
         if (!anilistURL.isNullOrBlank())
@@ -169,7 +173,7 @@ fun MappingIcons(media: Media) {
                 painterResource("icons/al.svg"),
                 "AniList",
                 Modifier.padding(8.dp, 3.dp).size(25.dp).clip(AppShapes.small).clickable {
-                    openURI(anilistURL)
+                    showAnilistSheet = true
                 },
                 contentScale = ContentScale.FillWidth,
                 colorFilter = filter
@@ -194,5 +198,11 @@ fun MappingIcons(media: Media) {
                 contentScale = ContentScale.FillWidth,
                 colorFilter = filter
             )
+    }
+    if (showAnilistSheet) {
+        val state = nav.rememberNavigatorScreenModel("al-sheet-${media.GUID}") { AnilistBottomSheetModel() }
+        AnilistButtomSheet(media, state) {
+            showAnilistSheet = false
+        }
     }
 }

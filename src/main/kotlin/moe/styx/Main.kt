@@ -77,9 +77,10 @@ object Main {
 }
 
 fun main(args: Array<String>) = application {
-    if (!args.contains("-debug"))
+    if (!args.contains("-debug") && System.getenv("STYX_DEBUG").isNullOrBlank())
         Main.setupLogFile()
     else {
+        Log.i { "Launching in debug mode." }
         Main.wasLaunchedInDebug = true
         Log.debugEnabled = true
     }
