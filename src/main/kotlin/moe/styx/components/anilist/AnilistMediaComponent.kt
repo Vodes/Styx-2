@@ -26,27 +26,26 @@ import moe.styx.common.compose.components.buttons.IconButtonWithTooltip
 import moe.styx.common.compose.extensions.getPainter
 import moe.styx.common.data.Image
 import moe.styx.common.data.Media
-import moe.styx.common.data.tmdb.decodeMapping
 import moe.styx.common.extension.capitalize
 import moe.styx.common.extension.eqI
 import moe.styx.common.extension.toInt
+import moe.styx.components.anilist.CommonMediaListStatus.Companion.fromAnilistStatus
 import moe.styx.logic.runner.openURI
 import pw.vodes.anilistkmp.graphql.fragment.User
 import pw.vodes.anilistkmp.graphql.type.MediaListStatus
 
 @Composable
 fun AnilistMediaComponent(media: Media, viewer: User?, alMedia: AlMedia, entry: AlUserEntry? = null) {
-    val mapping = media.decodeMapping()
     Column(Modifier.fillMaxWidth().padding(5.dp), horizontalAlignment = Alignment.CenterHorizontally) {
         var status by remember(viewer, entry) {
-            mutableStateOf(entry?.let {
-                RemoteMediaStatus(
-                    it.media.id,
-                    it.listEntry.status?.name ?: "",
-                    it.listEntry.progress ?: 0,
-                    alMedia.episodes,
+            mutableStateOf(
+                CommonMediaStatus(
+                    alMedia.id,
+                    entry?.listEntry?.status?.toCommon() ?: CommonMediaListStatus.NONE,
+                    entry?.listEntry?.progress ?: -1,
+                    alMedia.episodes ?: Int.MAX_VALUE
                 )
-            })
+            )
         }
 
         RemoteMediaComponent(
@@ -54,15 +53,56 @@ fun AnilistMediaComponent(media: Media, viewer: User?, alMedia: AlMedia, entry: 
             alMedia.coverImage?.large ?: "",
             "https://anilist.co/anime/${alMedia.id}",
             viewer != null,
-            status,
-            MediaListStatus.knownEntries.map { it.name }
+            status
         ) {
             status = it
         }
     }
 }
 
-data class RemoteMediaStatus(val id: Int, val status: String?, val progress: Int, val knownMax: Int? = null)
+enum class CommonMediaListStatus {
+    WATCHING,
+    PLANNING,
+    COMPLETED,
+    DROPPED,
+    PAUSED,
+    REPEATING,
+    NONE;
+
+    fun toAnilistStatus(): MediaListStatus? = when (this) {
+        WATCHING -> MediaListStatus.CURRENT
+        PLANNING -> MediaListStatus.PLANNING
+        COMPLETED -> MediaListStatus.COMPLETED
+        DROPPED -> MediaListStatus.DROPPED
+        PAUSED -> MediaListStatus.PAUSED
+        REPEATING -> MediaListStatus.REPEATING
+        else -> null
+    }
+
+    companion object {
+        fun fromAnilistStatus(status: MediaListStatus): CommonMediaListStatus = when (status) {
+            MediaListStatus.CURRENT -> WATCHING
+            MediaListStatus.PLANNING -> PLANNING
+            MediaListStatus.COMPLETED -> COMPLETED
+            MediaListStatus.DROPPED -> DROPPED
+            MediaListStatus.PAUSED -> PAUSED
+            MediaListStatus.REPEATING -> REPEATING
+            else -> NONE
+        }
+    }
+}
+
+fun MediaListStatus.toCommon(): CommonMediaListStatus = fromAnilistStatus(this)
+
+data class CommonMediaStatus(
+    val id: Int,
+    val status: CommonMediaListStatus,
+    val progress: Int = -1,
+    val knownMax: Int = Int.MAX_VALUE
+) {
+    val hasProgress get() = progress > 0
+    val hasKnownMax get() = knownMax != Int.MAX_VALUE
+}
 
 @Composable
 fun RemoteMediaComponent(
@@ -70,9 +110,8 @@ fun RemoteMediaComponent(
     imageURL: String,
     remoteURL: String,
     isLoggedIn: Boolean,
-    status: RemoteMediaStatus? = null,
-    statusList: List<String> = emptyList(),
-    onStatusUpdate: (RemoteMediaStatus) -> Unit = {}
+    status: CommonMediaStatus,
+    onStatusUpdate: (CommonMediaStatus) -> Unit = {}
 ) {
     var showStatusDialog by remember { mutableStateOf(false) }
     var showEpisodeDialog by remember { mutableStateOf(false) }
@@ -117,8 +156,9 @@ fun RemoteMediaComponent(
                         elevation = CardDefaults.elevatedCardElevation(1.dp)
                     ) {
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            val statusName = status.status.name.capitalize()
                             Text(
-                                status?.status?.capitalize() ?: "/",
+                                if (status.status != CommonMediaListStatus.NONE) statusName else "/",
                                 style = MaterialTheme.typography.labelLarge,
                                 textAlign = TextAlign.Center,
                                 modifier = Modifier.defaultMinSize(100.dp).padding(5.dp)
@@ -136,7 +176,7 @@ fun RemoteMediaComponent(
                         elevation = CardDefaults.elevatedCardElevation(1.dp)
                     ) {
                         Text(
-                            (status?.progress?.toString() ?: "0") + " / " + (status?.knownMax?.toString() ?: "?"),
+                            (if (status.hasProgress) status.progress.toString() else "0") + " / " + (if (status.hasKnownMax) status.knownMax.toString() else "?"),
                             style = MaterialTheme.typography.labelLarge,
                             textAlign = TextAlign.Center,
                             modifier = Modifier.defaultMinSize(100.dp).padding(5.dp)
@@ -145,9 +185,9 @@ fun RemoteMediaComponent(
                     Spacer(Modifier.weight(1f))
                     ElevatedCard(
                         {
-                            onStatusUpdate(status!!.copy(progress = status.progress + 1))
+                            onStatusUpdate(status.copy(progress = status.progress + 1))
                         },
-                        enabled = if (status?.progress != null && status.knownMax != null && isLoggedIn)
+                        enabled = if (status.hasProgress && status.hasKnownMax && isLoggedIn)
                             status.progress < status.knownMax
                         else isLoggedIn,
                         modifier = Modifier.padding(3.dp),
@@ -166,14 +206,14 @@ fun RemoteMediaComponent(
         }
     }
     if (showStatusDialog) {
-        StatusDialog(status?.status?.capitalize() ?: "", statusList, { showStatusDialog = false }) {
-            onStatusUpdate(status!!.copy(status = statusList.find { stat -> stat eqI it }))
+        StatusDialog(status.status.name.capitalize(), CommonMediaListStatus.entries.map { it.name }, { showStatusDialog = false }) {
+            onStatusUpdate(status.copy(status = CommonMediaListStatus.entries.find { s -> s.name eqI it }!!))
         }
     }
 
     if (showEpisodeDialog) {
-        EpisodeDialog(status?.progress ?: 0, status?.knownMax, { showEpisodeDialog = false }) {
-            onStatusUpdate(status!!.copy(progress = it))
+        EpisodeDialog(status.progress, status.knownMax, { showEpisodeDialog = false }) {
+            onStatusUpdate(status.copy(progress = it))
         }
     }
 }
@@ -186,6 +226,7 @@ fun StatusDialog(current: String, available: List<String>, onDismiss: () -> Unit
         title = { Text("Watch status") },
         icon = { Icon(Icons.Filled.Checklist, "Watch status") },
         state = state,
+        description = "Setting this to None will remove the entry from your list.",
         items = available,
         itemIdProvider = { available.indexOf(it) },
         selectionMode = DialogList.SelectionMode.SingleSelect(
