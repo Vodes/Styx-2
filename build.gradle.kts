@@ -43,7 +43,6 @@ dependencies {
     implementation(libs.slf4j.simple)
     implementation(libs.zip4j)
     implementation(libs.kdiscord.ipc)
-    implementation(libs.okio)
     implementation(libs.junixsocket)
 
     // Styx

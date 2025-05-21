@@ -1,10 +1,9 @@
 [versions]
 kotlin = "2.1.20"
 compose = "1.8.1"
-styx-common-compose = "0a705ee9"
+styx-common-compose = "0.2.0"
 buildconfig = "5.6.2"
 slf4j-simple = "2.0.17"
-okio = "3.10.2"
 kdiscord-ipc = "0.2.3"
 junix = "2.10.1"
 zip4j = "2.11.5"
@@ -22,7 +21,6 @@ buildconfig = { id = "com.github.gmazzo.buildconfig", version.ref = "buildconfig
 [libraries]
 zip4j = { module = "net.lingala.zip4j:zip4j", version.ref = "zip4j" }
 kdiscord-ipc = { module = "com.github.caoimhebyrne:KDiscordIPC", version.ref = "kdiscord-ipc" }
-okio = { module = "com.squareup.okio:okio", version.ref = "okio" }
 slf4j-simple = { module = "org.slf4j:slf4j-simple", version.ref = "slf4j-simple" }
 junixsocket = { module = "com.kohlschutter.junixsocket:junixsocket-core", version.ref = "junix" }
 coroutines-core-swing = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-swing", version.ref = "coroutines" }

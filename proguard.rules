@@ -99,6 +99,8 @@
 
 -keep class moe.styx.**
 -keep class oshi.**
+-keep class okio.**
+-keep class okhttp.**
 
 -keep class com.sun.jna.** { *; }
 -keep class * implements com.sun.jna.** { *; }
