@@ -33,9 +33,7 @@ import moe.styx.common.util.Log
 import moe.styx.components.misc.MpvVersionAndDownload
 import moe.styx.logic.Files
 import moe.styx.logic.runner.openURI
-import moe.styx.views.settings.sub.AppearanceSettings
-import moe.styx.views.settings.sub.DiscordSettings
-import moe.styx.views.settings.sub.MetadataSettings
+import moe.styx.views.settings.sub.*
 import java.awt.Desktop
 import java.io.File
 
@@ -61,6 +59,7 @@ class SettingsViewModel : ScreenModel {
     var appearanceExpanded by mutableStateOf(true)
     var metadataExpanded by mutableStateOf(true)
     var discordExpanded by mutableStateOf(false)
+    var trackingExpanded by mutableStateOf(false)
     var systemExpanded by mutableStateOf(false)
 }
 
@@ -85,6 +84,9 @@ fun SettingsViewComponent() {
             }
             ExpandableSettings("Discord", vm.discordExpanded, { vm.discordExpanded = !vm.discordExpanded }, withContainer = false) {
                 DiscordSettings()
+            }
+            ExpandableSettings("Tracking", vm.trackingExpanded, { vm.trackingExpanded = !vm.trackingExpanded }, withContainer = false) {
+                TrackingSettings()
             }
             ExpandableSettings("System", vm.systemExpanded, { vm.systemExpanded = !vm.systemExpanded }, withContainer = false) {
                 ServerSelection()

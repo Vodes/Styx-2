@@ -73,7 +73,7 @@ data class MpvStatus(
                         )
                         launchThreaded {
                             RequestQueue.updateWatched(watched).first.join()
-                            currentPlayer?.onClose?.let { it(MpvFinishStatus(0)) }
+                            currentPlayer?.onClose(MpvFinishStatus(0, "", previousEntry.GUID))
                         }
                     }
                 }
@@ -85,8 +85,8 @@ data class MpvStatus(
 
             if (Main.wasLaunchedInDebug && lastPrint < (currentUnixSeconds() - 4))
                 println(current).also { lastPrint = currentUnixSeconds() }
-            if (shouldAutoplay)
-                attemptPlayNext()
+            if (shouldAutoplay && currentPlayer != null)
+                currentPlayer!!.attemptPlayNext()
         }
     }
 

@@ -24,6 +24,7 @@ import moe.styx.common.compose.components.buttons.FavouriteIconButton
 import moe.styx.common.compose.components.buttons.IconButtonWithTooltip
 import moe.styx.common.compose.components.layout.MainScaffold
 import moe.styx.common.compose.components.misc.OnlineUsersIcon
+import moe.styx.common.compose.extensions.joinAndSyncProgress
 import moe.styx.common.compose.files.Storage
 import moe.styx.common.compose.files.collectWithEmptyInitial
 import moe.styx.common.compose.files.updateList
@@ -78,6 +79,7 @@ class MovieDetailView(private val mediaID: String) : Screen {
 
         MainScaffold(title = mediaStorage.media.name, actions = {
             OnlineUsersIcon { nav.replace(if (it.isSeries.toBoolean()) AnimeDetailView(it.GUID) else MovieDetailView(it.GUID)) }
+            MediaPreferencesIconButton(mediaStorage.preferences, mediaStorage.media, sm)
             FavouriteIconButton(mediaStorage.media, sm, storage)
         }) {
             val scrollState = rememberScrollState()
@@ -94,13 +96,13 @@ class MovieDetailView(private val mediaID: String) : Screen {
                 }
                 var showAppendDialog by remember { mutableStateOf(false) }
                 if (showAppendDialog && movieEntry != null) {
-                    AppendDialog(movieEntry, Modifier.fillMaxWidth(0.6F), Modifier.align(Alignment.CenterHorizontally), {
+                    AppendDialog(movieEntry, sm, Modifier.fillMaxWidth(0.6F), Modifier.align(Alignment.CenterHorizontally), {
                         showAppendDialog = false
-                    }) {
-                        if (!it.isOK)
-                            failedToPlayMessage = it.message
+                    }) { result ->
+                        if (!result.isOK)
+                            failedToPlayMessage = result.message
                         else
-                            sm.updateData(true)
+                            sm.updateData(true).also { job -> result.lastEntry?.let { job.joinAndSyncProgress(it, sm) } }
                     }
                 }
 
@@ -112,11 +114,11 @@ class MovieDetailView(private val mediaID: String) : Screen {
                                     if (movieEntry == null)
                                         return@IconButton
                                     if (currentPlayer == null) {
-                                        launchMPV(movieEntry, false) {
-                                            if (!it.isOK)
-                                                failedToPlayMessage = it.message
+                                        launchMPV(movieEntry, sm, false) { result ->
+                                            if (!result.isOK)
+                                                failedToPlayMessage = result.message
                                             else
-                                                sm.updateData(true)
+                                                sm.updateData(true).also { job -> result.lastEntry?.let { job.joinAndSyncProgress(it, sm) } }
                                         }
                                     } else {
                                         showAppendDialog = true
@@ -132,7 +134,7 @@ class MovieDetailView(private val mediaID: String) : Screen {
                                             RequestQueue.updateWatched(
                                                 MediaWatched(movieEntry.GUID, login?.userID ?: "", currentUnixSeconds(), 0, 0F, 100F)
                                             ).first.join()
-                                            sm.updateData(true)
+                                            sm.updateData(true).joinAndSyncProgress(movieEntry, sm)
                                         }
                                     }
                                 }) { Icon(Icons.Default.Visibility, "Set Watched") }
@@ -141,7 +143,7 @@ class MovieDetailView(private val mediaID: String) : Screen {
                                     movieEntry?.let {
                                         launchThreaded {
                                             RequestQueue.removeWatched(movieEntry).first.join()
-                                            sm.updateData(true)
+                                            sm.updateData(true).joinAndSyncProgress(movieEntry, sm)
                                         }
                                     }
                                 }) { Icon(Icons.Default.VisibilityOff, "Set Unwatched") }

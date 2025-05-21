@@ -1,7 +1,7 @@
 [versions]
 kotlin = "2.1.20"
-compose = "1.8.0"
-styx-common-compose = "f0a1938e"
+compose = "1.8.1"
+styx-common-compose = "0a705ee9"
 buildconfig = "5.6.2"
 slf4j-simple = "2.0.17"
 okio = "3.10.2"
@@ -9,7 +9,7 @@ kdiscord-ipc = "0.2.3"
 junix = "2.10.1"
 zip4j = "2.11.5"
 coroutines = "1.10.1"
-hot-reload = "1.0.0-alpha09"
+hot-reload = "1.0.0-alpha10"
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
