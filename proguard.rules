@@ -97,10 +97,12 @@
 -keep class org.slf4j.**
 -keep class * implements org.slf4j.Logger
 
--keep class moe.styx.**
+-keep class moe.styx.**  { *; }
 -keep class oshi.**
--keep class okio.**
--keep class okhttp.**
+-keep class okio.**  { *; }
+-keep class okhttp.**  { *; }
+-keep class okhttp3.**  { *; }
+
 
 -keep class com.sun.jna.** { *; }
 -keep class * implements com.sun.jna.** { *; }
