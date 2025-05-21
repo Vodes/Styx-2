@@ -31,6 +31,7 @@ import kotlinx.datetime.toLocalDateTime
 import moe.styx.Styx_2.BuildConfig
 import moe.styx.common.compose.AppConfig
 import moe.styx.common.compose.AppContextImpl.appConfig
+import moe.styx.common.compose.components.*
 import moe.styx.common.compose.extensions.kamelConfig
 import moe.styx.common.compose.http.Endpoints
 import moe.styx.common.compose.http.sendObject
@@ -47,7 +48,6 @@ import moe.styx.common.util.launchGlobal
 import moe.styx.logic.DiscordRPC
 import moe.styx.logic.Files
 import moe.styx.logic.runner.currentPlayer
-import moe.styx.theme.*
 import moe.styx.views.anime.AnimeOverview
 import java.io.File
 import java.io.PrintStream
@@ -77,9 +77,10 @@ object Main {
 }
 
 fun main(args: Array<String>) = application {
-    if (!args.contains("-debug"))
+    if (!args.contains("-debug") && System.getenv("STYX_DEBUG").isNullOrBlank())
         Main.setupLogFile()
     else {
+        Log.i { "Launching in debug mode." }
         Main.wasLaunchedInDebug = true
         Log.debugEnabled = true
     }
@@ -144,9 +145,10 @@ fun main(args: Array<String>) = application {
             }
             CompositionLocalProvider(LocalDensity provides Density(currentDensity.density * Main.densityScale.value)) {
                 val toasterState = rememberToasterState()
+                val font = if (monoFont) AppFont.JetbrainsMono() else AppFont.OpenSans()
                 MaterialTheme(
                     colorScheme = if (darkMode) darkScheme else lightScheme,
-                    typography = if (monoFont) AppFont.JetbrainsMono.Typography else AppFont.OpenSans.Typography,
+                    typography = font.Typography,
                     shapes = AppShapes
                 ) {
                     Toaster(toasterState, darkTheme = darkMode, richColors = true, widthPolicy = { ToastWidthPolicy(0.dp, 450.dp) })

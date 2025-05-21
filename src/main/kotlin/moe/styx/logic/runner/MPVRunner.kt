@@ -3,6 +3,7 @@ package moe.styx.logic.runner
 import com.russhwolf.settings.get
 import io.github.xxfast.kstore.extensions.getOrEmpty
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.first
 import moe.styx.common.compose.files.Storage
 import moe.styx.common.compose.files.getBlocking
 import moe.styx.common.compose.http.Endpoints
@@ -10,6 +11,7 @@ import moe.styx.common.compose.http.login
 import moe.styx.common.compose.settings
 import moe.styx.common.compose.threads.RequestQueue
 import moe.styx.common.compose.utils.MpvPreferences
+import moe.styx.common.compose.viewmodels.MainDataViewModel
 import moe.styx.common.data.MediaEntry
 import moe.styx.common.data.MediaWatched
 import moe.styx.common.extension.currentUnixSeconds
@@ -23,17 +25,17 @@ import java.io.*
 
 var currentPlayer: MpvInstance? = null
 
-data class MpvFinishStatus(val statusCode: Int, val message: String = "") {
+data class MpvFinishStatus(val statusCode: Int, val message: String, val lastEntry: String?) {
     val isOK: Boolean = statusCode == 0
 }
 
-fun launchMPV(entry: MediaEntry, append: Boolean, onClose: (MpvFinishStatus) -> Unit = {}) {
+fun launchMPV(entry: MediaEntry, mainDataViewModel: MainDataViewModel, append: Boolean, onClose: (MpvFinishStatus) -> Unit = {}) {
     if (currentPlayer == null) {
         currentPlayer = MpvInstance()
-        currentPlayer!!.start(entry, onClose) { processCode ->
+        currentPlayer!!.start(entry, mainDataViewModel, onClose) { processCode ->
             currentPlayer = null
             if (processCode > 0) {
-                onClose(MpvFinishStatus(processCode, "Playback ended with a bad status code: $processCode"))
+                onClose(MpvFinishStatus(processCode, "Playback ended with a bad status code: $processCode", null))
             } else {
                 val currentEntry =
                     runBlocking { Storage.stores.entryStore.getOrEmpty() }.find { MpvStatus.current.file eqI it.GUID }
@@ -48,16 +50,16 @@ fun launchMPV(entry: MediaEntry, append: Boolean, onClose: (MpvFinishStatus) -> 
                             MpvStatus.current.percentage.toFloat()
                         )
                         RequestQueue.updateWatched(watched).first.join()
-                        onClose(MpvFinishStatus(0))
+                        onClose(MpvFinishStatus(0, "", currentEntry.GUID))
                     }
                 }
             }
             MpvStatus.current = MpvStatus.current.copy(file = "", paused = true)
         }
     } else {
-        val result = currentPlayer!!.play(entry, append)
+        val result = currentPlayer!!.play(entry, mainDataViewModel, append)
         if (!result)
-            onClose(MpvFinishStatus(-1, "Failed to add episode to the queue!"))
+            onClose(MpvFinishStatus(-1, "Failed to add episode to the queue!", null))
     }
 }
 
@@ -68,13 +70,20 @@ class MpvInstance {
     private var firstPrint = true
     var mpvSock = MPVSocket()
     var onClose: (MpvFinishStatus) -> Unit = {}
+    var viewModel: MainDataViewModel? = null
 
     fun createScope(): CoroutineScope {
         return CoroutineScope(instanceJob)
     }
 
-    fun start(mediaEntry: MediaEntry, onClose: (MpvFinishStatus) -> Unit = {}, onFinish: (Int) -> Unit): Boolean {
+    fun start(
+        mediaEntry: MediaEntry,
+        mainDataViewModel: MainDataViewModel,
+        onClose: (MpvFinishStatus) -> Unit = {},
+        onFinish: (Int) -> Unit
+    ): Boolean {
         this.onClose = onClose
+        this.viewModel = mainDataViewModel
         val systemMpv = settings["mpv-system", !isWindows]
         val useConfigRegardless = settings["mpv-system-styx-conf", !isWindows]
         val mpvExecutable = if (systemMpv || !isWindows) {
@@ -86,14 +95,14 @@ class MpvInstance {
             File(Files.getMpvDir(), "mpv.exe")
 
         if (mpvExecutable == null || !mpvExecutable.exists()) {
-            onClose(MpvFinishStatus(404, "MPV executable not found!"))
+            onClose(MpvFinishStatus(404, "MPV executable not found!", null))
             currentPlayer = null
             return false
         }
         val downloadedEntry = runBlocking { Storage.stores.downloadedStore.getOrEmpty() }.find { it.entryID eqI mediaEntry.GUID }
         val uri = downloadedEntry?.path ?: "${Endpoints.WATCH.url()}/${mediaEntry.GUID}?token=${login?.watchToken}"
         if ((login == null || login!!.watchToken.isBlank()) && downloadedEntry == null) {
-            onClose(MpvFinishStatus(403, "You are not logged in or online and don't have this downloaded!"))
+            onClose(MpvFinishStatus(403, "You are not logged in or online and don't have this downloaded!", null))
             currentPlayer = null
             return false
         }
@@ -108,8 +117,16 @@ class MpvInstance {
             "--force-window=yes"
         ) else mutableListOf(mpvExecutable.absolutePath, uri, pipe, "--keep-open=yes")
         val pref = MpvPreferences.getOrDefault()
-        commands.add("-slang=${pref.getSlangArg()}")
-        commands.add("-alang=${pref.getAlangArg()}")
+        val mediaPrefs = runCatching {
+            runBlocking {
+                val storage = viewModel?.storageFlow?.first()
+                storage?.let {
+                    viewModel?.getMediaStorageForID(mediaEntry.mediaID, storage)?.preferences
+                }
+            }
+        }.getOrNull()
+        commands.add("-slang=${pref.getSlangArg(mediaPrefs)}")
+        commands.add("-alang=${pref.getAlangArg(mediaPrefs)}")
         if (useConfigRegardless || !systemMpv) {
             commands.add("--config-dir=${Files.getMpvConfDir().absolutePath}")
             commands.add("--profile=${pref.getPlatformProfile()}")
@@ -172,7 +189,8 @@ class MpvInstance {
         return true
     }
 
-    fun play(mediaEntry: MediaEntry, append: Boolean = true): Boolean {
+    fun play(mediaEntry: MediaEntry, mainDataViewModel: MainDataViewModel, append: Boolean = true): Boolean {
+        this.viewModel = mainDataViewModel
         val current = MpvStatus.current.copy()
         val downloadedEntry = runBlocking { Storage.stores.downloadedStore.getOrEmpty() }.find { it.entryID eqI mediaEntry.GUID }
         val uri = downloadedEntry?.okioPath?.normalized()?.toString()?.replace("\\", "\\\\")
@@ -221,36 +239,40 @@ class MpvInstance {
             }
         }
     }
-}
 
+    fun attemptPlayNext() {
+        if (viewModel == null)
+            return
 
-fun attemptPlayNext() {
-    val entryList = runBlocking { Storage.stores.entryStore.getOrEmpty() }
-    val mediaList = runBlocking { Storage.stores.mediaStore.getOrEmpty() }
+        val storage = runCatching {
+            runBlocking { viewModel?.storageFlow?.first() }
+        }.getOrNull() ?: return
 
-    val entry = entryList.find { it.GUID == MpvStatus.current.file } ?: return
-    val parentMedia = mediaList.find { it.GUID == entry.mediaID } ?: return
+        val (entry, mediaStorage) = viewModel!!.getMediaStorageForEntryID(MpvStatus.current.file, storage)
 
-    val current = entry.entryNumber.toDoubleOrNull() ?: 0.0
-    val entries =
-        entryList.filter {
-            val num = it.entryNumber.toDoubleOrNull() ?: 0.0
-            it.mediaID == parentMedia.GUID && num > current
-        }
-    val next = entries.minByOrNull { it.entryNumber.toDoubleOrNull() ?: 9999.0 } ?: return
+        val current = entry.entryNumber.toDoubleOrNull() ?: 0.0
+        val entries =
+            mediaStorage.entries.filter {
+                val num = it.entryNumber.toDoubleOrNull() ?: 0.0
+                it.mediaID == mediaStorage.media.GUID && num > current
+            }
+        val next = entries.minByOrNull { it.entryNumber.toDoubleOrNull() ?: 9999.0 } ?: return
 
-    if (currentPlayer == null || !currentPlayer!!.mpvSock.command(
-            "show-text",
-            0,
-            listOf("Playing next episode in 5 seconds...", 1500),
-            waitForResponse = true
+        if (currentPlayer == null || !currentPlayer!!.mpvSock.command(
+                "show-text",
+                0,
+                listOf("Playing next episode in 5 seconds...", 1500),
+                waitForResponse = true
+            )
         )
-    )
-        return
+            return
 
-    currentPlayer!!.createScope().launch {
-        delay(5000L)
-        if (MpvStatus.current.eof)
-            launchMPV(next, true)
+        currentPlayer!!.createScope().launch {
+            delay(5000L)
+            if (MpvStatus.current.eof)
+                launchMPV(next, viewModel!!, true)
+        }
     }
 }
+
+
