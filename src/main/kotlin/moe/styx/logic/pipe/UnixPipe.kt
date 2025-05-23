@@ -18,9 +18,15 @@ class UnixPipe(val path: String) : Pipe() {
         socket.connect(AFUNIXSocketAddress.of(file))
     }
 
-    override val isConnected: Boolean = socket.isConnected
+    override val isConnected: Boolean
+        get() {
+            return socket.isConnected
+        }
 
-    override val isClosed: Boolean = socket.isClosed
+    override val isClosed: Boolean
+        get() {
+            return !socket.isConnected
+        }
 
     override fun writeLine(line: String) {
         val writer = socket.outputStream.writer()
