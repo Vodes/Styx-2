@@ -75,12 +75,19 @@ class OutdatedView(private val requestedVersion: String? = null) : Screen {
                 }, enabled = !shouldBeDownloading, modifier = Modifier.padding(12.dp)) {
                     Text("DEB")
                 }
+                Button({
+                    shouldBeDownloading = true
+                    runDownload("arch", toaster) { shouldBeDownloading = false }
+                }, enabled = !shouldBeDownloading, modifier = Modifier.padding(12.dp)) {
+                    Text("Arch")
+                }
             }
         }
     }
 
     private fun runDownload(platform: String, toaster: ToasterState, onDone: () -> Unit) = launchThreaded {
-        val outFile = File(Files.getDataDir().parentFile, "Installer." + if (isWindows) "msi" else platform)
+        val linuxExt = if (platform == "arch") "pkg.tar.zst" else platform
+        val outFile = File(Files.getDataDir().parentFile, "Installer." + if (isWindows) "msi" else linuxExt)
         val result = downloadFileStream(
             Endpoints.DOWNLOAD_BUILD_BASE.url() + "/$platform" + (if (requestedVersion != null) "/$requestedVersion" else "") + "?token=${login?.accessToken}",
             outFile.absolutePath.toPath()
