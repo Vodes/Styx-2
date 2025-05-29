@@ -11,6 +11,7 @@ import moe.styx.common.compose.http.login
 import moe.styx.common.compose.settings
 import moe.styx.common.compose.threads.RequestQueue
 import moe.styx.common.compose.utils.MpvPreferences
+import moe.styx.common.compose.utils.getExecutableFromPath
 import moe.styx.common.compose.viewmodels.MainDataViewModel
 import moe.styx.common.data.MediaEntry
 import moe.styx.common.data.MediaWatched

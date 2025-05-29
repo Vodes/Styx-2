@@ -10,16 +10,17 @@ import cafe.adriel.voyager.core.screen.Screen
 import com.dokar.sonner.*
 import kotlinx.coroutines.delay
 import moe.styx.Styx_2.BuildConfig
+import moe.styx.common.compose.components.AppShapes
 import moe.styx.common.compose.components.layout.MainScaffold
 import moe.styx.common.compose.http.Endpoints
 import moe.styx.common.compose.http.login
 import moe.styx.common.compose.utils.LocalToaster
+import moe.styx.common.compose.utils.openURI
 import moe.styx.common.http.DownloadResult
 import moe.styx.common.http.downloadFileStream
 import moe.styx.common.isWindows
 import moe.styx.common.util.launchThreaded
 import moe.styx.logic.Files
-import moe.styx.logic.runner.openURI
 import okio.Path.Companion.toPath
 import java.awt.Desktop
 import java.io.File
@@ -39,9 +40,14 @@ class OutdatedView(private val requestedVersion: String? = null) : Screen {
                     style = MaterialTheme.typography.headlineMedium
                 )
                 DownloadButtons(shouldBeDownloading)
-                Button({
-                    openURI("${BuildConfig.SITE_URL}/user")
-                }, colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary), modifier = Modifier.padding(10.dp)) {
+                Button(
+                    {
+                        openURI("${BuildConfig.SITE_URL}/user")
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary),
+                    modifier = Modifier.padding(10.dp),
+                    shape = AppShapes.medium
+                ) {
                     Text("Open ${BuildConfig.SITE}")
                 }
             }
@@ -59,26 +65,26 @@ class OutdatedView(private val requestedVersion: String? = null) : Screen {
                 Button({
                     shouldBeDownloading = true
                     runDownload("win", toaster) { shouldBeDownloading = false }
-                }, enabled = !shouldBeDownloading) {
+                }, enabled = !shouldBeDownloading, shape = AppShapes.medium) {
                     Text("Download and open installer")
                 }
             } else {
                 Button({
                     shouldBeDownloading = true
                     runDownload("rpm", toaster) { shouldBeDownloading = false }
-                }, enabled = !shouldBeDownloading, modifier = Modifier.padding(12.dp)) {
+                }, enabled = !shouldBeDownloading, modifier = Modifier.padding(12.dp), shape = AppShapes.medium) {
                     Text("RPM")
                 }
                 Button({
                     shouldBeDownloading = true
                     runDownload("deb", toaster) { shouldBeDownloading = false }
-                }, enabled = !shouldBeDownloading, modifier = Modifier.padding(12.dp)) {
+                }, enabled = !shouldBeDownloading, modifier = Modifier.padding(12.dp), shape = AppShapes.medium) {
                     Text("DEB")
                 }
                 Button({
                     shouldBeDownloading = true
                     runDownload("arch", toaster) { shouldBeDownloading = false }
-                }, enabled = !shouldBeDownloading, modifier = Modifier.padding(12.dp)) {
+                }, enabled = !shouldBeDownloading, modifier = Modifier.padding(12.dp), shape = AppShapes.medium) {
                     Text("Arch")
                 }
             }

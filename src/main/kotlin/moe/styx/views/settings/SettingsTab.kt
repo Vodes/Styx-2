@@ -18,6 +18,7 @@ import com.dokar.sonner.ToastType
 import com.dokar.sonner.ToasterDefaults
 import com.russhwolf.settings.get
 import com.russhwolf.settings.set
+import moe.styx.common.compose.components.AppShapes
 import moe.styx.common.compose.components.layout.MainScaffold
 import moe.styx.common.compose.components.misc.ExpandableSettings
 import moe.styx.common.compose.components.misc.ServerSelection
@@ -28,11 +29,11 @@ import moe.styx.common.compose.http.login
 import moe.styx.common.compose.settings
 import moe.styx.common.compose.utils.LocalGlobalNavigator
 import moe.styx.common.compose.utils.LocalToaster
+import moe.styx.common.compose.utils.openURI
 import moe.styx.common.isWindows
 import moe.styx.common.util.Log
 import moe.styx.components.misc.MpvVersionAndDownload
 import moe.styx.logic.Files
-import moe.styx.logic.runner.openURI
 import moe.styx.views.settings.sub.*
 import java.awt.Desktop
 import java.io.File
@@ -119,14 +120,14 @@ fun SettingsViewComponent() {
                             duration = ToasterDefaults.DurationLong
                         )
                     )
-                }, Modifier.padding(8.dp, 5.dp)) {
+                }, Modifier.padding(8.dp, 5.dp), shape = AppShapes.medium) {
                     Text("Open Log Folder")
                 }
                 Spacer(Modifier.height(5.dp))
             }
             Column(Modifier.settingsContainer()) {
                 Text("MPV Options", style = MaterialTheme.typography.headlineSmall, modifier = Modifier.padding(10.dp, 7.dp))
-                Button({ nav.push(MpvConfigView()) }, Modifier.padding(8.dp, 4.dp)) {
+                Button({ nav.push(MpvConfigView()) }, Modifier.padding(8.dp, 4.dp), shape = AppShapes.medium) {
                     Text("Open Mpv Configuration")
                 }
                 MpvVersionAndDownload()

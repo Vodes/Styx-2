@@ -107,7 +107,12 @@ class MovieDetailView(private val mediaID: String) : Screen {
                 }
 
                 Column(Modifier.fillMaxSize().verticalScroll(scrollState)) {
-                    StupidImageNameArea(mediaStorage) {
+                    StupidImageNameArea(
+                        mediaStorage,
+                        requiredMaxHeight = 535.dp,
+                        mappingIconModifier = Modifier.padding(8.dp, 5.dp, 8.dp, 12.dp).size(30.dp),
+                        enforceConstraints = true
+                    ) {
                         Column(Modifier.padding(6.dp).widthIn(0.dp, 560.dp).fillMaxWidth()) {
                             Row(Modifier.padding(3.dp).fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                                 IconButton({

@@ -11,7 +11,7 @@ import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import com.russhwolf.settings.get
 import com.russhwolf.settings.set
-import kotlinx.serialization.encodeToString
+import moe.styx.common.compose.components.AppShapes
 import moe.styx.common.compose.components.layout.MainScaffold
 import moe.styx.common.compose.components.misc.ExpandableSettings
 import moe.styx.common.compose.components.misc.Toggles
@@ -162,7 +162,8 @@ class MpvConfigView : Screen {
                     colors = ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.secondary,
                         contentColor = MaterialTheme.colorScheme.surface
-                    )
+                    ),
+                    shape = AppShapes.medium
                 ) {
                     Text("Save", style = MaterialTheme.typography.bodyLarge)
                 }
