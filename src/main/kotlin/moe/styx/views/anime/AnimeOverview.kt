@@ -19,6 +19,7 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.tab.*
 import com.dokar.sonner.TextToastAction
 import com.dokar.sonner.Toast
+import com.dokar.sonner.ToasterDefaults
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import moe.styx.Main
@@ -67,7 +68,8 @@ class AnimeOverview() : Screen {
                         "New Pre-Release version available: $ver",
                         action = TextToastAction("Download") {
                             nav.push(OutdatedView(ver))
-                        }
+                        },
+                        duration = ToasterDefaults.DurationLong
                     )
                 )
                 overviewSm.availablePreRelease = null
