@@ -8,6 +8,7 @@ import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import moe.styx.Main
 import moe.styx.common.compose.components.layout.MainScaffold
+import moe.styx.common.compose.utils.LocalGlobalNavigator
 
 class FontSizeView : Screen {
 
@@ -15,6 +16,12 @@ class FontSizeView : Screen {
     override fun Content() {
         MainScaffold(title = "Font Sizes") {
             Column {
+                val nav = LocalGlobalNavigator.current
+                Button({
+                    nav.push(RemoteTrackingTestingView())
+                }) {
+                    Text("Remote tracking")
+                }
                 Row {
                     Button({
                         Main.densityScale.value -= 0.25f
