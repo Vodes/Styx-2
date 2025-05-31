@@ -1,6 +1,5 @@
 package moe.styx.logic.utils
 
-import java.math.BigDecimal
 import java.math.RoundingMode
 import java.text.DecimalFormat
 import kotlin.math.floor
@@ -21,6 +20,3 @@ fun Long.readableSize(useBinary: Boolean = false): String {
     return "${(if (steps > 2) big else small).format(current)} ${units[steps]}"
 }
 
-fun Double.round(decimals: Int = 2): Double {
-    return BigDecimal(this).setScale(decimals, RoundingMode.HALF_UP).toDouble()
-}
