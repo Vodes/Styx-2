@@ -39,8 +39,7 @@ import moe.styx.common.compose.settings
 import moe.styx.common.compose.threads.DownloadQueue
 import moe.styx.common.compose.threads.Heartbeats
 import moe.styx.common.compose.threads.RequestQueue
-import moe.styx.common.compose.utils.LocalGlobalNavigator
-import moe.styx.common.compose.utils.LocalToaster
+import moe.styx.common.compose.utils.*
 import moe.styx.common.extension.formattedStrFile
 import moe.styx.common.http.getHttpClient
 import moe.styx.common.util.Log
@@ -152,10 +151,12 @@ fun main(args: Array<String>) = application {
                     shapes = AppShapes
                 ) {
                     Toaster(toasterState, darkTheme = darkMode, richColors = true, widthPolicy = { ToastWidthPolicy(0.dp, 450.dp) })
+                    val currentSizes = fetchWindowSize()
                     Navigator(AnimeOverview()) { navigator ->
                         CompositionLocalProvider(
                             LocalGlobalNavigator provides navigator,
                             LocalKamelConfig provides kamelConfig,
+                            LocalLayoutSize provides currentSizes,
                             LocalToaster provides toasterState
                         ) {
                             LaunchedEffect(popCalled) {
