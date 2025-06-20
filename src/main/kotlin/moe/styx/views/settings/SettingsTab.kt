@@ -4,9 +4,11 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.model.ScreenModel
@@ -19,6 +21,7 @@ import com.dokar.sonner.ToasterDefaults
 import com.russhwolf.settings.get
 import com.russhwolf.settings.set
 import moe.styx.common.compose.components.AppShapes
+import moe.styx.common.compose.components.buttons.IconButtonWithTooltip
 import moe.styx.common.compose.components.layout.MainScaffold
 import moe.styx.common.compose.components.misc.ExpandableSettings
 import moe.styx.common.compose.components.misc.ServerSelection
@@ -50,7 +53,12 @@ class SettingsView : Screen {
 
     @Composable
     override fun Content() {
-        MainScaffold(Modifier.fillMaxSize(), "Settings") {
+        val nav = LocalGlobalNavigator.current
+        MainScaffold(Modifier.fillMaxSize(), "Settings", actions = {
+            IconButtonWithTooltip(Icons.Default.Info, "View info about this app") {
+                nav.push(AboutView())
+            }
+        }) {
             SettingsViewComponent()
         }
     }
@@ -141,11 +149,24 @@ fun SettingsViewComponent() {
 
 @Composable
 fun LoggedInComponent(nav: Navigator) {
-    val primaryColor = MaterialTheme.colorScheme.primary
-    if (login != null) {
-        Text(
-            "Logged in as: ${login!!.name}",
-            Modifier.padding(10.dp)
-        )
+    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+        if (login != null) {
+            Text(
+                "Logged in as: ${login!!.name}",
+                Modifier.padding(10.dp)
+            )
+        }
+        Spacer(Modifier.weight(1f))
+        Button(
+            {
+                nav.push(AboutView())
+            },
+            shape = AppShapes.medium,
+            modifier = Modifier.padding(4.dp, 0.dp),
+            contentPadding = PaddingValues(12.dp, 6.dp)
+        ) {
+            Icon(Icons.Default.Info, "View info about this app", modifier = Modifier.padding(0.dp, 0.dp, 4.dp, 0.dp))
+            Text("About")
+        }
     }
 }

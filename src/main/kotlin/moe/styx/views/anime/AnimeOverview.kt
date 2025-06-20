@@ -41,6 +41,7 @@ import moe.styx.views.*
 import moe.styx.views.login.LoginView
 import moe.styx.views.other.FontSizeView
 import moe.styx.views.other.OutdatedView
+import moe.styx.views.settings.AboutView
 
 class AnimeOverview() : Screen {
 
@@ -80,7 +81,9 @@ class AnimeOverview() : Screen {
         val isLoading by sm.isLoadingStateFlow.collectAsState()
         val loadingState by sm.loadingStateFlow.collectAsState()
 
-        MainScaffold(title = BuildConfig.APP_NAME, addPopButton = false, addAnimatedTitleBackground = true, actions = {
+        MainScaffold(title = BuildConfig.APP_NAME, addPopButton = false, addAnimatedTitleBackground = true, titleClickable = {
+            nav.push(AboutView())
+        }, actions = {
             if (isLoading) {
                 TooltipArea({ Text(loadingState) }, Modifier.fillMaxHeight(.9f), delayMillis = 200) {
                     Row(Modifier.fillMaxHeight(), verticalAlignment = Alignment.CenterVertically) {
