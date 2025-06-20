@@ -17,33 +17,34 @@ The new native desktop client for yet another mediaserver stack.
 - Player controlled through json-ipc and reading stdout
 	<br>So you can also use your own install with your own config if desired
 
-## Screenshots
+## Screenshots / Videos
+<img src="https://github.com/user-attachments/assets/25ac4c0e-6b98-484f-8dc8-b3c3a9e37ae9" title="About view" height="500" />
+
 <details>
-	<summary>Click here</summary>
+	<summary><h3>More</h3></summary>
 
- #### Search
- <img src="https://i.ibb.co/jLyzCvt/java-MZr-Msm-Msu-Q.webp" title="search" height="500" />
+ ### Search
+ 
+https://github.com/user-attachments/assets/3cc195d6-6847-431e-8740-1438789b21a3
 
- #### Show detail view
- <img src="https://i.ibb.co/9ZsfxCV/java-Eo-VTH9-B4-Qg.webp" title="detail view" height="500" />
+ ### Show detail view & Tracking
 
- #### Settings
- <img src="https://i.ibb.co/xLvHqVK/java-NSb-QJld4qg.webp" title="settings" height="500" />
+https://github.com/user-attachments/assets/6dcacd94-bd68-4806-aace-5bb39fe98a7f
+
+ ### Settings
+
+https://github.com/user-attachments/assets/719b5b18-2a8c-4744-aba1-09e28cd1232e
  
 </details>
 
 ## How do I use this?
-<details>
-	<summary>Short answer</summary>
-	You don't.
-</details>
 
-<details>
-	<summary>Long answer</summary>
-  
+### Short answer
+You don't.
+
+### Long answer
 There is no public instance for this.<br>
 You will have to build every part of the [ecosystem](https://github.com/Vodes?tab=repositories&q=Styx&language=kotlin) yourself and run it on your own server.
-</details>
 
 
 ## How to run/build
