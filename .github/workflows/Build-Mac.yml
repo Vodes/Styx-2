@@ -20,7 +20,7 @@ jobs:
 
     steps:
       - name: "Checkout"
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: "Setup JDK"
         id: java
         uses: actions/setup-java@v5
@@ -37,7 +37,7 @@ jobs:
       - name: "Print and save sha384 for binaries"
         run: find ./build/compose -type f -iname "Styx*macos*release.jar" -exec shasum -a 384 {} \; | tee checksums.sha384
       - name: "Upload checksum file"
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: checksums.sha384
           path: checksums.sha384

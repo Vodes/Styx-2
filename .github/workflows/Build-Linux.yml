@@ -1,4 +1,4 @@
-name: "Run Linux Build (deb, rpm, jar)"
+name: "Run Linux Build (deb, rpm, pkg, jar)"
 on:
   workflow_dispatch:
     inputs:
@@ -20,10 +20,10 @@ jobs:
 
     steps:
       - name: "Checkout"
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: "Setup JDK"
         id: java
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: "jetbrains"
           java-version: "21"
@@ -46,27 +46,25 @@ jobs:
       - name: "Print and save sha384 for binaries"
         run: find ./build/compose -type f \( -iname Styx\*linux\*.jar -o -iname \*.deb -o -iname \*.rpm -o -iname \*.pkg.tar.zst \) -exec shasum -a 384 {} \; | tee checksums.sha384
       - name: "Upload checksum file"
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: checksums.sha384
           path: checksums.sha384
-      - name: "Upload installers to FTP"
-        uses: "SamKirkland/FTP-Deploy-Action@v4.3.4"
+      - name: "Upload installers to (s)FTP"
+        uses: "wangyucode/sftp-upload-action@v3"
         with:
-          server: ${{ secrets.FTP_HOST }}
+          host: ${{ secrets.FTP_HOST }}
+          port: ${{ secrets.FTP_PORT }}
           username: ${{ secrets.FTP_USER }}
           password: ${{ secrets.FTP_PASS }}
-          protocol: ftps
-          security: loose
-          local-dir: "./build/compose/binaries/installers/"
-          server-dir: "/${{ inputs.version }}/linux/binaries/"
-      - name: "Upload jars to FTP"
-        uses: "SamKirkland/FTP-Deploy-Action@v4.3.4"
+          localDir: "./build/compose/binaries/installers/"
+          remoteDir: "/${{ inputs.version }}/linux/binaries/"
+      - name: "Upload jars to (s)FTP"
+        uses: "wangyucode/sftp-upload-action@v3"
         with:
-          server: ${{ secrets.FTP_HOST }}
+          host: ${{ secrets.FTP_HOST }}
+          port: ${{ secrets.FTP_PORT }}
           username: ${{ secrets.FTP_USER }}
           password: ${{ secrets.FTP_PASS }}
-          protocol: ftps
-          security: loose
-          local-dir: "./build/compose/jars/"
-          server-dir: "/${{ inputs.version }}/linux/jars/"
+          localDir: "./build/compose/jars/"
+          remoteDir: "/${{ inputs.version }}/linux/jars/"
