@@ -1,0 +1,52 @@
+name: "Run MacOS Build (just jar)"
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Mostly just the version folder it will be uploaded to."
+        required: true
+        type: string
+
+jobs:
+  build:
+    runs-on: macos-15
+    env:
+      STYX_BASEURL: ${{ secrets.STYX_BASEURL }}
+      STYX_IMAGEURL: ${{ secrets.STYX_IMAGEURL }}
+      STYX_SITEURL: ${{ secrets.STYX_SITEURL }}
+      STYX_APP_GUID: ${{ secrets.STYX_APP_GUID }}
+      STYX_SECRET: ${{ secrets.STYX_SECRET }}
+      STYX_DISCORDCLIENT: ${{ secrets.STYX_DISCORDCLIENT }}
+
+    steps:
+      - name: "Checkout"
+        uses: actions/checkout@v4
+      - name: "Setup JDK"
+        id: java
+        uses: actions/setup-java@v5
+        with:
+          distribution: "temurin"
+          java-version: "21"
+          cache: "gradle"
+      - name: "Build UberJar"
+        env:
+          JAVA_HOME: ${{ steps.java.outputs.path }}
+        run: |
+          chmod u+x ./gradlew
+          ./gradlew packageReleaseUberJarForCurrentOS
+      - name: "Print and save sha384 for binaries"
+        run: find ./build/compose -type f -iname "Styx*macos*release.jar" -exec shasum -a 384 {} \; | tee checksums.sha384
+      - name: "Upload checksum file"
+        uses: actions/upload-artifact@v4
+        with:
+          name: checksums.sha384
+          path: checksums.sha384
+      - name: "Upload jars to (s)FTP"
+        uses: "wangyucode/sftp-upload-action@v3"
+        with:
+          host: ${{ secrets.FTP_HOST }}
+          port: ${{ secrets.FTP_PORT }}
+          username: ${{ secrets.FTP_USER }}
+          password: ${{ secrets.FTP_PASS }}
+          localDir: "./build/compose/jars/"
+          remoteDir: "/${{ inputs.version }}/mac/jars/"

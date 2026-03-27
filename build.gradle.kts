@@ -70,7 +70,7 @@ compose.desktop {
         }
         nativeDistributions {
             modules(*jlinkModules)
-            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb, TargetFormat.Rpm, TargetFormat.AppImage)
+            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb, TargetFormat.Rpm)
             packageName = "Styx 2"
             copyright = "© 2024 Vodes & Styx contributors. All rights reserved."
             vendor = "Vodes & Styx contributors"
