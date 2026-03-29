@@ -25,7 +25,6 @@ import io.kamel.image.config.LocalKamelConfig
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.debounce
-import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import moe.styx.Styx_2.BuildConfig
@@ -50,6 +49,7 @@ import moe.styx.logic.runner.currentPlayer
 import moe.styx.views.anime.AnimeOverview
 import java.io.File
 import java.io.PrintStream
+import kotlin.time.Clock
 
 object Main {
     var isUiModeDark: MutableState<Boolean> = mutableStateOf(true)

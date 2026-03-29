@@ -1,5 +1,4 @@
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
-import org.jetbrains.compose.reload.ComposeHotRun
 import org.jetbrains.kotlin.compose.compiler.gradle.ComposeFeatureFlag
 import java.nio.file.Paths
 
@@ -13,11 +12,11 @@ plugins {
 }
 
 group = "moe.styx"
-version = "0.2.2-beta1"
+version = "0.2.2-beta2"
 
 // Necessary to have working Windows installers for rc/beta/etc versions.
 // Count up by one for every release until a new MINOR version bump.
-val subVersionClassifier = 4
+val subVersionClassifier = 5
 
 repositories {
     google()
@@ -92,6 +91,11 @@ compose.desktop {
                     if (it.startsWith("0.")) it.replaceFirst("0.", "1.") else it
                 }.split("-")[0]
                 appStore = false
+                dockName = project.name
+                setDockNameSameAsPackageName = false
+                signing {
+                    sign = false
+                }
                 iconFile.set(project.file("src/main/resources/icons/icon.icns"))
             }
         }
@@ -100,10 +104,6 @@ compose.desktop {
 
 composeCompiler {
     featureFlags.add(ComposeFeatureFlag.OptimizeNonSkippingGroups)
-}
-
-tasks.withType<ComposeHotRun>().configureEach {
-    mainClass.set("moe.styx.MainKt")
 }
 
 buildConfig {
