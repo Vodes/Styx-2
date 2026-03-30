@@ -17,10 +17,13 @@ jobs:
       STYX_APP_GUID: ${{ secrets.STYX_APP_GUID }}
       STYX_SECRET: ${{ secrets.STYX_SECRET }}
       STYX_DISCORDCLIENT: ${{ secrets.STYX_DISCORDCLIENT }}
+      U2C_SCRIPT: https://raw.githubusercontent.com/9001/copyparty/refs/heads/hovudstraum/bin/u2c.py
 
     steps:
       - name: "Checkout"
         uses: actions/checkout@v6
+      - name: "Setup uv"
+        uses: astral-sh/setup-uv@cec208311dfd045dd5311c1add060b2062131d57 # v8.0.0
       - name: "Setup JDK"
         id: java
         uses: actions/setup-java@v5
@@ -48,21 +51,10 @@ jobs:
         with:
           name: checksums.sha384
           path: checksums.sha384
-      - name: "Upload binaries to (s)FTP"
-        uses: "wangyucode/sftp-upload-action@v3"
-        with:
-          host: ${{ secrets.FTP_HOST }}
-          port: ${{ secrets.FTP_PORT }}
-          username: ${{ secrets.FTP_USER }}
-          password: ${{ secrets.FTP_PASS }}
-          localDir: "./build/compose/binaries/main-release/"
-          remoteDir: "/${{ inputs.version }}/win/binaries/"
-      - name: "Upload jars to (s)FTP"
-        uses: "wangyucode/sftp-upload-action@v3"
-        with:
-          host: ${{ secrets.FTP_HOST }}
-          port: ${{ secrets.FTP_PORT }}
-          username: ${{ secrets.FTP_USER }}
-          password: ${{ secrets.FTP_PASS }}
-          localDir: "./build/compose/jars/"
-          remoteDir: "/${{ inputs.version }}/win/jars/"
+      - name: "Upload binaries to copyparty"
+        run: |
+          uv run -p 3.12 ${{ env.U2C_SCRIPT }} -a ${{ secrets.COPYPARTY_PASS }} "${{ secrets.COPYPARTY_STYX_ROOT }}/builds/${{ inputs.version }}/win/binaries" "./build/compose/binaries/main-release/"
+
+      - name: "Upload jars to copyparty"
+        run: |
+          uv run -p 3.12 ${{ env.U2C_SCRIPT }} -a ${{ secrets.COPYPARTY_PASS }} "${{ secrets.COPYPARTY_STYX_ROOT }}/builds/${{ inputs.version }}/win/jars" "./build/compose/jars/"
