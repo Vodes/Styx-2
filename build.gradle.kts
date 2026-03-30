@@ -12,11 +12,11 @@ plugins {
 }
 
 group = "moe.styx"
-version = "0.2.2-beta2"
+version = "0.2.2-beta3"
 
 // Necessary to have working Windows installers for rc/beta/etc versions.
 // Count up by one for every release until a new MINOR version bump.
-val subVersionClassifier = 5
+val subVersionClassifier = 6
 
 repositories {
     google()
