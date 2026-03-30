@@ -56,6 +56,7 @@ val jlinkModules = arrayOf(
     "java.management",
     "java.net.http",
     "java.prefs",
+    "java.rmi",
     "jdk.unsupported",
     "jdk.crypto.ec"
 )

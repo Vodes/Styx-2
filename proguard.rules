@@ -102,10 +102,17 @@
 -keep class okio.**  { *; }
 -keep class okhttp.**  { *; }
 -keep class okhttp3.**  { *; }
+-keep class com.dokar.sonner.**  { *; }
+-keep class cafe.adriel.voyager.**  { *; }
 
 
 -keep class com.sun.jna.** { *; }
 -keep class * implements com.sun.jna.** { *; }
+
+# Mordant discovers terminal backends via ServiceLoader metadata.
+# The service descriptor survives jar flattening, so the provider classes
+# must not be removed by shrinking.
+-keep class com.github.ajalt.mordant.terminal.terminalinterface.** { *; }
 
 -dontwarn java.awt.*
 -keep class com.sun.jna.* { *; }
