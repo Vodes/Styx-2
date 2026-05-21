@@ -5,11 +5,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import cafe.adriel.voyager.core.screen.Screen
 import moe.styx.common.compose.components.layout.MainScaffold
 import moe.styx.common.compose.components.tracking.common.CommonMediaListStatus
 import moe.styx.common.compose.components.tracking.common.CommonMediaStatus
 import moe.styx.common.compose.components.tracking.common.RemoteMediaComponent
+import moe.styx.common.compose.navigation.Screen
 import pw.vodes.anilistkmp.graphql.type.ScoreFormat
 import kotlin.random.Random
 

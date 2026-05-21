@@ -8,7 +8,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import cafe.adriel.voyager.core.screen.Screen
 import com.russhwolf.settings.get
 import com.russhwolf.settings.set
 import moe.styx.common.compose.components.AppShapes
@@ -16,6 +15,7 @@ import moe.styx.common.compose.components.layout.MainScaffold
 import moe.styx.common.compose.components.misc.ExpandableSettings
 import moe.styx.common.compose.components.misc.Toggles
 import moe.styx.common.compose.components.misc.Toggles.settingsContainer
+import moe.styx.common.compose.navigation.Screen
 import moe.styx.common.compose.settings
 import moe.styx.common.compose.utils.*
 import moe.styx.common.isWindows

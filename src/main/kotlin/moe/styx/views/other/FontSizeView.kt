@@ -5,9 +5,9 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import cafe.adriel.voyager.core.screen.Screen
 import moe.styx.Main
 import moe.styx.common.compose.components.layout.MainScaffold
+import moe.styx.common.compose.navigation.Screen
 import moe.styx.common.compose.utils.LocalGlobalNavigator
 
 class FontSizeView : Screen {

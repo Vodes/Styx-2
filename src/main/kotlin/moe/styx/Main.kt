@@ -1,8 +1,5 @@
 package moe.styx
 
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.VisibilityThreshold
-import androidx.compose.animation.core.spring
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -14,8 +11,6 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.*
 import androidx.compose.ui.window.*
-import cafe.adriel.voyager.navigator.Navigator
-import cafe.adriel.voyager.transitions.SlideTransition
 import com.dokar.sonner.ToastWidthPolicy
 import com.dokar.sonner.Toaster
 import com.dokar.sonner.rememberToasterState
@@ -34,6 +29,8 @@ import moe.styx.common.compose.components.*
 import moe.styx.common.compose.extensions.kamelConfig
 import moe.styx.common.compose.http.Endpoints
 import moe.styx.common.compose.http.sendObject
+import moe.styx.common.compose.navigation.Navigator
+import moe.styx.common.compose.navigation.StyxCurrentScreen
 import moe.styx.common.compose.settings
 import moe.styx.common.compose.threads.DownloadQueue
 import moe.styx.common.compose.threads.Heartbeats
@@ -165,12 +162,7 @@ fun main(args: Array<String>) = application {
                                     popCalled = false
                                 }
                             }
-                            SlideTransition(
-                                navigator, animationSpec = spring(
-                                    stiffness = Spring.StiffnessMedium,
-                                    visibilityThreshold = IntOffset.VisibilityThreshold
-                                )
-                            )
+                            StyxCurrentScreen(navigator)
 
                             val debouncedWindowSize by Main.windowSizeFlow.debounce(500L).collectAsState(null)
                             LaunchedEffect(debouncedWindowSize) {

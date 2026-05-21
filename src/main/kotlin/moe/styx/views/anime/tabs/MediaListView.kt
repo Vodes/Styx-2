@@ -5,10 +5,6 @@ import androidx.compose.material.icons.filled.Movie
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.Tv
 import androidx.compose.runtime.*
-import cafe.adriel.voyager.core.model.rememberNavigatorScreenModel
-import cafe.adriel.voyager.core.screen.ScreenKey
-import cafe.adriel.voyager.navigator.tab.Tab
-import cafe.adriel.voyager.navigator.tab.TabOptions
 import com.russhwolf.settings.get
 import kotlinx.coroutines.runBlocking
 import moe.styx.common.compose.components.search.MediaSearch
@@ -16,6 +12,10 @@ import moe.styx.common.compose.extensions.createTabOptions
 import moe.styx.common.compose.extensions.getDistinctCategories
 import moe.styx.common.compose.extensions.getDistinctGenres
 import moe.styx.common.compose.files.Stores
+import moe.styx.common.compose.navigation.ScreenKey
+import moe.styx.common.compose.navigation.Tab
+import moe.styx.common.compose.navigation.TabOptions
+import moe.styx.common.compose.navigation.rememberNavigatorScreenModel
 import moe.styx.common.compose.settings
 import moe.styx.common.compose.utils.LocalGlobalNavigator
 import moe.styx.common.compose.utils.SearchState
@@ -26,15 +26,18 @@ import moe.styx.common.extension.toBoolean
 import moe.styx.views.barWithListComp
 
 class MediaListView(private val movies: Boolean = false, private val favourites: Boolean = false) : Tab {
+    override val index: UInt
+        get() = if (favourites) 2u else if (movies) 1u else 0u
+
     override val options: TabOptions
         @Composable
         get() {
             return if (favourites)
-                createTabOptions("Favourites", Icons.Default.Star)
+                createTabOptions("Favourites", Icons.Default.Star, index)
             else if (movies)
-                createTabOptions("Movies", Icons.Default.Movie)
+                createTabOptions("Movies", Icons.Default.Movie, index)
             else
-                createTabOptions("Shows", Icons.Default.Tv)
+                createTabOptions("Shows", Icons.Default.Tv, index)
         }
 
     override val key: ScreenKey

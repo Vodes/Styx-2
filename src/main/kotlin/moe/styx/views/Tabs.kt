@@ -6,10 +6,10 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import cafe.adriel.voyager.navigator.tab.Tab
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.debounce
 import moe.styx.common.compose.components.search.MediaSearch
+import moe.styx.common.compose.navigation.Tab
 import moe.styx.common.compose.utils.SearchState
 import moe.styx.common.compose.viewmodels.ListPosViewModel
 import moe.styx.common.compose.viewmodels.MainDataViewModelStorage

@@ -8,7 +8,7 @@ import moe.styx.common.compose.extensions.SimpleTab
 import moe.styx.common.compose.utils.LocalGlobalNavigator
 import moe.styx.logic.utils.pushMediaView
 
-class ScheduleView : SimpleTab("Schedule", Icons.Default.CalendarViewWeek) {
+class ScheduleView : SimpleTab("Schedule", Icons.Default.CalendarViewWeek, 3u) {
 
     @Composable
     override fun Content() {

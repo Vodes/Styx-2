@@ -12,11 +12,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.unit.dp
-import cafe.adriel.voyager.core.model.rememberNavigatorScreenModel
-import cafe.adriel.voyager.core.model.rememberScreenModel
-import cafe.adriel.voyager.core.model.screenModelScope
-import cafe.adriel.voyager.core.screen.Screen
-import cafe.adriel.voyager.navigator.tab.*
 import com.dokar.sonner.TextToastAction
 import com.dokar.sonner.Toast
 import com.dokar.sonner.ToasterDefaults
@@ -30,6 +25,15 @@ import moe.styx.common.compose.components.layout.MainScaffold
 import moe.styx.common.compose.components.misc.OnlineUsersIcon
 import moe.styx.common.compose.files.Storage
 import moe.styx.common.compose.http.login
+import moe.styx.common.compose.navigation.CurrentTab
+import moe.styx.common.compose.navigation.LaunchedEffectWhenCurrentScreen
+import moe.styx.common.compose.navigation.LocalTabNavigator
+import moe.styx.common.compose.navigation.Screen
+import moe.styx.common.compose.navigation.Tab
+import moe.styx.common.compose.navigation.TabNavigator
+import moe.styx.common.compose.navigation.rememberNavigatorScreenModel
+import moe.styx.common.compose.navigation.rememberScreenModel
+import moe.styx.common.compose.navigation.screenModelScope
 import moe.styx.common.compose.utils.LocalGlobalNavigator
 import moe.styx.common.compose.utils.LocalToaster
 import moe.styx.common.compose.utils.ServerStatus
@@ -53,12 +57,16 @@ class AnimeOverview() : Screen {
 
         val nav = LocalGlobalNavigator.current
 
-        if (overviewSm.isOutdated == true) {
-            nav.replaceAll(OutdatedView())
+        LaunchedEffectWhenCurrentScreen(overviewSm.isOutdated) {
+            if (overviewSm.isOutdated == true) {
+                nav.replaceAll(OutdatedView())
+            }
         }
 
-        if (overviewSm.isLoggedIn == false && ServerStatus.lastKnown == ServerStatus.UNAUTHORIZED) {
-            nav.replaceAll(LoginView())
+        LaunchedEffectWhenCurrentScreen(overviewSm.isLoggedIn, ServerStatus.lastKnown) {
+            if (overviewSm.isLoggedIn == false && ServerStatus.lastKnown == ServerStatus.UNAUTHORIZED) {
+                nav.replaceAll(LoginView())
+            }
         }
 
         LaunchedEffect(overviewSm.availablePreRelease) {

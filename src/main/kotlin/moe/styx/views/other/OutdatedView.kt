@@ -6,7 +6,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import cafe.adriel.voyager.core.screen.Screen
 import com.dokar.sonner.*
 import kotlinx.coroutines.delay
 import moe.styx.Styx_2.BuildConfig
@@ -14,6 +13,7 @@ import moe.styx.common.compose.components.AppShapes
 import moe.styx.common.compose.components.layout.MainScaffold
 import moe.styx.common.compose.http.Endpoints
 import moe.styx.common.compose.http.login
+import moe.styx.common.compose.navigation.Screen
 import moe.styx.common.compose.utils.LocalToaster
 import moe.styx.common.compose.utils.openURI
 import moe.styx.common.http.DownloadResult

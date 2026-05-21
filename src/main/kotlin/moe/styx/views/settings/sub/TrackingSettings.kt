@@ -8,13 +8,13 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import cafe.adriel.voyager.core.model.rememberNavigatorScreenModel
 import com.russhwolf.settings.get
 import com.russhwolf.settings.set
 import moe.styx.Styx_2.BuildConfig
 import moe.styx.common.compose.components.AppShapes
 import moe.styx.common.compose.components.misc.Toggles
 import moe.styx.common.compose.components.tracking.common.TrackingConnectionIndicator
+import moe.styx.common.compose.navigation.rememberNavigatorScreenModel
 import moe.styx.common.compose.settings
 import moe.styx.common.compose.utils.LocalGlobalNavigator
 import moe.styx.common.compose.utils.openURI

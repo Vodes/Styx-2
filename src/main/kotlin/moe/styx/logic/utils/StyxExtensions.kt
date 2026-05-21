@@ -1,6 +1,6 @@
 package moe.styx.logic.utils
 
-import cafe.adriel.voyager.navigator.Navigator
+import moe.styx.common.compose.navigation.Navigator
 import moe.styx.common.data.Media
 import moe.styx.common.extension.toBoolean
 import moe.styx.views.anime.AnimeDetailView
